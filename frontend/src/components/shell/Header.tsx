@@ -9,5 +9,5 @@ function label(loading: boolean, error: unknown, status?: string) {
 export function Header() {
   const health = useHealth();
   const readiness = useReadiness();
-  return <header><div><strong>Evidence browser</strong><p>Measurements are shown as source-native records, not conclusions.</p></div><div className="api-status" aria-live="polite"><span>{label(health.isLoading || readiness.isLoading, health.error ?? readiness.error, readiness.data?.status)}</span><small>liveness: {health.isLoading ? "checking" : health.isError ? "connection failed" : health.data?.status ?? "not reported"}</small>{(health.isError || readiness.isError) && <button onClick={() => { void health.refetch(); void readiness.refetch(); }}>Retry connection</button>}</div></header>;
+  return <header><div><strong>Security evaluation workspace</strong><p>Run a model, follow its evidence, and keep every conclusion traceable.</p></div><div className="api-status" aria-live="polite"><span>{label(health.isLoading || readiness.isLoading, health.error ?? readiness.error, readiness.data?.status)}</span><small>{health.isLoading ? "checking connection" : health.isError ? "connection failed" : "local workspace"}</small>{(health.isError || readiness.isError) && <button onClick={() => { void health.refetch(); void readiness.refetch(); }}>Retry connection</button>}</div></header>;
 }
