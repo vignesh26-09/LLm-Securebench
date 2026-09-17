@@ -6,6 +6,20 @@ This implementation replaces the unsafe legacy assumption that independent promp
 
 The implementation does not fabricate scientific results. The new runner stores observations and metadata only; behavioral measurements must be supplied by an independently configured measurement stage. A missing measurement remains failed/unavailable and cannot become a numeric RC or SAEA value.
 
+### Metric authenticity check
+
+| Displayed quantity | What is actually measured | Status after review | Safe interpretation |
+|---|---|---|---|
+| Local “model score” | Equal-weight aggregate of three Layer 1 detector-native signals on completed example evaluations | `engineering_only` | Detector-absence summary; not safety, quality, ranking, or selection evidence |
+| Layer 1 signal | Literal keyword/regex/pattern rule match | `uncalibrated` | Rule observation only |
+| Layer 2 judge | Structured local judge measurement | `not_validated` | Measurement only; cannot replace human labels |
+| BSDA / RC / SAEA | Existing formulas over supplied behavioral states | `unavailable` until controlled measured inputs exist | Formula and guard implementation only |
+| DQI semantic novelty | Embedding-derived novelty proxy | `unavailable` when embeddings are absent | Never treated as zero |
+
+The chart below separates implemented engineering evidence from evidence that is still blocked for scientific conclusions. It is a readiness classification, not a score chart.
+
+![Scientific-readiness gates](../artifacts/paper_evidence/figure3_readiness_gates.svg)
+
 ## 2. Files Added
 
 - `core/experiments/models.py`, `runner.py`, `trajectory.py`, `specification.py`, `manifest.py`, and `persistence.py`: controlled experiment contracts, append-only JSON/SQL evidence, metric-input bridge, and manifest support.
@@ -56,6 +70,10 @@ Recovery probes are generated after the actual sequence attack in the same conve
 
 The generated JailbreakBench artifact recomputes from the persisted CSV/results: N=300, usable N=295, coverage=98.333%, agreement=53.898%, κ=0.211261, TN=51/FP=135/FN=1/TP=108. Its status remains `not_validated`; the original result did not retain a judge digest, and that absence is explicit.
 
+The confusion-matrix chart below is derived from those persisted records. It shows why the current judge must not be represented as human-equivalent.
+
+![JailbreakBench judge-versus-human confusion matrix](../artifacts/paper_evidence/figure2_judge_human_confusion.svg)
+
 ## 11. Statistical Analysis
 
 `paired_difference_analysis` accepts only complete pre-matched pairs, records exclusions/missingness, reports mean paired differences, paired standardized effect size when defined, and deterministic percentile bootstrap intervals. It returns `unsupported` when no complete pairs and `insufficient_data` when uncertainty is not estimable. `grouped_paired_analyses` supports model, family, condition, or another caller-defined grouping key.
@@ -86,7 +104,7 @@ The new suite verifies complete sequential history; independent isolated history
 
 ## 18. Test Results
 
-Baseline: 138 passed. Final suite: 151 passed, 0 failed, 0 skipped. Collection: 151 tests. Focused protocol suite: 43 passed before final additions; focused paper/protocol/regression suite: 36 passed after legacy-runner correction. The deterministic end-to-end smoke completed and correctly reported DQI as unavailable without embeddings. Coverage was not run because `pytest-cov` is not installed; no dependency was installed.
+Baseline: 138 passed. Final suite: 152 passed, 0 failed, 0 skipped. Collection: 152 tests. Focused protocol suite: 43 passed before final additions; focused paper/protocol/regression suite: 36 passed after legacy-runner correction. The deterministic end-to-end smoke completed and correctly reported DQI as unavailable without embeddings. Coverage was not run because `pytest-cov` is not installed; no dependency was installed.
 
 ## 19. Real-Provider Smoke-Test Status
 

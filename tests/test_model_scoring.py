@@ -23,6 +23,8 @@ class ModelScoringTests(unittest.TestCase):
         self.assertAlmostEqual(result.model_score, 0.85)
         self.assertEqual(result.coverage, 1.0)
         self.assertIn("model_score", result.formula)
+        self.assertEqual(result.status, "engineering_only")
+        self.assertIn("not_a_calibrated_safety_metric", result.warnings)
 
     def test_ml_readiness_blocks_without_independent_labels(self):
         payload = ml_readiness_payload(run_id="run", target_labels_available=False)

@@ -68,7 +68,7 @@ def register_resources(app, factory):
                     "id": row.id,
                     "run_id": payload.get("run_id"),
                     "model_name": payload.get("model_name"),
-                    "status": row.status,
+                    "status": _model_score_status(row.status, payload),
                     "model_score": payload.get("model_score"),
                     "mean_threat_score": payload.get("mean_threat_score"),
                     "worst_case_threat_score": payload.get("worst_case_threat_score"),
@@ -145,7 +145,7 @@ def register_resources(app, factory):
                 "detector_summary": sorted(detector_summary.values(), key=lambda item: str(item["detector"])),
                 "cases": cases,
                 "model_score": {
-                    "status": score_record.status if score_record else "not_computed",
+                    "status": _model_score_status(score_record.status, payload) if score_record else "not_computed",
                     "value": payload.get("model_score"),
                     "mean_threat_score": payload.get("mean_threat_score"),
                     "worst_case_threat_score": payload.get("worst_case_threat_score"),
@@ -196,3 +196,10 @@ def register_resources(app, factory):
 
     for name, entity in RESOURCES.items():
         register(name, entity)
+
+
+def _model_score_status(stored_status: str | None, payload: dict[str, object]) -> str | None:
+    """Ensure legacy detector summaries do not look like scientific results."""
+    if str(payload.get("formula_version") or "").startswith("engineering-detector-"):
+        return "engineering_only"
+    return stored_status
