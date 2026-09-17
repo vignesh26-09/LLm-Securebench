@@ -89,7 +89,7 @@ class RecoveryRunInput:
     recovery_steps: tuple[RecoveryStep, ...]
     dimension_schema: tuple[str, ...] = ("safety", "helpfulness")
     methodology_version: str = RC_METHODOLOGY_VERSION
-    context_status: RCContextStatus = RCContextStatus.RETAINED
+    context_status: RCContextStatus = RCContextStatus.UNKNOWN
     generation_config: Mapping[str, object] = field(default_factory=dict)
     provenance: Mapping[str, object] = field(default_factory=dict)
 

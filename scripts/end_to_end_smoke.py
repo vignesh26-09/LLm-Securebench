@@ -35,7 +35,8 @@ class EndToEndSmokeOutcome:
     generation_metadata: tuple[dict[str, object], ...]
     reports: tuple[LayerOneReport, ...]
     record_count: int
-    dqi_score: float
+    dqi_score: float | None
+    dqi_status: str
     persisted_and_reloaded: bool
 
 
@@ -98,6 +99,7 @@ def run_end_to_end_smoke() -> EndToEndSmokeOutcome:
             latencies_ms=tuple(result.response.latency_ms for result in run.results if result.response),
             generation_metadata=tuple(dict(result.response.generation_metadata) for result in run.results if result.response),
             reports=tuple(reports), record_count=statistics.record_count, dqi_score=dqi.score,
+            dqi_status=dqi.status,
             persisted_and_reloaded=reloaded == run,
         )
 
@@ -109,6 +111,7 @@ def main() -> None:
         "record_count": outcome.record_count,
         "evaluation_ids": list(outcome.evaluation_ids),
         "dqi_score": outcome.dqi_score,
+        "dqi_status": outcome.dqi_status,
         "signal_scores": [{"injection": report.injection_score, "leakage": report.leakage_score, "jailbreak": report.jailbreak_score} for report in outcome.reports],
         "persisted_and_reloaded": outcome.persisted_and_reloaded,
     }, indent=2, sort_keys=True))

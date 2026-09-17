@@ -77,9 +77,11 @@ class DqiWeights:
 
 @dataclass(frozen=True, slots=True)
 class DatasetQualityIndex:
-    score: float
-    components: Mapping[str, float]
+    score: float | None
+    components: Mapping[str, float | None]
     weights: DqiWeights
+    status: str = "computed"
+    reason: str | None = None
 
 
 def calculate_dqi(dataset: Dataset, *, embeddings: Sequence[Embedding | None] | None = None, weights: DqiWeights = DqiWeights()) -> DatasetQualityIndex:
@@ -89,11 +91,11 @@ def calculate_dqi(dataset: Dataset, *, embeddings: Sequence[Embedding | None] | 
     category_values = [record.category for record in dataset.records]
     difficulty_values = [record.difficulty for record in dataset.records]
     coverage = calculate_coverage_statistics(dataset)
-    components = {
+    components: dict[str, float | None] = {
         "duplicate_quality": 1.0 - (duplicate_records / records) if records else 0.0,
         "coverage": coverage.prompt_coverage,
         "entropy": normalized_entropy(category_values),
-        "novelty": estimate_novelty(embeddings) if embeddings is not None else 0.0,
+        "novelty": estimate_novelty(embeddings) if embeddings is not None else None,
         "difficulty": normalized_entropy(difficulty_values),
         "balance": analyze_category_balance(dataset).normalized_entropy,
     }
@@ -101,5 +103,10 @@ def calculate_dqi(dataset: Dataset, *, embeddings: Sequence[Embedding | None] | 
     if any(weight < 0 for weight in weight_map.values()):
         raise ValueError("DQI weights must be non-negative")
     total_weight = sum(weight_map.values())
-    score = sum(components[name] * weight for name, weight in weight_map.items()) / total_weight if total_weight else 0.0
-    return DatasetQualityIndex(score, components, weights)
+    if components["novelty"] is None and weight_map["novelty"] > 0:
+        return DatasetQualityIndex(None, components, weights, "unavailable", "semantic_embeddings_unavailable")
+    score = (sum(float(components[name]) * weight for name, weight in weight_map.items() if weight > 0) / total_weight
+             if total_weight else None)
+    return DatasetQualityIndex(score, components, weights,
+        "computed" if score is not None else "undefined",
+        None if score is not None else "total_weight_zero")

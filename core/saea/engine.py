@@ -13,6 +13,7 @@ from core.saea.models import (
     ResultStatus, SAEAInput, SAEAResult, SequentialTrajectory, ShapleyAttributionResult,
     StateTransition, SynergyResult,
 )
+from core.experiments.models import validate_control_match
 
 
 class SAEAEngine:
@@ -161,4 +162,10 @@ def _isolated_delta(attack: AttackInstance, dimensions: set[str]) -> tuple[float
         return None, "isolated_state_unavailable_or_incompatible"
     if any(_compatible_state_reason(state, dimensions) for state in attack.isolated_baseline):
         return None, "isolated_baseline_unavailable_or_incompatible"
+    if (attack.sequential_identity is None) != (attack.isolated_identity is None):
+        return None, "missing_control_match_identity"
+    if attack.sequential_identity is not None and attack.isolated_identity is not None:
+        match = validate_control_match(attack.sequential_identity, attack.isolated_identity)
+        if not match.matched:
+            return None, match.reason
     return _distance(_mean_vector(attack.isolated_baseline), attack.isolated_state.scores, dimensions), None

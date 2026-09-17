@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Mapping
 
+from core.experiments.models import ControlMatchIdentity
+
 
 REQUIRED_DIMENSIONS = frozenset({"safety", "helpfulness"})
 METHODOLOGY_VERSION = "saea-reconciled-v1"
@@ -77,6 +79,8 @@ class AttackInstance:
     bsda_reference: Mapping[str, object] | None = None
     recovery_window: RecoveryWindow | None = None
     metadata: Mapping[str, object] = field(default_factory=dict)
+    sequential_identity: ControlMatchIdentity | None = None
+    isolated_identity: ControlMatchIdentity | None = None
 
     def __post_init__(self) -> None:
         if not self.attack_instance_id or not self.attack_id or self.position <= 0:

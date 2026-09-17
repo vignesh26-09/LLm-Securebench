@@ -109,7 +109,10 @@ def _run(model_name: str, provider_name: str, model_version: str | None, target_
             baseline_states=(_rc_state("baseline", states["baseline"]),),
             attack_state=_rc_state("isolated_attack", states["isolated_attack"]),
             recovery_steps=(RecoveryStep(1, _rc_state("recovery_1", states["recovery_1"])),),
-            provenance={"protocol_id": protocol_id, "fixture_dry_run": fixture},
+            context_status=RCContextStatus.UNKNOWN,
+            provenance={"protocol_id": protocol_id, "fixture_dry_run": fixture,
+                        "legacy_runner": True,
+                        "context_reason": "legacy_runner_uses_independent_single_prompt_calls"},
         )
         rc_result = RecoveryCapabilityEngine().evaluate_run(rc_input, calibration)
     else:
@@ -128,8 +131,10 @@ def _run(model_name: str, provider_name: str, model_version: str | None, target_
         "saea-" + uuid.uuid4().hex[:12], "sequence-1", model_name, "repository:example", _source_hash(),
         (_saea_state("baseline", states["baseline"]),),
         tuple(AttackInstance(f"attack-{index}", f"attack-{index}", "prompt-injection", "fixture" if fixture else "local", index, "example-1", _saea_state(f"seq-{index}", states[f"sequential_{index}"]), _saea_state("isolated_attack", states["isolated_attack"]), (_saea_state("baseline", states["baseline"]),)) for index in (1, 2)),
-        SpacingCondition.STACKED, ContextStatus.RETAINED,
-        metadata={"matched_controls": _matched_controls(model_name, protocol_id)},
+        SpacingCondition.STACKED, ContextStatus.UNKNOWN,
+        metadata={"matched_controls": _matched_controls(model_name, protocol_id),
+                  "legacy_runner": True,
+                  "context_reason": "legacy_runner_uses_independent_single_prompt_calls"},
     ))
     draa = EvidenceExtractor().build(identities={"run_id": protocol_id, "model_id": model_name, "dataset_id": "repository:example", "threat_model": "injection"}, layer_one=layer1["isolated_attack"], judge_results=tuple(layer2["isolated_attack"]), bsda=bsda, rc=asdict(rc_result), saea=saea, provenance={"protocol_id": protocol_id, "fixture_dry_run": fixture})
     pri = PRIProfileBuilder().build(
@@ -158,7 +163,7 @@ def _run(model_name: str, provider_name: str, model_version: str | None, target_
         "asr": calculate_asr(()),
         "matched_control_validation": _matched_controls(model_name, protocol_id),
         "paper_usable": False,
-        "paper_blockers": ["fixture data" if fixture else "RC calibration artifact is unvalidated", "Layer 2 judge measurements are not ground truth", "ASR labels require explicit approved outcome protocol"],
+        "paper_blockers": ["legacy runner does not execute a retained conversation; use scripts/run_controlled_experiment.py", "fixture data" if fixture else "RC calibration artifact is unvalidated", "Layer 2 judge measurements are not ground truth", "ASR labels require explicit approved outcome protocol"],
     }
     _ensure_imported()
     return trace
@@ -303,7 +308,7 @@ def _rc_unavailable_result(model_name: str, protocol_id: str, calibration: RCCal
         status=RCResultStatus.FAILED_EVALUATION,
         reason="missing_required_behavioral_state_dimension",
         calibration_artifact=asdict(calibration),
-        context_status=RCContextStatus.RETAINED,
+        context_status=RCContextStatus.UNKNOWN,
         diagnostics={"state_statuses": {name: state.get("status") for name, state in states.items()}},
         provenance={"protocol_id": protocol_id, "fixture_dry_run": fixture},
     )

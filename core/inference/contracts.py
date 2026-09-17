@@ -1,6 +1,7 @@
 """Provider-neutral inference schemas and ports."""
 
 from dataclasses import dataclass, field
+from enum import StrEnum
 from typing import Mapping, Protocol
 
 from core.models.registry import ModelMetadata
@@ -45,6 +46,7 @@ class InferenceRequest:
     model: ModelMetadata
     prompt: str
     generation: GenerationConfig = field(default_factory=GenerationConfig)
+    requested_seed: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,6 +59,65 @@ class InferenceResult:
     latency_ms: float
     token_usage: TokenUsage | None = None
     finish_reason: str | None = None
+    metadata: Mapping[str, object] = field(default_factory=dict)
+
+
+class ContextValidity(StrEnum):
+    """Evidence-backed conversation context state."""
+
+    RETAINED = "retained"
+    TRUNCATED = "truncated"
+    UNKNOWN = "unknown"
+
+
+@dataclass(frozen=True, slots=True)
+class ConversationMessage:
+    role: str
+    content: str
+    turn_index: int
+    message_id: str
+
+    def __post_init__(self) -> None:
+        if self.role not in {"system", "user", "assistant"}:
+            raise ValueError("conversation message role is invalid")
+        if not self.content or self.turn_index < 0 or not self.message_id:
+            raise ValueError("conversation messages require content, non-negative turn index, and identity")
+
+
+@dataclass(frozen=True, slots=True)
+class ConversationRequest:
+    model: ModelMetadata
+    conversation_id: str
+    messages: tuple[ConversationMessage, ...]
+    generation: GenerationConfig = field(default_factory=GenerationConfig)
+    requested_seed: int | None = None
+    system_prompt: str | None = None
+    metadata: Mapping[str, object] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.conversation_id or not self.messages:
+            raise ValueError("conversation request requires identity and messages")
+        indexes = tuple(message.turn_index for message in self.messages)
+        if indexes != tuple(sorted(indexes)):
+            raise ValueError("conversation messages must be in turn order")
+        if len({message.message_id for message in self.messages}) != len(self.messages):
+            raise ValueError("conversation message identities must be unique")
+
+
+@dataclass(frozen=True, slots=True)
+class ConversationResponse:
+    text: str
+    conversation_id: str
+    turn_index: int
+    model: ModelMetadata
+    provider: str
+    latency_ms: float
+    context_status: ContextValidity
+    token_usage: TokenUsage | None = None
+    finish_reason: str | None = None
+    requested_seed: int | None = None
+    effective_seed: int | None = None
+    provider_supports_seed: bool = False
     metadata: Mapping[str, object] = field(default_factory=dict)
 
 
@@ -79,6 +140,12 @@ class InferenceProvider(Protocol):
     def provider_name(self) -> str: ...
 
     def generate(self, request: InferenceRequest) -> InferenceResult: ...
+
+
+class ConversationInferenceProvider(InferenceProvider, Protocol):
+    """Optional provider port for ordered multi-turn requests."""
+
+    def generate_conversation(self, request: ConversationRequest) -> ConversationResponse: ...
 
 
 class ApiInferenceProvider(InferenceProvider, Protocol):

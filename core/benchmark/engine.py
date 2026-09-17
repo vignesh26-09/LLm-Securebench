@@ -72,7 +72,7 @@ class BenchmarkEngine:
         for attempt in range(1, config.max_retries + 2):
             error_message: str | None = None
             try:
-                result = self._provider.generate(InferenceRequest(model, case.prompt, config.generation))
+                result = self._provider.generate(InferenceRequest(model, case.prompt, config.generation, config.seed))
                 response = ModelResponse(
                     text=result.text, provider=result.provider, latency_ms=result.latency_ms,
                     token_usage=result.token_usage, finish_reason=result.finish_reason,

@@ -1,6 +1,10 @@
 """Compatibility exports for provider-neutral inference contracts."""
 
 from core.inference.contracts import (
+    ConversationInferenceProvider,
+    ConversationMessage,
+    ConversationRequest,
+    ConversationResponse,
     InferenceProvider,
     InferenceRequest,
     InferenceResponse,
@@ -9,4 +13,5 @@ from core.inference.contracts import (
 
 InferenceClient = InferenceProvider
 
-__all__ = ["InferenceClient", "InferenceProvider", "InferenceRequest", "InferenceResponse", "InferenceResult"]
+__all__ = ["InferenceClient", "InferenceProvider", "InferenceRequest", "InferenceResponse", "InferenceResult",
+           "ConversationInferenceProvider", "ConversationMessage", "ConversationRequest", "ConversationResponse"]

@@ -37,6 +37,7 @@ def run_input(**changes: object) -> RecoveryRunInput:
         "baseline_states": (state("b1", 1.0, 1.0), state("b2", 0.8, 0.8)),
         "attack_state": state("a", 0.2, 0.2),
         "recovery_steps": (RecoveryStep(1, state("r1", 0.5, 0.5)), RecoveryStep(2, state("r2", 0.8, 0.8))),
+        "context_status": RCContextStatus.RETAINED,
         "provenance": {"case_id": "case"},
     }
     values.update(changes)

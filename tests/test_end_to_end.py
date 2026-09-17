@@ -17,8 +17,8 @@ class EndToEndSmokeTest(unittest.TestCase):
         self.assertTrue(all(latency >= 0 for latency in outcome.latencies_ms))
         self.assertTrue(all(metadata["deterministic"] for metadata in outcome.generation_metadata))
         self.assertTrue(outcome.persisted_and_reloaded)
-        self.assertGreaterEqual(outcome.dqi_score, 0.0)
-        self.assertLessEqual(outcome.dqi_score, 1.0)
+        self.assertIsNone(outcome.dqi_score)
+        self.assertEqual(outcome.dqi_status, "unavailable")
 
         self.assertEqual(len(outcome.reports), 3)
         self.assertTrue(all(len(report.detector_results) == 3 for report in outcome.reports))

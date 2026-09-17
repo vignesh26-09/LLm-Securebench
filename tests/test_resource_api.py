@@ -79,7 +79,9 @@ class ResourceApiTests(unittest.TestCase):
         self.assertEqual(record['scope'], 'DATASET_VERSION')
         self.assertFalse(record['provenance']['scientifically_validated'])
         self.assertFalse(record['provenance']['embeddings_supplied'])
-        self.assertEqual(record['payload']['components']['novelty'], 0)
+        self.assertIsNone(record['payload']['components']['novelty'])
+        self.assertIsNone(record['payload']['score'])
+        self.assertEqual(record['payload']['status'], 'unavailable')
         self.assertEqual(record['provenance']['record_count'], 3)
         self.assertEqual(self.client.get('/models').json()['total'], 0)
 

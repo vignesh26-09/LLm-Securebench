@@ -31,12 +31,12 @@ def analyze_example(session):
     identity = hashlib.sha256(json.dumps({'source': digest, 'code': code_hashes, 'weights': asdict(result.weights)}, sort_keys=True).encode()).hexdigest()
     record_id = f'repository-example:dqi:{identity}'
     record = metric_record(record_id=record_id, family='dqi', scope='DATASET_VERSION',
-        owner_id=owner, schema_version='dataset-quality-index-v1', status='computed', domain=result,
+        owner_id=owner, schema_version='dataset-quality-index-v2', status=result.status, domain=result,
         provenance={'source': 'data/raw/example.json', 'source_sha256': digest,
                     'kind': 'repository_example_analysis', 'scientifically_validated': False,
                     'method': 'core.dataset.quality.calculate_dqi', 'code_sha256': code_hashes,
                     'normalization': 'core.dataset.normalization.TextNormalizer',
-                    'embeddings_supplied': False, 'novelty_note': 'Zero is the existing no-embeddings default, not measured semantic novelty.',
+                    'embeddings_supplied': False, 'novelty_note': 'Semantic novelty is unavailable because embeddings were not supplied; the composite is therefore unavailable.',
                     'record_count': len(dataset.records)})
     with session.begin():
         version = session.get(DatasetVersionEntity, owner)
