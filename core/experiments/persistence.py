@@ -15,7 +15,8 @@ ALLOWED_FAMILIES = frozenset({
     "experiment_specification", "experimental_condition", "conversation",
     "control_match_identity", "attack_outcome", "judge_calibration",
     "bsda", "recovery", "saea", "paired_analysis", "complementarity",
-    "reproducibility_manifest",
+    "reproducibility_manifest", "preregistration", "analysis_plan_diff",
+    "session_contamination", "replication_bundle", "replication_replay",
 })
 
 

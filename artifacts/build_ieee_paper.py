@@ -16,8 +16,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "artifacts" / "SecureLLMBench_IEEE_Paper_Draft.docx"
+OUT = ROOT / "artifacts" / "SecureLLMBench_Final_Research_Paper.docx"
 ASSETS = ROOT / "artifacts" / "paper_assets"
+CHARTS = ROOT / "artifacts" / "chart_exports"
 TRACE = ROOT / ".tmp" / "paper_trace_real_local.json"
 ANALYSIS = ROOT / ".tmp" / "paper_analysis_real_local.json"
 BLUE = "#17365D"
@@ -305,6 +306,7 @@ def main():
     create_architecture()
     create_latency_chart(latencies)
     create_status_matrix()
+    calibration_chart = sorted(CHARTS.glob("judge_calibration_*.png"))[-1]
 
     doc = Document()
     section = doc.sections[0]
@@ -329,17 +331,20 @@ def main():
     r = p.add_run("Anonymous IEEE-Style Research Draft")
     set_run_font(r, 9.5, italic=True)
     add_heading(doc, "Abstract", 1)
-    add_p(doc, "SecureLLMBench is a research-oriented software framework for conducting traceable evaluations of local large language models (LLMs) under benign, isolated-attack, sequential-attack, and recovery conditions. The framework persists versioned inputs, generation settings, target-model metadata, detector evidence, structured judge measurements, metric artifacts, and explicit failure states. This paper documents the implemented architecture and a local engineering trace using qwen3.5:2b as target and gemma3:4b as judge. The trace confirms end-to-end execution and provenance capture, but it is not an empirical security result: target responses were empty at the configured generation limit, some judge dimensions failed validation, and attack-success labels were absent. The contribution is therefore a reproducible measurement and governance substrate, not a claim that a model is secure or that any proposed metric is validated.")
+    add_p(doc, "SecureLLMBench is a research-oriented software framework for conducting traceable evaluations of local large language models (LLMs) under benign, isolated-attack, sequential-attack, and recovery conditions. The framework persists versioned inputs, generation settings, target-model metadata, detector evidence, structured judge measurements, metric artifacts, and explicit failure states. This paper documents the implemented architecture, a local engineering trace, and one real external calibration artifact. The JailbreakBench judge-comparison calibration contains 300 source records and 295 usable records; the fixed Gemma-based mapping achieved 53.9% raw agreement and Cohen's kappa 0.211. This negative result shows that the configured judge cannot replace independent human outcome labels. BSDA, RC, and SAEA have no Phase 1 empirical records and are reported as pending rather than plotted. The contribution is therefore a reproducible measurement and governance substrate, not a claim that a model is secure or that any proposed metric is validated.")
     add_p(doc, "Index Terms—LLM security evaluation, reproducibility, local inference, benchmark provenance, behavioral measurement, scientific safeguards.", size=8.7, first_indent=False, bold_prefix="Index Terms—")
     body_section = doc.add_section(WD_SECTION.CONTINUOUS)
-    set_columns(body_section)
+    # The title page uses the conference-style compact front matter. The body
+    # remains single-column so wide trace tables and calibrated figures retain
+    # legibility and never spill across a column boundary.
+    set_columns(body_section, num=1)
     add_heading(doc, "I. INTRODUCTION", 1)
     add_p(doc, "Security evaluation for LLMs requires more than a prompt and a score. A defensible result must identify the benchmark population, model version, generation settings, prompt sequence, measurements, evaluator behavior, and all unavailable prerequisites. SecureLLMBench addresses this engineering requirement by treating an evaluation as an auditable trace rather than as an opaque number. It connects dataset ingestion, local inference, Layer 1 detector evidence, Layer 2 structured judging, behavioral metrics, persistent records, a FastAPI backend, and a research dashboard.")
     add_p(doc, "The central design choice is semantic restraint. Layer 1 outputs are detector-native evidence rather than attack-success truth. Layer 2 outputs are structured measurements rather than calibrated probabilities. Missing, failed, uncalibrated, undefined, and not-applicable values remain distinct values in storage and in the dashboard. This prevents a user interface or downstream report from implying that a missing measurement is evidence of zero risk.")
     add_heading(doc, "A. Contributions", 2)
     add_p(doc, "First, the framework implements an end-to-end local evaluation trace with database persistence, read-only API endpoints, and dashboard exploration. Second, it implements four-component BSDA computation, Recovery Capability (RC), and Sequential Attack Evaluation Algorithm (SAEA) runtimes with explicit applicability contracts. Third, it preserves DRAA and PRI as uncalibrated evidence profiles, deliberately withholding scalar risk and model-ranking values. Fourth, it provides reproducibility artifacts, safety tests, and explicit research blockers.")
     add_heading(doc, "B. Scope of This Paper", 2)
-    add_p(doc, "This paper is an implementation and trace report. It does not present a broad benchmark comparison, validated attack success rate (ASR), calibration study, or model ranking. The included real local trace contains one repository example case and is used only to demonstrate system behavior and to show how scientific uncertainty is carried forward.")
+    add_p(doc, "This paper is an implementation and trace report with one external judge-calibration result. It does not present a broad benchmark comparison, validated attack success rate (ASR), Phase 1 BSDA/RC/SAEA result, or model ranking. The included real local trace contains one repository example case and is used only to demonstrate system behavior and to show how scientific uncertainty is carried forward.")
     page_break(doc)
 
     # Page 2
@@ -423,11 +428,21 @@ def main():
     add_caption(doc, "TABLE IV. What the present artifacts do and do not substantiate.")
     add_heading(doc, "C. Threats to Validity", 2)
     add_p(doc, "The current dataset is a three-record repository engineering example, not a validated corpus. The local trace contains one case. Target outputs were empty, and the judge encountered structured-output validation failures. No independent outcome labels, rater adjudication, calibration set, or preregistered inferential plan exists. These limitations are persisted as blockers rather than hidden by aggregation or imputation.")
-    page_break(doc)
 
     # Page 6
-    add_heading(doc, "VI. REPRODUCIBILITY AND NEXT STUDY", 1)
-    add_p(doc, "The repository contains a fixture dry-run, a local-Ollama runner, trace analysis scripts, unit tests, API smoke checks, and frontend typecheck, lint, test, and production-build commands. The verified software suite contains 129 passing Python tests and 19 passing frontend tests, together with successful typecheck, lint, build, API smoke, and local server checks. These checks establish implementation behavior; they do not validate a scientific hypothesis.")
+    add_heading(doc, "VI. JUDGE CALIBRATION EVIDENCE", 1)
+    add_p(doc, "Figure 4 reports the only currently paper-ready empirical metric in this repository: the fixed JailbreakBench judge-comparison calibration. The source contains 300 records, of which 295 have usable judge outputs. Under the predeclared mapping, the Gemma-based judge produced 108 true positives, 135 false positives, 1 false negative, and 51 true negatives. Coverage was 98.3%, raw agreement was 53.9%, and Cohen's kappa was 0.211. These values are read from the persisted calibration artifact, not inferred from dashboard fixtures or recomputed for presentation.")
+    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.add_run().add_picture(str(calibration_chart), width=Inches(6.55))
+    add_caption(doc, "Fig. 4. JailbreakBench judge calibration confusion matrix. This is a negative validation result: the current fixed judge mapping is not sufficiently reliable to replace independent human outcome labels.")
+    add_table(doc, ["Source N", "Usable N", "Coverage", "Agreement", "Cohen's kappa"], [["300", "295", "98.3%", "53.9%", "0.211"]], [1.1, 1.1, 1.2, 1.35, 1.55])
+    add_caption(doc, "TABLE V. Persisted JailbreakBench judge-comparison calibration values.")
+    add_p(doc, "The calibration result is not a safety score, attack-success estimate, or model ranking. It supports one conservative operational conclusion: the current judge configuration must remain an auxiliary measurement source while independent human labels retain authority for outcome claims. The chart-export gate also refused BSDA, RC, SAEA, and applicability-summary figures because no real Phase 1 metric records satisfied their data requirements.")
+    page_break(doc)
+
+    # Page 7
+    add_heading(doc, "VII. REPRODUCIBILITY AND NEXT STUDY", 1)
+    add_p(doc, "The repository contains a fixture dry-run, a local-Ollama runner, trace analysis scripts, unit tests, API smoke checks, and frontend typecheck, lint, test, and production-build commands. The verified software suite contains 166 passing Python tests, including provenance-gated reporting and enforcement-path regressions, together with API smoke checks. These checks establish implementation behavior; they do not validate a scientific hypothesis.")
     add_heading(doc, "A. Reproduction Procedure", 2)
     add_table(doc, ["Step", "Command / artifact", "Expected evidence"], [
         ["1", "python -m pytest", "Implementation tests"],
@@ -437,18 +452,21 @@ def main():
         ["5", "analyze_results.py --input trace.json", "Descriptive analysis plus blockers"],
         ["6", "frontend typecheck, lint, test, build", "Dashboard integrity"],
     ], [0.5, 3.2, 2.08])
-    add_caption(doc, "TABLE V. Reproduction sequence. Each command records an engineering artifact rather than a scientific conclusion.")
+    add_caption(doc, "TABLE VI. Reproduction sequence. Each command records an engineering artifact rather than a scientific conclusion.")
     add_heading(doc, "B. Required Work Before a Research Claim", 2)
     add_p(doc, "A valid benchmark study needs a versioned threat model, a representative dataset with provenance, locked target and judge models, an approved outcome taxonomy and ASR denominator policy, independent labels or blinded human raters, a compatible RC calibration artifact, matched isolated and sequential trajectories, and a preregistered statistical plan. Any learned ML or DRAA scalar must be trained and validated against independently defined labels with grouped splits that prevent family, session, and near-duplicate leakage.")
-    add_heading(doc, "VII. CONCLUSION", 1)
+    add_heading(doc, "VIII. CONCLUSION", 1)
     add_p(doc, "SecureLLMBench provides a working foundation for local LLM safety and security evaluation: it runs models, captures a complete trace, computes permitted metric artifacts, preserves provenance, exposes safe read APIs, and renders research data in a dashboard. Its most important current output is disciplined uncertainty. The project is ready for a properly designed empirical study, but the present repository and local trace do not justify claims about model robustness, safety probabilities, metric validity, or rankings.")
     add_heading(doc, "REFERENCES", 1)
     refs = [
-        "[1] SecureLLMBench, Repository implementation and reproducibility documentation, 2026.",
-        "[2] SecureLLMBench, Recovery Capability Reconciled Implementation Specification, 2026.",
-        "[3] SecureLLMBench, Sequential Attack Evaluation Algorithm Implementation Specification, 2026.",
-        "[4] SecureLLMBench, DRAA and PRI Methodology-to-Implementation Reconciliations, 2026.",
-        "[5] FastAPI, SQLAlchemy, React, and Ollama local runtime components, accessed in the implementation environment.",
+        "[1] S. Chao et al., JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models, NeurIPS Datasets and Benchmarks Track, 2024.",
+        "[2] J. Cohen, A Coefficient of Agreement for Nominal Scales, Educational and Psychological Measurement, vol. 20, no. 1, pp. 37–46, 1960.",
+        "[3] A. Chiang and J. Y. J. Lee, Can Large Language Models Be an Alternative to Human Evaluations?, ACL, 2023.",
+        "[4] SecureLLMBench, JailbreakBench Judge Comparison Calibration Artifact, revision b2b462fd32ca655e0bdfc70b68155720977f4d69, 2026.",
+        "[5] SecureLLMBench, Recovery Capability Reconciled Implementation Specification, 2026.",
+        "[6] SecureLLMBench, Sequential Attack Evaluation Algorithm Implementation Specification, 2026.",
+        "[7] SecureLLMBench, DRAA and PRI Methodology-to-Implementation Reconciliations, 2026.",
+        "[8] FastAPI, SQLAlchemy, React, and Ollama local runtime components, accessed in the implementation environment.",
     ]
     for ref in refs:
         add_p(doc, ref, size=8.2, first_indent=False, after=1)

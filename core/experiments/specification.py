@@ -23,9 +23,12 @@ def load_experiment_specification(path: Path) -> ExperimentSpecification:
         tuple(tuple(sequence) for sequence in item.get("sequences", ())),
         tuple(item.get("recovery_probes", ()))) for item in value["cases"])
     return ExperimentSpecification(
-        value["experiment_id"], value["dataset_id"], value["dataset_version"],
-        value["dataset_hash"], models, cases,
-        GenerationConfig(**value.get("generation", {})), tuple(value["seeds"]),
-        int(value["repetitions"]), MeasurementConfiguration(**value["measurement"]),
-        value.get("system_prompt"), value.get("specification_version", "controlled-trajectory-v1"),
-        value.get("metadata", {}))
+        experiment_id=value["experiment_id"], dataset_id=value["dataset_id"],
+        dataset_version=value["dataset_version"], dataset_hash=value["dataset_hash"],
+        models=models, cases=cases, generation=GenerationConfig(**value.get("generation", {})),
+        seeds=tuple(value["seeds"]), repetitions=int(value["repetitions"]),
+        measurement=MeasurementConfiguration(**value["measurement"]),
+        system_prompt=value.get("system_prompt"),
+        specification_version=value.get("specification_version", "controlled-trajectory-v1"),
+        preregistration_id=value.get("preregistration_id"),
+        canary_policy=value.get("canary_policy", {}), metadata=value.get("metadata", {}))

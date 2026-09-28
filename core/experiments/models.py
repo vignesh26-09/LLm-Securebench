@@ -85,6 +85,8 @@ class ExperimentSpecification:
     system_prompt: str | None = None
     specification_version: str = "controlled-trajectory-v1"
     metadata: Mapping[str, object] = field(default_factory=dict)
+    preregistration_id: str | None = None
+    canary_policy: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if not all((self.experiment_id, self.dataset_id, self.dataset_version, self.dataset_hash)):
@@ -180,6 +182,8 @@ class ExperimentalObservation:
     layer1_configuration: Mapping[str, object] = field(default_factory=dict)
     layer2_judge_configuration: Mapping[str, object] = field(default_factory=dict)
     measurement_parameters: Mapping[str, object] = field(default_factory=dict)
+    canary_evidence: Mapping[str, object] | None = None
+    preregistration_id: str | None = None
 
 
 def generation_digest(config: GenerationConfig, seed: int | None) -> str:

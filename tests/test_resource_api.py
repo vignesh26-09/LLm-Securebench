@@ -95,3 +95,18 @@ class ResourceApiTests(unittest.TestCase):
         self.assertEqual(result['payload'], {'value': None})
         self.assertEqual(result['provenance'], {'kind': 'test_fixture'})
         self.assertEqual(self.client.get('/scientific-records/missing').status_code, 404)
+
+    def test_research_evidence_endpoint_is_read_only_and_family_scoped(self):
+        with self.factory.begin() as session:
+            session.add_all([
+                ScientificRecordEntity(id='pre-fixture', family='preregistration', schema_version='preregistration-v1',
+                    scope='EXPERIMENT', owner_id='experiment', status='locked', payload={'version': 1}, provenance={}),
+                ScientificRecordEntity(id='other-fixture', family='dqi', schema_version='v1',
+                    scope='DATASET_VERSION', owner_id='dataset', status='unavailable', payload={}, provenance={}),
+            ])
+        response = self.client.get('/research-evidence/preregistration')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['family'], 'preregistration')
+        self.assertEqual([item['id'] for item in response.json()['items']], ['pre-fixture'])
+        self.assertEqual(self.client.get('/research-evidence/not-a-family').status_code, 404)
+        self.assertEqual(self.client.post('/research-evidence/preregistration').status_code, 405)

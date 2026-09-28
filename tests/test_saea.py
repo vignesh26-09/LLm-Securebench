@@ -1,13 +1,20 @@
 """Deterministic safe synthetic tests for reconciled SAEA calculations."""
 
+import tempfile
 import unittest
+from pathlib import Path
 
+from core.experiments.contamination import IsolationStatus, assess_isolation
+from core.experiments.runner import ExperimentRunner, ObservationStore
+from core.experiments.trajectory import BehaviorMeasurement, build_saea_input
+from core.inference.mock import MockInferenceProvider
 from core.saea import SAEAEngine, SAEAInput
 from core.saea.models import (
     AttackInstance, BehavioralState, CoalitionEvaluation, ContextStatus,
     RecoveryWindow, ResultStatus, SAEAConfig, SpacingCondition,
 )
 from core.saea.statistics import bootstrap_synergy
+from tests.test_research_protocol import specification
 
 
 def state(identifier: str, safety: float, helpfulness: float, *, status: ResultStatus = ResultStatus.APPLICABLE) -> BehavioralState:
@@ -114,6 +121,31 @@ class SAEATest(unittest.TestCase):
         interval_b = bootstrap_synergy((first, second), resamples=20, seed=7)
         self.assertEqual(interval_a, interval_b)
         self.assertEqual(bootstrap_synergy((first,)).status, ResultStatus.INSUFFICIENT_DATA)
+
+    def test_suspected_session_contamination_blocks_matched_isolated_delta(self) -> None:
+        """The ledger record reaches SAEA's actual isolated-delta computation."""
+        with tempfile.TemporaryDirectory() as directory:
+            observations = ExperimentRunner(
+                MockInferenceProvider(default_response="answer"), ObservationStore(Path(directory))
+            ).run(specification())
+        sequential = next(item for item in observations
+                          if item.sequence_id == "case-sequence-1" and item.attack_instance_id == "attack-1")
+        isolated = next(item for item in observations
+                        if item.condition.value == "isolated_attack" and item.attack_instance_id == "attack-1")
+        ledger = assess_isolation(
+            record_id="forced-shared-session", sequential_observation_id=sequential.observation_id,
+            isolated_observation_id=isolated.observation_id,
+            sequential_conversation_id="reused-provider-session",
+            isolated_conversation_id="reused-provider-session", provider="mock",
+            sequential_metadata={}, isolated_metadata={})
+        self.assertIs(ledger.status, IsolationStatus.SUSPECTED_LEAK)
+        measurements = tuple(BehaviorMeasurement(item.observation_id,
+            {"safety": .8, "helpfulness": .7}, "behavior-v1", "fixture") for item in observations)
+        result = self.engine.evaluate(build_saea_input(
+            observations, measurements, sequence_id="case-sequence-1", contamination_records=(ledger,)))
+        self.assertEqual(result.per_step[0].status, ResultStatus.UNDEFINED)
+        self.assertIsNone(result.per_step[0].isolated_delta)
+        self.assertEqual(result.per_step[0].reason, "control_contamination_suspected")
 
 
 if __name__ == "__main__":

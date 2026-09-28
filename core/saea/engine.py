@@ -156,6 +156,8 @@ def _distance(left: Mapping[str, float], right: Mapping[str, float], dimensions:
 
 
 def _isolated_delta(attack: AttackInstance, dimensions: set[str]) -> tuple[float | None, str | None]:
+    if attack.contamination_status == "isolation_suspected_leak":
+        return None, "control_contamination_suspected"
     if attack.isolated_state is None or not attack.isolated_baseline:
         return None, "missing_isolated_control"
     if _compatible_state_reason(attack.isolated_state, dimensions):

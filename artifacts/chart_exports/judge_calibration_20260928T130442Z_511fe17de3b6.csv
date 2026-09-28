@@ -1,0 +1,2 @@
+artifact_id,tp,fp,fn,tn,coverage,raw_agreement,cohen_kappa,usable_n,source_n
+jbb-gemma-fixed-mapping-v1,108,135,1,51,0.9833333333333333,0.5389830508474577,0.2112609601698581,295,300

@@ -11,6 +11,8 @@ from dataclasses import dataclass, field
 from typing import Mapping, Sequence
 
 from core.experiments.models import ExperimentalCondition, ExperimentalObservation
+from core.experiments.canary import CanaryStatus
+from core.experiments.contamination import SessionContaminationRecord
 from core.recovery.models import (BehavioralState as RCState, RCContextStatus,
     RCResultStatus, RecoveryRunInput, RecoveryStep)
 from core.saea.models import (AttackInstance, BehavioralState, ContextStatus,
@@ -30,7 +32,8 @@ class BehaviorMeasurement:
 
 def build_saea_input(observations: Sequence[ExperimentalObservation],
                      measurements: Sequence[BehaviorMeasurement], *,
-                     sequence_id: str, run_id: str | None = None) -> SAEAInput:
+                     sequence_id: str, run_id: str | None = None,
+                     contamination_records: Sequence[SessionContaminationRecord] = ()) -> SAEAInput:
     ordered = tuple(item for item in observations if item.sequence_id == sequence_id)
     if not ordered:
         raise ValueError("sequence observations are unavailable")
@@ -40,6 +43,8 @@ def build_saea_input(observations: Sequence[ExperimentalObservation],
     if baseline is None or not sequential:
         raise ValueError("sequence requires a baseline and at least one sequential attack")
     index = {item.observation_id: item for item in measurements}
+    contamination_index = {(item.sequential_observation_id, item.isolated_observation_id): item
+                           for item in contamination_records}
     states = {item.observation_id: _saea_state(item, index.get(item.observation_id)) for item in observations}
     attacks = []
     for item in sequential:
@@ -51,6 +56,7 @@ def build_saea_input(observations: Sequence[ExperimentalObservation],
                                  if candidate.condition is ExperimentalCondition.BASELINE
                                  and candidate.sequence_id == f"isolated-{item.attack_instance_id}"
                                  and candidate.run_id == item.run_id)
+        contamination = contamination_index.get((item.observation_id, isolated.observation_id)) if isolated else None
         attacks.append(AttackInstance(
             item.attack_instance_id or "missing", item.attack_id or "missing", item.attack_family or "missing",
             item.attack_family or "missing", item.sequence_position or 0, item.evaluation_case_id,
@@ -59,7 +65,9 @@ def build_saea_input(observations: Sequence[ExperimentalObservation],
             sequential_identity=item.control_identity,
             isolated_identity=isolated.control_identity if isolated else None,
             metadata={"sequential_observation_id": item.observation_id,
-                      "isolated_observation_id": isolated.observation_id if isolated else None},
+                      "isolated_observation_id": isolated.observation_id if isolated else None,
+                      "contamination_record_id": contamination.record_id if contamination else None},
+            contamination_status=contamination.status.value if contamination else None,
         ))
     return SAEAInput(
         run_id or baseline.run_id, sequence_id, baseline.target_model, baseline.dataset_id,
@@ -67,7 +75,8 @@ def build_saea_input(observations: Sequence[ExperimentalObservation],
         SpacingCondition.STACKED, _saea_context(ordered),
         metadata={"controlled_observation_ids": tuple(item.observation_id for item in ordered),
                   "measurement_sources": {item.observation_id: index[item.observation_id].source
-                                          for item in ordered if item.observation_id in index}},
+                                          for item in ordered if item.observation_id in index},
+                  "context_gate": _context_gate_metadata(ordered)},
     )
 
 
@@ -97,7 +106,8 @@ def build_recovery_input(observations: Sequence[ExperimentalObservation],
         generation_config=dict(baseline.generation_configuration),
         provenance={"controlled_sequence_id": sequence_id,
                     "measurement_sources": {item.observation_id: index[item.observation_id].source
-                                            for item in ordered if item.observation_id in index}},
+                                            for item in ordered if item.observation_id in index},
+                    "context_gate": _context_gate_metadata(ordered)},
     )
 
 
@@ -120,6 +130,8 @@ def _rc_state(observation, measurement):
 
 def _saea_context(observations):
     from core.inference.contracts import ContextValidity
+    if _has_failed_canary(observations):
+        return ContextStatus.TRUNCATED
     states = {item.context_status for item in observations}
     if ContextValidity.TRUNCATED in states:
         return ContextStatus.TRUNCATED
@@ -128,10 +140,27 @@ def _saea_context(observations):
 
 def _rc_context(observations):
     from core.inference.contracts import ContextValidity
+    if _has_failed_canary(observations):
+        return RCContextStatus.TRUNCATED
     states = {item.context_status for item in observations}
     if ContextValidity.TRUNCATED in states:
         return RCContextStatus.TRUNCATED
     return RCContextStatus.RETAINED if states == {ContextValidity.RETAINED} else RCContextStatus.UNKNOWN
+
+
+def _has_failed_canary(observations) -> bool:
+    return any((item.canary_evidence or {}).get("status") == CanaryStatus.FAILED.value for item in observations)
+
+
+def _context_gate_metadata(observations) -> dict[str, object]:
+    statuses = tuple((item.canary_evidence or {}).get("status", CanaryStatus.NOT_APPLICABLE.value)
+                     for item in observations)
+    return {"provider_context_states": tuple(item.context_status.value for item in observations),
+            "canary_statuses": statuses,
+            "canary_failure_blocks_metrics": _has_failed_canary(observations),
+            "preferred_evidence": "canary_verified" if CanaryStatus.VERIFIED.value in statuses
+                                  else "provider_context_declaration",
+            "note": "canary verification is request-level evidence and does not promote an unknown provider context state"}
 
 
 def _one(values):

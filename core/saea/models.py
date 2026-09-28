@@ -81,6 +81,7 @@ class AttackInstance:
     metadata: Mapping[str, object] = field(default_factory=dict)
     sequential_identity: ControlMatchIdentity | None = None
     isolated_identity: ControlMatchIdentity | None = None
+    contamination_status: str | None = None
 
     def __post_init__(self) -> None:
         if not self.attack_instance_id or not self.attack_id or self.position <= 0:

@@ -1,4 +1,6 @@
 """Read-only projections of existing persistence entities; no derived science."""
+from dataclasses import asdict
+from pathlib import Path
 from fastapi import HTTPException, Query
 from sqlalchemy import func, select
 from core.persistence import models
@@ -41,6 +43,36 @@ def project(row):
 
 
 def register_resources(app, factory):
+    @app.get("/reports/charts/{chart_type}")
+    def report_chart(chart_type: str, model: str | None = None, dataset: str | None = None,
+                     category: str | None = None):
+        """Generate a provenance-gated report export without mutating evidence."""
+        from core.reporting.charts import generate_chart
+        try:
+            with factory() as session:
+                result = generate_chart(session, chart_type,
+                    output_dir=Path(__file__).resolve().parents[2] / "artifacts" / "chart_exports",
+                    model=model, dataset=dataset, category=category)
+        except ValueError:
+            raise HTTPException(404, "Chart type not found")
+        return asdict(result)
+
+    @app.get("/research-evidence/{family}")
+    def research_evidence(family: str, limit: int = Query(100, ge=1, le=500)):
+        """Read-only access to append-only evidence-layer artifacts."""
+        allowed = {"preregistration", "analysis_plan_diff", "session_contamination",
+                   "replication_bundle", "replication_replay", "reproducibility_manifest"}
+        if family not in allowed:
+            raise HTTPException(404, "Research evidence family not found")
+        with factory() as session:
+            rows = list(session.scalars(select(models.ScientificRecordEntity).where(
+                models.ScientificRecordEntity.family == family).order_by(
+                models.ScientificRecordEntity.created_at.desc(), models.ScientificRecordEntity.id).limit(limit)))
+            return {"family": family, "items": [{"id": row.id, "schema_version": row.schema_version,
+                    "scope": row.scope, "owner_id": row.owner_id, "status": row.status,
+                    "payload": redact_configuration(row.payload), "provenance": redact_configuration(row.provenance),
+                    "created_at": row.created_at} for row in rows]}
+
     @app.get("/dashboard-summary")
     def summary():
         with factory() as session:

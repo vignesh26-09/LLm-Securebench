@@ -7,6 +7,7 @@ import json
 import platform
 import subprocess
 import sys
+from collections import Counter
 from dataclasses import asdict
 from dataclasses import dataclass, field
 from typing import Mapping, Sequence
@@ -43,6 +44,8 @@ class ReproducibilityManifest:
     failed_count: int
     artifact_hashes: Mapping[str, str]
     unavailable_reasons: Mapping[str, str] = field(default_factory=dict)
+    schema_version: str = "reproducibility-manifest-v2"
+    evidence_layer_status: Mapping[str, object] = field(default_factory=dict)
 
 
 def git_state(root: str) -> tuple[str | None, bool | None, str | None]:
@@ -71,7 +74,8 @@ def runtime_versions() -> Mapping[str, str | None]:
 def build_manifest(spec, observations: Sequence[object], *, root: str,
                    experiment_start: str, experiment_end: str,
                    judge_identity: Mapping[str, object] | None = None,
-                   artifact_hashes: Mapping[str, str] | None = None) -> ReproducibilityManifest:
+                   artifact_hashes: Mapping[str, str] | None = None,
+                   evidence_layer_status: Mapping[str, object] | None = None) -> ReproducibilityManifest:
     commit, dirty, git_reason = git_state(root)
     successful = sum(getattr(item, "status", None).value == "completed" for item in observations)
     failed = len(observations) - successful
@@ -84,6 +88,12 @@ def build_manifest(spec, observations: Sequence[object], *, root: str,
         unavailable["model_version"] = "one_or_more_model_versions_not_supplied"
     if judge_identity is None:
         unavailable["judge_identity"] = "judge_not_configured_for_execution_stage"
+    generated_evidence = {
+        "canary_status_counts": dict(Counter(str((getattr(item, "canary_evidence", None) or {}).get(
+            "status", "canary_not_applicable")) for item in observations)),
+        "preregistration_id": getattr(spec, "preregistration_id", None),
+    }
+    generated_evidence.update(dict(evidence_layer_status or {}))
     return ReproducibilityManifest(
         spec.experiment_id, commit, dirty,
         {"id": spec.dataset_id, "version": spec.dataset_version, "hash": spec.dataset_hash},
@@ -102,4 +112,5 @@ def build_manifest(spec, observations: Sequence[object], *, root: str,
          "experiment_specification": spec.specification_version},
         runtime_versions(), sys.version, platform.platform(), experiment_start, experiment_end,
         len(spec.cases), len(observations), successful, failed,
-        dict(artifact_hashes or {}), unavailable)
+        dict(artifact_hashes or {}), unavailable, "reproducibility-manifest-v2",
+        generated_evidence)
