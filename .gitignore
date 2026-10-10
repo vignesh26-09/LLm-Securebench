@@ -2,6 +2,7 @@
 __pycache__/
 frontend/node_modules/
 frontend/dist/
+artifacts/paper_render/
 frontend/.npm-cache/
 .tmp/
 *.localhost.log
