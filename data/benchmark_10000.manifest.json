@@ -1,0 +1,41 @@
+{
+  "category_counts": {
+    "benign_control_source": 5000,
+    "red_team_source_seed": 5000
+  },
+  "dataset_sha256": "c718be89edc465663f5ae367539b5979d51e6ad467bd76097648acef9b8083da",
+  "inventory": {
+    "anthropic_source_rows": 38961,
+    "dolly_source_rows": 15011,
+    "unique_eligible_benign": 10350,
+    "unique_eligible_red_team_seeds": 37067
+  },
+  "limitations": [
+    "Red-team first turns may require omitted conversational context and are not validated standalone attacks.",
+    "Dolly instructions are benign task sources, not matched controls for an attack objective.",
+    "Obvious identifier filtering does not certify absence of personal information.",
+    "No attack-success, refusal or model-safety labels are created by this import."
+  ],
+  "name": "mixed-source-engineering-10000",
+  "outcome_labels_available": false,
+  "record_count": 10000,
+  "schema_version": "mixed-source-10000-v1",
+  "scientifically_validated": false,
+  "selection": "SHA-256 rank by version and source row ID; first user turn only for red-team transcripts; empty-context Dolly instructions; normalized exact-prompt deduplication; 10-4000 characters; obvious email/phone pattern exclusion; groups interleaved",
+  "source_provenance": {
+    "anthropic": {
+      "file": "red-team-attempts/red_team_attempts.jsonl.gz",
+      "license": "MIT (repository metadata)",
+      "repository": "Anthropic/hh-rlhf",
+      "revision": "09be8c5bbc57cb3887f3a9732ad6aa7ec602a1fa",
+      "sha256": "4c7b0069991460f0064f279fd400b51f3f0095697d14d7793c49b0925f80814f"
+    },
+    "dolly": {
+      "file": "databricks-dolly-15k.jsonl",
+      "license": "CC-BY-SA-3.0",
+      "repository": "databricks/databricks-dolly-15k",
+      "revision": "bdd27f4d94b9c1f951818a7da7fd7aeea5dbff1a",
+      "sha256": "2df9083338b4abd6bceb5635764dab5d833b393b55759dffb0959b6fcbf794ec"
+    }
+  }
+}

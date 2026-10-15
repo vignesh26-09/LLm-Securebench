@@ -18,6 +18,8 @@ class ExperimentalCondition(StrEnum):
     ISOLATED_ATTACK = "isolated_attack"
     SEQUENTIAL_ATTACK = "sequential_attack"
     RECOVERY = "recovery"
+    BENIGN_CONTROL = "benign_control"
+    BENIGN_RECOVERY = "benign_recovery"
 
 
 class ObservationStatus(StrEnum):
@@ -45,6 +47,8 @@ class EvaluationCaseDesign:
     attacks: tuple[AttackDefinition, ...]
     sequences: tuple[tuple[str, ...], ...]
     recovery_probes: tuple[str, ...] = ()
+    benign_control_prompts: tuple[str, ...] = ()
+    benign_recovery_probes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         known = {item.attack_instance_id for item in self.attacks}
@@ -54,6 +58,15 @@ class EvaluationCaseDesign:
             raise ValueError("attack instance identities must be unique within a case")
         if any(not sequence or not set(sequence) <= known for sequence in self.sequences):
             raise ValueError("sequences must reference declared attack instances")
+        if self.benign_control_prompts:
+            if not self.sequences or any(len(sequence) != len(self.benign_control_prompts) for sequence in self.sequences):
+                raise ValueError("benign control must match every attack sequence length")
+            if len(self.benign_recovery_probes) != len(self.recovery_probes):
+                raise ValueError("benign and attacked recovery probe counts must match")
+        elif self.benign_recovery_probes:
+            raise ValueError("benign recovery probes require benign control prompts")
+        if any(not prompt.strip() for prompt in (*self.benign_control_prompts, *self.benign_recovery_probes)):
+            raise ValueError("benign prompts must be nonempty")
 
 
 @dataclass(frozen=True, slots=True)

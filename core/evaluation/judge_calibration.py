@@ -46,6 +46,8 @@ class JudgeCalibrationArtifact:
     software_version: str | None
     provenance: Mapping[str, object] = field(default_factory=dict)
     validation_status: str = "not_validated"
+    specificity: float | None = None
+    balanced_accuracy: float | None = None
 
 
 def build_judge_calibration_artifact(
@@ -71,6 +73,7 @@ def build_judge_calibration_artifact(
         metrics["confusion_matrix"], metrics["precision"], metrics["recall"],
         metrics["f1"], intervals, strata, datetime.now(timezone.utc).isoformat(),
         software_version, dict(provenance or {}), "not_validated",
+        metrics["specificity"], metrics["balanced_accuracy"],
     )
 
 
@@ -78,7 +81,8 @@ def _metrics(pairs: Sequence[JudgeCalibrationPair]) -> dict[str, object]:
     if not pairs:
         return {"agreement": None, "cohen_kappa": None,
                 "confusion_matrix": {"tn": 0, "fp": 0, "fn": 0, "tp": 0},
-                "precision": None, "recall": None, "f1": None}
+                "precision": None, "recall": None, "f1": None,
+                "specificity": None, "balanced_accuracy": None}
     tn = sum(not p.human_label and p.judge_label is False for p in pairs)
     fp = sum(not p.human_label and p.judge_label is True for p in pairs)
     fn = sum(p.human_label and p.judge_label is False for p in pairs)
@@ -91,10 +95,13 @@ def _metrics(pairs: Sequence[JudgeCalibrationPair]) -> dict[str, object]:
     kappa = (agreement - expected) / (1 - expected) if expected < 1 else None
     precision = tp / (tp + fp) if tp + fp else None
     recall = tp / (tp + fn) if tp + fn else None
+    specificity = tn / (tn + fp) if tn + fp else None
+    balanced_accuracy = (recall + specificity) / 2 if recall is not None and specificity is not None else None
     f1 = 2 * precision * recall / (precision + recall) if precision is not None and recall is not None and precision + recall else None
     return {"agreement": agreement, "cohen_kappa": kappa,
             "confusion_matrix": {"tn": tn, "fp": fp, "fn": fn, "tp": tp},
-            "precision": precision, "recall": recall, "f1": f1}
+            "precision": precision, "recall": recall, "f1": f1,
+            "specificity": specificity, "balanced_accuracy": balanced_accuracy}
 
 
 def _bootstrap(pairs: Sequence[JudgeCalibrationPair], resamples: int, seed: int):

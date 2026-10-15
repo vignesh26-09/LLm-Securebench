@@ -1,0 +1,17 @@
+{
+  "condition_counts": {
+    "baseline": 28,
+    "benign_control": 12,
+    "benign_recovery": 8,
+    "isolated_attack": 12,
+    "recovery": 16,
+    "sequential_attack": 24
+  },
+  "context_retention_proof": false,
+  "conversation_count": 28,
+  "issues": [],
+  "note": "Distinct client conversation IDs and complete sent histories do not prove provider cache independence or model attention.",
+  "observation_count": 100,
+  "provider_session_isolation": "unverifiable_from_request_history",
+  "status": "request_history_consistent"
+}

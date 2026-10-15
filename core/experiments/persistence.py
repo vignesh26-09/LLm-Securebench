@@ -17,13 +17,15 @@ ALLOWED_FAMILIES = frozenset({
     "bsda", "recovery", "saea", "paired_analysis", "complementarity",
     "reproducibility_manifest", "preregistration", "analysis_plan_diff",
     "session_contamination", "replication_bundle", "replication_replay",
+    "human_annotation", "human_adjudication",
 })
 
 
 def append_scientific_artifact(session, *, record_id: str, family: str,
                                schema_version: str, scope: str, owner_id: str | None,
                                status: str | None, artifact: object,
-                               provenance: Mapping[str, object] | None = None) -> ScientificRecordEntity:
+                               provenance: Mapping[str, object] | None = None,
+                               commit: bool = True) -> ScientificRecordEntity:
     if family not in ALLOWED_FAMILIES:
         raise ValueError(f"unsupported scientific artifact family: {family}")
     repository = ScientificRecordRepository(session)
@@ -36,7 +38,8 @@ def append_scientific_artifact(session, *, record_id: str, family: str,
         provenance=_json_value(dict(provenance or {})),
     )
     repository.add(record)
-    session.commit()
+    if commit:
+        session.commit()
     return record
 
 

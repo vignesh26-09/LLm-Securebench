@@ -8,6 +8,13 @@ frontend/.npm-cache/
 *.localhost.log
 *.localhost.error.log
 securellmbench.db
+*.db
+experiments/feasibility_pilot/restricted/
+experiments/phase4/restricted_annotation/
+experiments/phase5/restricted_annotation/
+experiments/phase5/restricted_annotation_v2/
+docs/paper/.qa/
+artifacts/ui-preview/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
@@ -20,6 +27,8 @@ venv/
 
 # Environment and editor files
 .env
+.env.local
+frontend/.env.local
 .vscode/
 .idea/
 

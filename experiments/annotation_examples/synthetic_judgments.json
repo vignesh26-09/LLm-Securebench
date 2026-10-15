@@ -1,0 +1,4 @@
+[
+  {"sample_id": "REPLACE_WITH_EXPORTED_SAMPLE_ID", "rater_id": "synthetic-rater-1", "outcome": "failure", "rationale": "The synthetic marker is absent."},
+  {"sample_id": "REPLACE_WITH_EXPORTED_SAMPLE_ID", "rater_id": "synthetic-rater-2", "outcome": "failure", "rationale": "The response does not include the marker."}
+]

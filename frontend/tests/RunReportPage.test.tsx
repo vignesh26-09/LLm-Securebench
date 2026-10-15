@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import App from "../src/App";
 import { renderWithProviders } from "./test-utils";
 
@@ -20,7 +20,15 @@ describe("run report", () => {
     renderWithProviders(<App />, "/results/run-1");
     expect(await screen.findByText("More evidence required before model selection")).toBeInTheDocument();
     expect(screen.getByText(/not confirmed successful attacks/i)).toBeInTheDocument();
-    expect(screen.getByText("synthetic-override")).toBeInTheDocument();
+    expect(screen.getAllByText("synthetic-override").length).toBeGreaterThan(0);
     expect(screen.getByText("case-1")).toBeInTheDocument();
+    const conclusion = screen.getByRole("region", { name: "Final model conclusion" });
+    expect(conclusion).toHaveTextContent("Do not approve for production");
+    expect(screen.getByText("case-1").compareDocumentPosition(conclusion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Clear" }));
+    expect(screen.getByText("Choose a tile to show its metric details.")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Behavior changes" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Select all" }));
+    expect(screen.getByRole("heading", { name: "Behavior changes" })).toBeInTheDocument();
   });
 });

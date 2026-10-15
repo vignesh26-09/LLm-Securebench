@@ -114,6 +114,22 @@ class ExperimentRunner:
                     f"{sequence_id}-recovery-{probe_position}", messages, prompt,
                     ExperimentalCondition.RECOVERY, sequence_id=sequence_id,
                     sequence_position=probe_position, force=force))
+        if case.benign_control_prompts:
+            sequence_id = f"{case.evaluation_case_id}-benign-control"
+            messages = []
+            values.append(self._turn(spec, model, case, run_id, seed, f"{sequence_id}-baseline",
+                                     messages, case.baseline_prompt, ExperimentalCondition.BASELINE,
+                                     sequence_id=sequence_id, force=force))
+            for position, prompt in enumerate(case.benign_control_prompts, start=1):
+                values.append(self._turn(spec, model, case, run_id, seed,
+                    f"{sequence_id}-turn-{position}", messages, prompt,
+                    ExperimentalCondition.BENIGN_CONTROL, sequence_id=sequence_id,
+                    sequence_position=position, force=force))
+            for position, prompt in enumerate(case.benign_recovery_probes, start=1):
+                values.append(self._turn(spec, model, case, run_id, seed,
+                    f"{sequence_id}-recovery-{position}", messages, prompt,
+                    ExperimentalCondition.BENIGN_RECOVERY, sequence_id=sequence_id,
+                    sequence_position=position, force=force))
         return values
 
     def _turn(self, spec, model, case, run_id, seed, lane, messages, prompt, condition,

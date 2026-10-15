@@ -9,13 +9,13 @@ const requirements: Record<string, [string, string, string]> = {
   "scientific-reviews": ["No explicit scientific reviews have been recorded. Results do not automatically create review decisions.", "/records", "Inspect scientific evidence"],
 };
 const scientific: Record<string, string> = {
-  bsda: "BSDA requires source component evidence from evaluations.",
-  rc: "Recovery Capability requires a source recovery record with its scope and provenance.",
-  saea: "SAEA requires ordered session evidence and the existing sequence analysis output.",
+  bsda: "No matched baseline and perturbed response measurements are saved yet. Use the calculator above with actual paired observations; scientific eligibility still requires validated measurements.",
+  rc: "No qualified baseline, attack and recovery trajectory is saved yet. Use the calculator above with measured states; a missing calibration keeps recovery indices undefined.",
+  saea: "No matched sequential and isolated-control measurements are saved yet. Use the calculator above with actual state evidence; contaminated or missing controls remain blocked.",
   draa: "DRAA requires persisted Mode A/B evidence. Mode C remains deferred by the research specification.",
   pri: "PRI requires persisted descriptive profile records and their coverage metadata.",
   dqi: "DQI requires a persisted output from the existing exploratory dataset analysis. Importing a dataset alone does not calculate DQI.",
-  ml: "ML requires a saved experiment artifact with explicit training, validation and calibration status.",
+  ml: "No eligible labeled experiment is saved yet. The calculator requires independent labels, admissible features and an explicit split; existing readiness records are not model predictions.",
   statistics: "Statistical analysis requires a saved computation artifact with source data and protocol provenance.",
 };
 export function DataRequirement({ resource, filtered = false }: { resource: string; filtered?: boolean }) {

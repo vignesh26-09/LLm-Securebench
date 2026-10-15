@@ -24,6 +24,18 @@ export interface PaginatedScientificRecords {
   offset: number;
 }
 
+export interface MetricCatalog {
+  items: {
+    metric: string;
+    compute_path: string;
+    required_fields: string[];
+    ordinary_run_persists_family: boolean;
+    records: number;
+    statuses: Record<string, number>;
+    scientific_validation: string;
+  }[];
+}
+
 export interface ModelScore {
   id: string;
   run_id: string;
@@ -101,11 +113,26 @@ export interface CalibrationSummary {
 export interface BenchmarkRunInput {
   model: string;
   provider: "ollama-local" | "openai-compatible";
+  dataset_key: "repository-example" | "mixed-source-10000-v1";
+  case_offset: number;
+  case_count: number;
   endpoint?: string;
   api_key?: string;
 }
 
+export interface BenchmarkDataset {
+  id: BenchmarkRunInput["dataset_key"];
+  name: string;
+  case_count: number;
+  available: boolean;
+  category_counts: Record<string, number>;
+  evidence_class: string;
+  max_cases_per_job: number;
+  note: string;
+}
+
 export interface BenchmarkRunReport {
+  metric_profiles?: { family: string; record_count: number; status: string | null; value: number | null; components?: Record<string, number | null>; measurements?: { label: string; value: number; unit: string }[]; note?: string | null }[];
   run: { id: string; status: string; model_name: string | null; model_config_id: string; created_at: string };
   execution: { total_cases: number; completed_cases: number; failed_cases: number; coverage: number; mean_latency_ms: number | null };
   detector_summary: { detector: string; max_score: number; observed_signal_count: number }[];

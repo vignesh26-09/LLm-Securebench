@@ -49,6 +49,8 @@ class OpenAICompatibleProvider:
             "temperature": request.generation.temperature,
             "max_tokens": request.generation.resolved_max_new_tokens,
         }
+        if request.generation.top_p is not None:
+            body["top_p"] = request.generation.top_p
         if self._supports_seed and request.requested_seed is not None:
             body["seed"] = request.requested_seed
         headers = {"Content-Type": "application/json"}
@@ -91,6 +93,8 @@ class OpenAICompatibleProvider:
         body = {"model": request.model.name, "messages": messages,
                 "temperature": request.generation.temperature,
                 "max_tokens": request.generation.resolved_max_new_tokens}
+        if request.generation.top_p is not None:
+            body["top_p"] = request.generation.top_p
         if self._supports_seed and request.requested_seed is not None:
             body["seed"] = request.requested_seed
         value, elapsed = self._post(body, request.generation.timeout_seconds or 180)

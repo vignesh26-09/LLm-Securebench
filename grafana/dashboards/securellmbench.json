@@ -1,0 +1,221 @@
+{
+  "uid": "securellmbench",
+  "title": "SecureLLMBench | Benchmark evidence",
+  "description": "A single-page view of persisted engineering benchmark summaries. No unsupported behavioral-drift value is plotted.",
+  "tags": [
+    "SecureLLMBench",
+    "engineering evidence"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 42,
+  "version": 1,
+  "refresh": "30s",
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "text",
+      "title": "What this dashboard measures",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "# SecureLLMBench benchmark evidence\nThe marked line below shows saved **engineering detector summaries** for repository-example runs using detector formula v1. Each marker is one completed run. Other formula versions are excluded. These are not calibrated model-safety scores. Different runs need not be comparable as a controlled time series.\n\n**Before attack → after attack drift:** unavailable. The database does not yet contain matched, validated behavioral measurements for both conditions; no drift value is inferred or plotted."
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Completed engineering runs",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "securellmbench-sqlite"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "table",
+          "timeColumns": [],
+          "queryText": "SELECT COUNT(*) AS completed_runs FROM scientific_records WHERE family = 'model_score' AND status = 'computed' AND json_extract(provenance, '$.dataset_kind') = 'repository_example' AND json_extract(provenance, '$.scientifically_validated') = 0 AND json_extract(payload, '$.formula_version') = 'engineering-detector-score-v1'",
+          "rawQueryText": "SELECT COUNT(*) AS completed_runs FROM scientific_records WHERE family = 'model_score' AND status = 'computed' AND json_extract(provenance, '$.dataset_kind') = 'repository_example' AND json_extract(provenance, '$.scientifically_validated') = 0 AND json_extract(payload, '$.formula_version') = 'engineering-detector-score-v1'"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "id": 3,
+      "type": "text",
+      "title": "Validated paired drift records",
+      "gridPos": {
+        "x": 8,
+        "y": 4,
+        "w": 8,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "## Unavailable\nNo validated matched before/after attack measurements are persisted."
+      }
+    },
+    {
+      "id": 4,
+      "type": "text",
+      "title": "Evidence class",
+      "gridPos": {
+        "x": 16,
+        "y": 4,
+        "w": 8,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "## Engineering only\nRepository-example detector signals; no safety ranking or model recommendation."
+      }
+    },
+    {
+      "id": 5,
+      "type": "xychart",
+      "title": "Benchmark detector summary by completed run",
+      "description": "Chronological run number is the x-axis. Each point is one persisted engineering detector summary; completion timestamps and run IDs are listed below.",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "securellmbench-sqlite"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "table",
+          "timeColumns": [],
+          "queryText": "SELECT ROW_NUMBER() OVER (ORDER BY created_at, id) AS run_number, ROUND(CAST(json_extract(payload, '$.model_score') AS REAL) * 100, 2) AS detector_summary_pct FROM scientific_records WHERE family = 'model_score' AND status = 'computed' AND json_extract(provenance, '$.dataset_kind') = 'repository_example' AND json_extract(provenance, '$.scientifically_validated') = 0 AND json_extract(payload, '$.formula_version') = 'engineering-detector-score-v1' AND json_extract(payload, '$.model_score') IS NOT NULL ORDER BY created_at, id",
+          "rawQueryText": "SELECT ROW_NUMBER() OVER (ORDER BY created_at, id) AS run_number, ROUND(CAST(json_extract(payload, '$.model_score') AS REAL) * 100, 2) AS detector_summary_pct FROM scientific_records WHERE family = 'model_score' AND status = 'computed' AND json_extract(provenance, '$.dataset_kind') = 'repository_example' AND json_extract(provenance, '$.scientifically_validated') = 0 AND json_extract(payload, '$.formula_version') = 'engineering-detector-score-v1' AND json_extract(payload, '$.model_score') IS NOT NULL ORDER BY created_at, id"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "show": "points+lines",
+            "lineWidth": 3,
+            "pointSize": {
+              "fixed": 7
+            },
+            "pointShape": "circle",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "detector_summary_pct"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "mapping": "auto",
+        "series": [
+          {}
+        ],
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "table",
+      "title": "Run provenance and exact summary values",
+      "datasource": {
+        "type": "frser-sqlite-datasource",
+        "uid": "securellmbench-sqlite"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "queryType": "table",
+          "timeColumns": [],
+          "queryText": "SELECT substr(created_at, 1, 16) AS completed_utc, json_extract(payload, '$.model_name') AS model, json_extract(payload, '$.run_id') AS run_id, printf('%d/%d', json_extract(payload, '$.completed_evaluations'), json_extract(payload, '$.total_evaluations')) AS cases, ROUND(CAST(json_extract(payload, '$.model_score') AS REAL) * 100, 2) AS detector_summary_pct FROM scientific_records WHERE family = 'model_score' AND status = 'computed' AND json_extract(provenance, '$.dataset_kind') = 'repository_example' AND json_extract(provenance, '$.scientifically_validated') = 0 AND json_extract(payload, '$.formula_version') = 'engineering-detector-score-v1' ORDER BY created_at DESC LIMIT 50",
+          "rawQueryText": "SELECT substr(created_at, 1, 16) AS completed_utc, json_extract(payload, '$.model_name') AS model, json_extract(payload, '$.run_id') AS run_id, printf('%d/%d', json_extract(payload, '$.completed_evaluations'), json_extract(payload, '$.total_evaluations')) AS cases, ROUND(CAST(json_extract(payload, '$.model_score') AS REAL) * 100, 2) AS detector_summary_pct FROM scientific_records WHERE family = 'model_score' AND status = 'computed' AND json_extract(provenance, '$.dataset_kind') = 'repository_example' AND json_extract(provenance, '$.scientifically_validated') = 0 AND json_extract(payload, '$.formula_version') = 'engineering-detector-score-v1' ORDER BY created_at DESC LIMIT 50"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "description": "Full source checksums and detector provenance remain in each saved run report."
+    },
+    {
+      "id": 7,
+      "type": "text",
+      "title": "Before / after attack drift readiness",
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 24,
+        "h": 5
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### Baseline → attack → recovery\nThe exploratory Phase 4 observations include condition labels, but their responses have no validated common behavioral state. Plotting a numerical path between conditions would invent a drift measurement. Once matched baseline/attack records and a validated measurement are persisted, this panel can plot the paired change with its source IDs and uncertainty."
+      }
+    }
+  ]
+}

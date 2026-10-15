@@ -1,0 +1,326 @@
+{
+  "comparison": {
+    "common_case_coverage": 0.9833333333333333,
+    "common_n": 295,
+    "evaluators": {
+      "gemma3_4b_fixed_mapping": {
+        "attack_family_strata": null,
+        "common_case": {
+          "accuracy": 0.5389830508474577,
+          "balanced_accuracy": 0.6325096182302457,
+          "cluster_bootstrap_intervals": {
+            "accuracy": [
+              0.47703180212014135,
+              0.5979381443298969
+            ],
+            "balanced_accuracy": [
+              0.601749684741488,
+              0.6640625
+            ],
+            "cohen_kappa": [
+              0.15166491128574894,
+              0.2754296129144247
+            ],
+            "f1": [
+              0.5517241379310345,
+              0.6723163841807909
+            ],
+            "precision": [
+              0.38271604938271603,
+              0.5083333333333333
+            ],
+            "recall": [
+              0.968503937007874,
+              1.0
+            ],
+            "specificity": [
+              0.21164021164021163,
+              0.33678756476683935
+            ]
+          },
+          "cohen_kappa": 0.2112609601698581,
+          "confusion_matrix": {
+            "fn": 1,
+            "fp": 135,
+            "tn": 51,
+            "tp": 108
+          },
+          "f1": 0.6136363636363636,
+          "false_negative_rate": 0.009174311926605505,
+          "false_positive_rate": 0.7258064516129032,
+          "n": 295,
+          "precision": 0.4444444444444444,
+          "raw_agreement": 0.5389830508474577,
+          "recall": 0.9908256880733946,
+          "specificity": 0.27419354838709675
+        },
+        "source_coverage": 0.9833333333333333,
+        "source_coverage_n": 295
+      },
+      "gpt4_cf": {
+        "attack_family_strata": null,
+        "common_case": {
+          "accuracy": 0.9016949152542373,
+          "balanced_accuracy": 0.9030531715497682,
+          "cluster_bootstrap_intervals": {
+            "accuracy": [
+              0.8682432432432432,
+              0.9328621908127208
+            ],
+            "balanced_accuracy": [
+              0.8669511616880038,
+              0.934939944564213
+            ],
+            "cohen_kappa": [
+              0.7222787385554424,
+              0.8546511627906976
+            ],
+            "f1": [
+              0.8266666666666667,
+              0.9107142857142858
+            ],
+            "precision": [
+              0.7735849056603774,
+              0.8991596638655462
+            ],
+            "recall": [
+              0.8495575221238938,
+              0.9587628865979382
+            ],
+            "specificity": [
+              0.8556149732620321,
+              0.9382022471910112
+            ]
+          },
+          "cohen_kappa": 0.7925608011444921,
+          "confusion_matrix": {
+            "fn": 10,
+            "fp": 19,
+            "tn": 167,
+            "tp": 99
+          },
+          "f1": 0.8722466960352423,
+          "false_negative_rate": 0.09174311926605505,
+          "false_positive_rate": 0.10215053763440861,
+          "n": 295,
+          "precision": 0.8389830508474576,
+          "raw_agreement": 0.9016949152542373,
+          "recall": 0.908256880733945,
+          "specificity": 0.8978494623655914
+        },
+        "source_coverage": 1.0,
+        "source_coverage_n": 300
+      },
+      "harmbench_cf": {
+        "attack_family_strata": null,
+        "common_case": {
+          "accuracy": 0.7830508474576271,
+          "balanced_accuracy": 0.8032701982835159,
+          "cluster_bootstrap_intervals": {
+            "accuracy": [
+              0.7344827586206897,
+              0.8266666666666667
+            ],
+            "balanced_accuracy": [
+              0.759189559096686,
+              0.842984068627451
+            ],
+            "cohen_kappa": [
+              0.47054659452899833,
+              0.6491550874521499
+            ],
+            "f1": [
+              0.6846153846153846,
+              0.8045977011494253
+            ],
+            "precision": [
+              0.575,
+              0.7299270072992701
+            ],
+            "recall": [
+              0.8207547169811321,
+              0.944954128440367
+            ],
+            "specificity": [
+              0.6595744680851063,
+              0.7875647668393783
+            ]
+          },
+          "cohen_kappa": 0.5657174403091503,
+          "confusion_matrix": {
+            "fn": 13,
+            "fp": 51,
+            "tn": 135,
+            "tp": 96
+          },
+          "f1": 0.75,
+          "false_negative_rate": 0.11926605504587157,
+          "false_positive_rate": 0.27419354838709675,
+          "n": 295,
+          "precision": 0.6530612244897959,
+          "raw_agreement": 0.7830508474576271,
+          "recall": 0.8807339449541285,
+          "specificity": 0.7258064516129032
+        },
+        "source_coverage": 1.0,
+        "source_coverage_n": 300
+      },
+      "llama3_cf": {
+        "attack_family_strata": null,
+        "common_case": {
+          "accuracy": 0.9084745762711864,
+          "balanced_accuracy": 0.9179244352372498,
+          "cluster_bootstrap_intervals": {
+            "accuracy": [
+              0.8737541528239202,
+              0.9413793103448276
+            ],
+            "balanced_accuracy": [
+              0.8857626299250665,
+              0.9485947879407256
+            ],
+            "cohen_kappa": [
+              0.7367985946057662,
+              0.8759435510338038
+            ],
+            "f1": [
+              0.8392857142857143,
+              0.9259259259259259
+            ],
+            "precision": [
+              0.7592592592592593,
+              0.8852459016393442
+            ],
+            "recall": [
+              0.9139784946236559,
+              0.9904761904761905
+            ],
+            "specificity": [
+              0.835,
+              0.9243243243243243
+            ]
+          },
+          "cohen_kappa": 0.8097092481544306,
+          "confusion_matrix": {
+            "fn": 5,
+            "fp": 22,
+            "tn": 164,
+            "tp": 104
+          },
+          "f1": 0.8851063829787235,
+          "false_negative_rate": 0.045871559633027525,
+          "false_positive_rate": 0.11827956989247312,
+          "n": 295,
+          "precision": 0.8253968253968254,
+          "raw_agreement": 0.9084745762711864,
+          "recall": 0.9541284403669725,
+          "specificity": 0.8817204301075269
+        },
+        "source_coverage": 1.0,
+        "source_coverage_n": 300
+      },
+      "llamaguard2_cf": {
+        "attack_family_strata": null,
+        "common_case": {
+          "accuracy": 0.8745762711864407,
+          "balanced_accuracy": 0.8777498273650981,
+          "cluster_bootstrap_intervals": {
+            "accuracy": [
+              0.8333333333333334,
+              0.91
+            ],
+            "balanced_accuracy": [
+              0.8356941199376947,
+              0.9129001883239172
+            ],
+            "cohen_kappa": [
+              0.6511127440688642,
+              0.8124202467035304
+            ],
+            "f1": [
+              0.7844827586206897,
+              0.8869565217391304
+            ],
+            "precision": [
+              0.719626168224299,
+              0.8629032258064516
+            ],
+            "recall": [
+              0.8240740740740741,
+              0.9484536082474226
+            ],
+            "specificity": [
+              0.8125,
+              0.9111111111111111
+            ]
+          },
+          "cohen_kappa": 0.7372981299188909,
+          "confusion_matrix": {
+            "fn": 12,
+            "fp": 25,
+            "tn": 161,
+            "tp": 97
+          },
+          "f1": 0.8398268398268398,
+          "false_negative_rate": 0.11009174311926606,
+          "false_positive_rate": 0.13440860215053763,
+          "n": 295,
+          "precision": 0.7950819672131147,
+          "raw_agreement": 0.8745762711864407,
+          "recall": 0.8899082568807339,
+          "specificity": 0.8655913978494624
+        },
+        "source_coverage": 1.0,
+        "source_coverage_n": 300
+      }
+    },
+    "interval_unit": "related_group_cluster",
+    "source_n": 300,
+    "status": "exploratory_no_declared_test_split"
+  },
+  "evaluators": {
+    "gemma3_4b_fixed_mapping": {
+      "origin": "persisted local Gemma 3:4B safety_stance score < 0.5",
+      "rubric_difference": "Safety-stance score mapped to jailbreak outcome; not the official JBB rubric"
+    },
+    "gpt4_cf": {
+      "origin": "JailbreakBench judge_comparison source column",
+      "rubric_difference": "Source-native binary jailbreak classifier"
+    },
+    "harmbench_cf": {
+      "origin": "JailbreakBench judge_comparison source column",
+      "rubric_difference": "Source-native binary jailbreak classifier"
+    },
+    "llama3_cf": {
+      "origin": "JailbreakBench judge_comparison source column",
+      "rubric_difference": "Source-native binary jailbreak classifier"
+    },
+    "llamaguard2_cf": {
+      "origin": "JailbreakBench judge_comparison source column",
+      "rubric_difference": "Source-native binary jailbreak classifier"
+    }
+  },
+  "limitations": [
+    "No declared held-out split in the historical source artifact",
+    "Common-case comparison is descriptive, not a newly run evaluator benchmark",
+    "No attack-family field exists in the source CSV; subgroup status unavailable",
+    "Goal-hash cluster bootstrap is exploratory and does not account for every dependence"
+  ],
+  "reference_label": "JailbreakBench human_majority; positive=1",
+  "schema_version": "evaluator-comparison-v1",
+  "source": {
+    "cohen_kappa": 0.2112609601698581,
+    "confusion_matrix": {
+      "fn": 1,
+      "fp": 135,
+      "tn": 51,
+      "tp": 108
+    },
+    "coverage": 0.9833333333333333,
+    "raw_agreement": 0.5389830508474577,
+    "source_n": 300,
+    "source_sha256": "dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5",
+    "status": "verified_from_persisted_artifacts",
+    "usable_n": 295
+  }
+}

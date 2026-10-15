@@ -1,0 +1,24 @@
+# Phase 3A evaluator comparison and integration assessment
+
+The offline harness `scripts/compare_judge_evaluators.py` aligns the stored Gemma prediction and four source-native JailbreakBench classifier columns on the same 295 rows with usable Gemma output. It reports each evaluator's 300-row coverage separately, computes common-case metrics, and resamples by SHA-256 of the source goal to keep repeated goals together. It never calls or downloads a model. The reproducible machine-readable result is `artifacts/phase3a/jbb_evaluator_comparison_v2.json`. The historical source did **not** declare a development/validation/held-out split, so the result status is `exploratory_no_declared_test_split`; do not present these as new held-out performance estimates.
+
+| Stored evaluator | Accuracy | Precision | Recall | Specificity | F1 | Balanced accuracy | Cohen's κ | FP / FN |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Gemma 3:4B safety-stance mapping | 53.90% | 44.44% | 99.08% | 27.42% | 61.36% | 63.25% | 0.211 | 135 / 1 |
+| `harmbench_cf` source column | 78.31% | 65.31% | 88.07% | 72.58% | 75.00% | 80.33% | 0.566 | 51 / 13 |
+| `gpt4_cf` source column | 90.17% | 83.90% | 90.83% | 89.78% | 87.22% | 90.31% | 0.793 | 19 / 10 |
+| `llamaguard2_cf` source column | 87.46% | 79.51% | 88.99% | 86.56% | 83.98% | 87.77% | 0.737 | 25 / 12 |
+| `llama3_cf` source column | 90.85% | 82.54% | 95.41% | 88.17% | 88.51% | 91.79% | 0.810 | 22 / 5 |
+
+All rows use `human_majority=1` as positive. The four `_cf` columns are **published dataset predictions**, not fresh runs in this environment; their model versions/settings and generation metadata are not recovered from this CSV. The official [JailbreakBench README](https://github.com/JailbreakBench/jailbreakbench/blob/main/README.md#judges-dataset) documents those columns and the original judges. The JBB jailbreak judge asks whether a response specifically addresses a harmful request, whereas the current Gemma rubric asks for safety stance and then applies a midpoint mapping. The [official classifier implementation](https://github.com/JailbreakBench/jailbreakbench/blob/main/src/jailbreakbench/classifier.py) documents that substantive rubric difference. Even the same rows do not remove construct differences.
+
+## Integration feasibility
+
+- **JailbreakBench:** [Official code](https://github.com/JailbreakBench/jailbreakbench) is MIT licensed. Its repository documents Llama 3 70B jailbreak and 8B refusal judges reached through an API key; no paid endpoint is invoked here. The present local NVIDIA RTX 4060 Laptop GPU reports 8,188 MiB total memory, so the 70B reference judge is not a practical local run without additional hardware. Its stored source-native classifier predictions already permit an honest offline comparator. Dataset reuse still needs attention to the [constituent source/citation notes](https://github.com/JailbreakBench/jailbreakbench/blob/main/README.md#citation).
+- **StrongREJECT:** The [maintained official package](https://github.com/dsbowen/strong_reject/blob/main/README.md) states MIT licensing, but warns that constituent dataset examples include sources with differing or absent licenses. Its rubric evaluator's documented quickstart uses an OpenAI API key; its fine-tuned evaluator uses gated Gemma weights and an HF token. Neither package nor weights are installed here. The installed `gemma3:4b` is **not** that fine-tuned evaluator. We therefore did not install, download, invoke, or relabel a local model as StrongREJECT. An external StrongREJECT output can be supplied later only as an independently generated, SHA-256-pinned binary prediction file with a predeclared mapping and versioned rubric/model identities.
+
+`compare_judge_evaluators.py --extra-config CONFIG.json` accepts additional *already generated* binary predictions keyed by source `Index`. It rejects missing/duplicate IDs, nonbinary labels, incomplete coverage, and checksum mismatch. It never turns continuous StrongREJECT scores into success labels on its own. The core comparison API supports a held-out-only gate; `core/evaluation/split_integrity.py` must separately validate the complete related-group split manifest before a future result can carry a held-out interpretation. The claim-specific eligibility gate in `core/evaluation/evaluator_eligibility.py` requires a prior locked policy, held-out human reference, and grouped error intervals. It deliberately supplies no universal threshold.
+
+## Human-label workflow verification
+
+The synthetic-only CLI test runs export → blinded public/private split → two conflicting independent judgments → third-party adjudication → versioned SQLite import, then confirms four append-only records, fixture provenance, null binary success for ambiguity, and duplicate-import rejection. Other tests cover changed source hashes and split leakage. These tests validate enforcement paths, not real annotation quality or scientific eligibility.

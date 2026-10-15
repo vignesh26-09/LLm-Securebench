@@ -1,0 +1,133 @@
+{
+  "allocation_sha256": "42e2ed9aa34ad660670e21e76c178cc4cf8981361d4a7e5d65f2f03707fdf657",
+  "approved_fixture_corpus_sha256": "407a42c17d44916b197afb0d6d2ac5f9c99699c2f641d411061edfaa8ec04875",
+  "arms_executed": [
+    "A",
+    "B0",
+    "B1",
+    "I",
+    "R",
+    "S",
+    "T"
+  ],
+  "at_context_pair_rows": [
+    {
+      "a_audit_available": true,
+      "a_completed": true,
+      "a_status": "truncated_known",
+      "a_trial_id": "trial.a40a945bf2e6c06d4348b3c36fd92250",
+      "a_verified_context_eligible": false,
+      "matching_set_id": "pair.d500c4cd09004491dccaa1a0d81b2528",
+      "t_audit_available": true,
+      "t_completed": true,
+      "t_status": "retention_unverifiable",
+      "t_trial_id": "trial.11b1d160719b8cea188806b0dce2e0f2",
+      "t_verified_context_eligible": false,
+      "validity_asymmetry": true
+    },
+    {
+      "a_audit_available": true,
+      "a_completed": false,
+      "a_status": "retention_unverifiable",
+      "a_trial_id": "trial.d32e80b780ac40bb35be4199cfd6a040",
+      "a_verified_context_eligible": false,
+      "matching_set_id": "pair.e767433cd4495452d5b5d572abf43fc1",
+      "t_audit_available": true,
+      "t_completed": true,
+      "t_status": "retention_unverifiable",
+      "t_trial_id": "trial.d932742e7e975487e2708a42368c6308",
+      "t_verified_context_eligible": false,
+      "validity_asymmetry": true
+    },
+    {
+      "a_audit_available": true,
+      "a_completed": true,
+      "a_status": "retention_unverifiable",
+      "a_trial_id": "trial.c328038aef20b3a2d07bcd40f0206b96",
+      "a_verified_context_eligible": false,
+      "matching_set_id": "pair.ebff663075b04cc0e4a58ce894c19710",
+      "t_audit_available": true,
+      "t_completed": true,
+      "t_status": "retention_unverifiable",
+      "t_trial_id": "trial.cce57b5c2d4629887fe06c8b08ba85f6",
+      "t_verified_context_eligible": false,
+      "validity_asymmetry": false
+    }
+  ],
+  "at_context_pairs": {
+    "a_retention_unverifiable": 2,
+    "a_truncated_known": 1,
+    "assigned_pairs": 3,
+    "asymmetric_pairs": 2,
+    "completion_asymmetric_pairs": 1,
+    "differential_validity_warning": true,
+    "missing_context_audits": 0,
+    "t_retention_unverifiable": 3,
+    "t_truncated_known": 0
+  },
+  "b0_distance_not_applicable": true,
+  "context_status_counts": {
+    "retained_verified": 0,
+    "retention_unverifiable": 11,
+    "truncated_known": 1
+  },
+  "coverage": {
+    "assigned": 12,
+    "completed": 10,
+    "failed": 2,
+    "missing": 0,
+    "null_outcomes": 2,
+    "observed": 12
+  },
+  "distance_cells": [
+    0,
+    2,
+    5
+  ],
+  "evidence_class": "mock_fixture",
+  "interrupted_delivery_uncertain_trials": 1,
+  "live_at_rows": 6,
+  "model_downloads": 0,
+  "originality_gate": "G1_STOP",
+  "outcome_fixture_checks": {
+    "both": [
+      1,
+      1,
+      1
+    ],
+    "earlier_only": [
+      0,
+      1,
+      1
+    ],
+    "final_only": [
+      1,
+      0,
+      1
+    ],
+    "interrupted": [
+      null,
+      null,
+      null
+    ],
+    "invalid_filler": [
+      null,
+      null,
+      null
+    ]
+  },
+  "public_observation_count": 12,
+  "real_model_generation_calls": 0,
+  "restricted_record_count": 90,
+  "retry_pre_submission_trials": 1,
+  "schema_version": "p6.1-mock-smoke-v1",
+  "scientific_pilot_evidence": false,
+  "source_sha256": {
+    "core/feasibility_pilot/checker.py": "48d867ef87f7be608baf55f6bbd1d95f24c0351ca806dc0c324eb46b435de833",
+    "core/feasibility_pilot/context.py": "296b9697b6049ec0e3bf23a3750978e25850cb8fae4017d6cd215f2d4ba7a1da",
+    "core/feasibility_pilot/distance.py": "4adf73576e34f27a6de36008ee8f3ce41356e60e776a0bada296fa69e3788f25",
+    "core/feasibility_pilot/runner.py": "b99250193f2417e76039322452b4f7c526879407f438bc241c227b8198842639",
+    "scripts/feasibility_mock_smoke.py": "502571dad89e227fa9f80840d93c3fdc3f5977179b8bfea7a82c6283f0c1e085"
+  },
+  "verified_context_primary_rows": 0
+}

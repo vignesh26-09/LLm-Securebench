@@ -1,0 +1,41 @@
+{
+  "checker_version": "exact-contiguous-v1",
+  "confusion": {
+    "fn": 0,
+    "fp": 0,
+    "tn": 65,
+    "tp": 35
+  },
+  "criteria": {
+    "broad_minimum": 0.99,
+    "critical_negative": 1.0,
+    "critical_positive": 1.0
+  },
+  "defined_y_final_n": 100,
+  "development_sha256": "e5b2f14c88dc255c66fe40184f243f2a01bf983685f93567f428930d8a1af73c",
+  "evidence_class": "fixture_only",
+  "gate": "passed",
+  "heldout_n": 125,
+  "heldout_sha256": "259756111e841061540e22b1c9d4c7eff2a554ec4520f83108ae71065628396b",
+  "model_calls": 0,
+  "scores": {
+    "broad": {
+      "accuracy": 1.0,
+      "correct": 85,
+      "total": 85
+    },
+    "critical_negative": {
+      "accuracy": 1.0,
+      "correct": 20,
+      "total": 20
+    },
+    "critical_positive": {
+      "accuracy": 1.0,
+      "correct": 20,
+      "total": 20
+    }
+  },
+  "sensitivity": 1.0,
+  "specificity": 1.0,
+  "undefined_y_final_n": 25
+}

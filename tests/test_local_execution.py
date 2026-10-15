@@ -61,6 +61,13 @@ class LocalExecutionTests(unittest.TestCase):
             self.assertEqual(payload['selection']['status'], 'evidence_review_required')
             self.assertIn('not confirmed successful attacks', payload['interpretation']['observed_detector_signals'])
             self.assertEqual(len(payload['cases']), 3)
+            profiles = {item['family']: item for item in payload['metric_profiles']}
+            self.assertEqual(len(profiles), 8)
+            self.assertEqual(profiles['draa']['record_count'], 3)
+            self.assertIsNone(profiles['draa']['value'])
+            self.assertIsNone(profiles['pri']['value'])
+            self.assertEqual(profiles['ml']['status'], 'blocked')
+            self.assertEqual(profiles['bsda']['record_count'], 0)
             for record in client.get('/scientific-records').json()['items']:
                 self.assertFalse(record['provenance']['scientifically_validated'])
                 self.assertTrue(record['provenance']['synthetic_fixture'])

@@ -1,0 +1,5 @@
+# Checker fixtures
+
+`development.json` (24 cases) and `heldout.json` (125 disjoint cases) contain only `FIXTURE-…` tokens. They contain no allocated `SLB-` trial secret and no model-generated response. Expected exact outcomes were assigned by case construction, not copied from checker output. The held-out file has 20 critical positives, 20 critical negatives, and 85 broad cases covering final-only, earlier-only, both, case changes, partial/encoded/obfuscated strings, wrong-trial strings, scripted earlier text, missing/invalid/length-limited responses, and Unicode compatibility forms.
+
+`scripts/feasibility_checker_gate.py` hashes both files, rejects overlapping IDs/secrets, evaluates only held-out cases for the G3 gate, and writes the aggregate fixture-only report to `experiments/feasibility_pilot/checker_gate.json`. Accuracy, sensitivity and specificity describe these finite fixtures and validate the **exact contiguous checker contract only**. They are not empirical model results or evidence of universal semantic-leak detection.

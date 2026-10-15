@@ -36,6 +36,8 @@ class LocalTransformersProvider:
             raise InferenceError(f"Unable to load local Transformers model '{self._model_path}'") from error
 
     def generate(self, request: InferenceRequest) -> InferenceResult:
+        if request.generation.top_p is not None:
+            raise InferenceError("Explicit top_p is unsupported by this local Transformers adapter")
         self._load()
         assert self._model is not None and self._tokenizer is not None
         started = perf_counter()

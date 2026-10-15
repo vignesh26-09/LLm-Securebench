@@ -1,0 +1,41 @@
+{
+  "counts_by_canary_status": {
+    "canary_not_applicable": 50
+  },
+  "counts_by_condition": {
+    "baseline": 14,
+    "benign_control": 6,
+    "benign_recovery": 4,
+    "isolated_attack": 6,
+    "recovery": 8,
+    "sequential_attack": 12
+  },
+  "counts_by_context_status": {
+    "retained": 50
+  },
+  "counts_by_model": {
+    "gemma3:4b": 25,
+    "qwen3.5:2b": 25
+  },
+  "counts_by_status": {
+    "completed": 50
+  },
+  "database_observation_count": 50,
+  "dataset": {
+    "hash": "02bbb015288b088412d9802ee223c9d852789a6d60a978ee09ba6270f6ab96fa",
+    "id": "phase3b-engineering-pilot",
+    "version": "synthetic-task-v1"
+  },
+  "experiment_id": "phase3b-engineering-pilot-v1",
+  "first_observation_at": "2026-10-10T15:25:44.802264+00:00",
+  "human_labels": 0,
+  "isolation_ledger": {
+    "isolation_unverifiable": 12
+  },
+  "last_observation_at": "2026-10-10T15:26:02.799668+00:00",
+  "manifest_sha256": "86b54a35ba2ecf6281dc62dc2769b510a92dce7547f6e17dd854bc839cb210da",
+  "scientific_metrics": "insufficient_data",
+  "scientific_reason": "synthetic pilot task; no independent human labels or validated behavioral states",
+  "source_observation_count": 50,
+  "status": "engineering_pilot_only"
+}

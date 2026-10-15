@@ -1,0 +1,138 @@
+{
+  "artifact_hashes": {
+    "observations\\022e5db6c99601ac4ecbc8f5.json": "8b48125b2adc2f7f21f23d451a0f9abe1ad266452fe698b59e8a244b825a5775",
+    "observations\\044019b5e68d013cacf81c23.json": "55cebb87414092644d32f05d80878fd63a430c5167fcc19330e15b8fb9807b5f",
+    "observations\\188087d1d7c7ee8c09259664.json": "484652c89617319b595ca7eba05831446a69d451dd1a51fb21ed8ca41f66ad7c",
+    "observations\\1c69ca44109130f4d68956e7.json": "1ce879d8b0bd03f27679a5025aed675c6bc24851e3bb9533de629d6fcb5e7038",
+    "observations\\1d6f5ef731d291eb85a8e874.json": "e1ec08505a609083d6078da59865324ee36b9087f4d20da10c80ee0eaa0f3c6c",
+    "observations\\27ff0ff55066895655aec956.json": "94195f30970ee69171acf2bb23cf94e67ade965078c2e86d5452bec6fdf0df47",
+    "observations\\2aabc073b40fe3a9256982e8.json": "50f1978a87ab110c79ca04ce35372349c3711a0ef86396f76c1dd3b4cda7eea8",
+    "observations\\2f684995caf8f20a3e493131.json": "07f264021bae75d09ad888c0f05a70ff16d57999f1cc868cd473d6b29caa45d7",
+    "observations\\359bc497100b8bfc69a07d87.json": "700018eec565007019f68a647dde3fea866fca83e5fac3cfc42743b84e6674f2",
+    "observations\\35ee7e9fb664a259606759db.json": "de9685ff8934453632cbc8e2066785bd0b07162f37a39258054cf207e773bab0",
+    "observations\\37596a4aa3261735c1b25dee.json": "b09a4603f719a5393da9a0298963748be42782fc25ac7358fadcc11fd8d715ca",
+    "observations\\44ab41e2a61be3fafdf733b5.json": "9574223c7a08505bcfe03fa25bc2b0b8099b2734b321a52bddcee6951d370dc0",
+    "observations\\467eecd63933fbefb608f820.json": "399cdc9786c41b07384c5af7a32c0da7b37cf2eeac8e65e4387844ecbbfee2f9",
+    "observations\\47cfa27e875669399f396abd.json": "5c601b97fbfae0212d7884f8f7b01e954ebb8f9edb3e42e29b6db08e226db0a3",
+    "observations\\4ffdb51109dbb1715ae03c07.json": "b19afd5c7f7daf1381f4826619f451355261d2b72a3444545bd69ae0a972850c",
+    "observations\\525e6356bbc2c710621b032c.json": "d9d0a41c9063da797555875317de02d0ae4e65abd89a5863f614d46d4f14f686",
+    "observations\\53ee8b594e667c205a0cbecf.json": "bb32cfcaeacd30d80304409d642e4b0d0bf34ad644982938f76db4e60d22e807",
+    "observations\\5a79e30f1f0f1c2506e02b78.json": "ad7d4a185d2de36d64e0be194b5677c42557c7a428855ba55e5b090f9009055c",
+    "observations\\5d3ed2c254896c393ae10a4c.json": "78ae69ad1dc7f3eb99573b20534b64bead0cbc294daca97994170c33fc6795c2",
+    "observations\\6961dcc728eb90472b7dcf86.json": "d2e430e1ed6a7860c2b9d4b0b991e0435980addea4f071de8fdc782204bf4684",
+    "observations\\6a59ebbb8b91476b51a4d79c.json": "cd401553a461dd754c198e5214aa3327f22b83b1b0c5da9c30066b000aa67045",
+    "observations\\6df4495ee3fd20275101c57e.json": "1418d112ff4948f66823f51f6bb4c89f671544a23c4e7051695a043dd788b174",
+    "observations\\73e01de91939b4084cf10822.json": "232d29bdfd13bc33b060618fbe4591caaac2e1ea3d353bdb9b65902edff21ece",
+    "observations\\86c6977bb3186b85c702d408.json": "3c045a74d93fbce44f0c617a5e18abdb0851fdb85bd09136a38eecf834215c90",
+    "observations\\8a6ee47b4c686f4c552d35e8.json": "bfd8cca242cf168d6564aa8334aa3dc6a3d6e80bbd3316fedfcef0ce5a9b9342",
+    "observations\\8ae7ba631c3b311bab2921ce.json": "67a25d32e93ebb4d6d6aad09ba637209b93d29b396c5565cd1e5e56916e63823",
+    "observations\\8c6590aed6d784108adf8f11.json": "2e3182124d72c1e1382a6eea0768e8082d173838c1d3d36224ee6a82dfdae78f",
+    "observations\\8d6cb93aa550a6c2a7e79b02.json": "a71fc514cb3ff28f6b84f15b247527699f67f4c5400ef837116fc1d4cfb9cb41",
+    "observations\\92c4302ce2bdacef5f351adf.json": "c1701f1b2d72a63efa2e73ab54cefb95652363319959d5b04b0451ea1b348b2c",
+    "observations\\9c39600e66811c589850e09f.json": "4e271b0a733d7837bfb7ed1e02916252d3437c4f6eedcffce7d51ff89ae1f5b4",
+    "observations\\a227c17e4dc74fd9f4406d1a.json": "f84bc09217dd89f80a8538661584e766cd7c5f5051a1d24dcce2c4ec1b08f55c",
+    "observations\\a439119aed608e3be898fef9.json": "7dafcc8f35c7634d948fb3c1d97eb8ab606e1f2e894fd5ffd782223d4f1a4e41",
+    "observations\\ade25da5d4b953ee644059ca.json": "5b9bed0382b76568ee2310987dffed831cf82932d6976b28c3dfce0a482f2905",
+    "observations\\b31723e1d263ad48de4c3646.json": "25c39bbfd76d36c94185f1e609554612c67bf5884a52579345e0e327afac205c",
+    "observations\\b40fc4b2d4c422b30eabf110.json": "26bdf67f5035d5b98abdcc9336b78e88e341ed3bdba392306477bc6578c07611",
+    "observations\\b508b8079ac56db44672610d.json": "0a9e7f79766d6b5d2bcc14f5fcb46bf64a248a3185286440d214ca3988faa125",
+    "observations\\b59a9842f96e685f8eb2507e.json": "506a53d5e4e6be8d06d9866daff581f1b15c824fa9cd181671e03b053da70abf",
+    "observations\\b74d45ec1dd80e1fc0f78913.json": "f65e811eba07b7dd5948d16763953aaca23b6ecb019ffa2e82058cdab71e8c33",
+    "observations\\c1a8bffe92f7a756da1900a0.json": "9461f1303f394df2ce132edb52337b2bbb53288e563c1034ac7ab247cc65a90a",
+    "observations\\caa830acca3620d741393644.json": "3ea9f41c84ee56ecc9898903e697411f44e750a7a2d09a364b2efaabe6b3030c",
+    "observations\\caf8599df42fbc37a959745b.json": "738da9752cd2cc59c6f712f6153c5b5bfb8fb97db95c768a83e7dc6558252993",
+    "observations\\cd5ec515bd919cffb92c6726.json": "a0017db57c84e758094b2133056fa828371a8b93fc5f810fe310cc85aa9e9e1e",
+    "observations\\cda16e19eecc07b7687dbf6d.json": "3099e7a1c6210dafa879f9b098a802d0885fcdda6c3c22151f6a890852f38455",
+    "observations\\cdc18ae068577c3d54b19043.json": "8c9e3f3d2e0b7280a524de1359e50325a5a84d49061c406194af3642fddb72ad",
+    "observations\\d1d18916a9eb974ac7c94659.json": "125f487acfb8a712d55918795717daa0345b927327a429517d3392da0e490f30",
+    "observations\\dedf61818d64f9b7e3ce61f1.json": "c1c388f20a493929793c1dc37e14c4901378032f348f13cdf232b9a8e93517fa",
+    "observations\\e7b1fe5c820ff248ec4cd52f.json": "b5aeddd279318393c9661b38ff39fba1c1074028459870354db143ab9572f620",
+    "observations\\e9114c6850680a0ba6a0f53d.json": "9361d12d5da04502cd8938d8c5b52aa3fb750ec089b2a62d06235fa5ac1d3241",
+    "observations\\fa0e602221b59f0ae7d2cabc.json": "955668c0ee2ea62cbd0ff5c5fbd54a0b624887f89cf52f5cb5b11ddde5f0b395",
+    "observations\\fd1476be00edb9f9821860dd.json": "dc7c6e0daafd7bed3c81b23b6c8edde26b980ce1c61ed532353ea3804973f812"
+  },
+  "case_count": 1,
+  "condition_count": 50,
+  "dataset_identity": {
+    "hash": "02bbb015288b088412d9802ee223c9d852789a6d60a978ee09ba6270f6ab96fa",
+    "id": "phase3b-engineering-pilot",
+    "version": "synthetic-task-v1"
+  },
+  "detector_configuration": {
+    "behavior_representation": "not_validated_pilot",
+    "layer1": {
+      "configuration": {},
+      "version": null
+    },
+    "layer2_judge": {
+      "configuration": {},
+      "version": null
+    }
+  },
+  "dirty_working_tree": true,
+  "effective_seeds": [
+    2026
+  ],
+  "evidence_layer_status": {
+    "canary_status_counts": {
+      "canary_not_applicable": 50
+    },
+    "dataset_source_sha256_verified": "02bbb015288b088412d9802ee223c9d852789a6d60a978ee09ba6270f6ab96fa",
+    "evidence_class": "engineering_pilot",
+    "planned_call_budget": 50,
+    "preregistration_id": "local-pilot-freeze-v1",
+    "protocol_lock_sha256": "1b7a5ccb3101003e5772158ea60844636dd4c7a933ceddf78eb0ed2e634c4b16",
+    "protocol_status": "locally_frozen"
+  },
+  "experiment_end": "2026-10-10T15:26:02.813822+00:00",
+  "experiment_id": "phase3b-engineering-pilot-v1",
+  "experiment_start": "2026-10-10T15:24:47.473158+00:00",
+  "failed_count": 0,
+  "generation_settings": {
+    "max_new_tokens": 32,
+    "max_tokens": null,
+    "temperature": 0.0,
+    "timeout_seconds": 90
+  },
+  "git_commit": "fbfba89846b94169c4d006bf79bd8c2103a0151e",
+  "judge_identity": null,
+  "metric_versions": {
+    "experiment_specification": "controlled-trajectory-v1",
+    "measurement": "not_validated_pilot"
+  },
+  "models": [
+    {
+      "context_window": 4096,
+      "name": "qwen3.5:2b",
+      "provider": "ollama-local",
+      "version": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df"
+    },
+    {
+      "context_window": 4096,
+      "name": "gemma3:4b",
+      "provider": "ollama-local",
+      "version": "a2af6cc3eb7fa8be8504abaf9b04e88f17a119ec3f04a3addf55f92841195f5a"
+    }
+  ],
+  "platform": "Windows-11-10.0.26200-SP0",
+  "provider": "ollama-local",
+  "provider_supports_seed": true,
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "requested_seeds": [
+    2026
+  ],
+  "rubric_prompt_versions": {
+    "prompt": "pilot_harmless_v1",
+    "rubric": null
+  },
+  "schema_version": "reproducibility-manifest-v2",
+  "software_versions": {
+    "fastapi": "0.141.1",
+    "securellmbench": "0.1.0",
+    "sqlalchemy": "2.1.1"
+  },
+  "successful_count": 50,
+  "unavailable_reasons": {
+    "judge_identity": "judge_not_configured_for_execution_stage"
+  }
+}

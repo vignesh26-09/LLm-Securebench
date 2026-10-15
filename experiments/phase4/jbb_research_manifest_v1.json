@@ -1,0 +1,126 @@
+{
+  "attack_lineage": [
+    {
+      "artifact_file": "data\\external\\jbb_artifacts_909e68c\\PAIR-black_box-vicuna-13b-v1.5.json",
+      "artifact_sha256": "18b101386419a98fbdf45cb987069f83af3a40d5e0f7f0d32c4e9dc5ecc049b4",
+      "attack_family": "PAIR",
+      "case_id": "jbb-1",
+      "prior_target_model": "vicuna-13b-v1.5",
+      "prompt_sha256": "9983cf48794330e487a0333d7c682cd7e7df56968970333b49499cb6e7db63d1"
+    },
+    {
+      "artifact_file": "data\\external\\jbb_artifacts_909e68c\\GCG-transfer-gpt-3.5-turbo-1106.json",
+      "artifact_sha256": "ff185b1dc73732d830e96efdb3f4a92294ee72e9c88a1800b1d11d4ecb3d4cdf",
+      "attack_family": "GCG",
+      "case_id": "jbb-1",
+      "prior_target_model": "gpt-3.5-turbo-1106",
+      "prompt_sha256": "d396eec2dce0bcdf041fa3070598bdc6446e5bec9b9edbf09153ec9622c9d0e8"
+    },
+    {
+      "artifact_file": "data\\external\\jbb_artifacts_909e68c\\JBC-manual-vicuna-13b-v1.5.json",
+      "artifact_sha256": "1d5df5aa451c3d1bb8a4c048a7b2e1e6132e72f2970cb9d94ffc77f44e0edb39",
+      "attack_family": "JBC",
+      "case_id": "jbb-1",
+      "prior_target_model": "vicuna-13b-v1.5",
+      "prompt_sha256": "4a0c25666280315ce11f2342fa0274af775393b133520918773b82142fd0c446"
+    },
+    {
+      "benign_goal_sha256": "b79613c184d8cbbf1476f5172b5f4321f703f550000754dd6bbadad7a7c931c1",
+      "benign_match": "same source index and category; semantic/length match not validated",
+      "case_id": "jbb-1",
+      "category": "Harassment/Discrimination",
+      "harmful_goal_sha256": "b7b2545e76ea6296571d989ee09c584dddbe55b7b59f741cf62445ca107c4351",
+      "max_calibration_goal_lexical_similarity": 0.4715447154471545,
+      "source": "Original",
+      "source_index": "1"
+    },
+    {
+      "artifact_file": "data\\external\\jbb_artifacts_909e68c\\PAIR-black_box-vicuna-13b-v1.5.json",
+      "artifact_sha256": "18b101386419a98fbdf45cb987069f83af3a40d5e0f7f0d32c4e9dc5ecc049b4",
+      "attack_family": "PAIR",
+      "case_id": "jbb-51",
+      "prior_target_model": "vicuna-13b-v1.5",
+      "prompt_sha256": "3247983d86e1d54df2b806964279c2bf1b9632eaaa9cee4ea209d142d8edf7ab"
+    },
+    {
+      "artifact_file": "data\\external\\jbb_artifacts_909e68c\\GCG-transfer-gpt-3.5-turbo-1106.json",
+      "artifact_sha256": "ff185b1dc73732d830e96efdb3f4a92294ee72e9c88a1800b1d11d4ecb3d4cdf",
+      "attack_family": "GCG",
+      "case_id": "jbb-51",
+      "prior_target_model": "gpt-3.5-turbo-1106",
+      "prompt_sha256": "de168bd8cb28b6de0fc39e673df27af551d652b392af9bfc54d91e328c4cb7e8"
+    },
+    {
+      "artifact_file": "data\\external\\jbb_artifacts_909e68c\\JBC-manual-vicuna-13b-v1.5.json",
+      "artifact_sha256": "1d5df5aa451c3d1bb8a4c048a7b2e1e6132e72f2970cb9d94ffc77f44e0edb39",
+      "attack_family": "JBC",
+      "case_id": "jbb-51",
+      "prior_target_model": "vicuna-13b-v1.5",
+      "prompt_sha256": "029efc81b9b5405928ce7e89eae244e96e02bb024be5ea8e51e4165879273994"
+    },
+    {
+      "benign_goal_sha256": "54f7a344e11468e6b9fb15ec12a0be5ea5d910c9aa578d4f4072c64e99f28f22",
+      "benign_match": "same source index and category; semantic/length match not validated",
+      "case_id": "jbb-51",
+      "category": "Disinformation",
+      "harmful_goal_sha256": "4527475587c9746f2fb398a31fef7c715064318e913da6f582f40c0eb15b165a",
+      "max_calibration_goal_lexical_similarity": 0.45161290322580644,
+      "source": "TDC/HarmBench",
+      "source_index": "51"
+    }
+  ],
+  "dataset_id": "jbb-phase4-exploratory-subset",
+  "dataset_source_sha256": "9c815d6d89b35a5ed5729a883e037c2e52e6411d97f7de0a06361844bdcfc1ba",
+  "dataset_version": "behaviors-886acc3-artifacts-909e68c-v1",
+  "handling": "Treat raw goals, attack prompts, responses, blinded batches and private join map as restricted research data; no public response release without review.",
+  "harmful_internal_lexical_near_duplicate_pairs": [],
+  "historical_calibration_exact_overlap_count_all_harmful": 9,
+  "historical_calibration_lexical_near_overlap_count_all_harmful": 13,
+  "license": {
+    "attack_artifacts": "MIT; local LICENSE in pinned artifact directory",
+    "behaviors": "MIT; local LICENSE in pinned behavior directory",
+    "constituent_sources": "Source field retained; constituent-citation review still required"
+  },
+  "manifest_version": "phase4-jbb-source-manifest-v1",
+  "related_group_ids": [
+    "jbb-goal-1",
+    "jbb-goal-51"
+  ],
+  "research_status": "real_source_exploratory_pilot_not_confirmatory",
+  "selected_calibration_overlap": false,
+  "selected_case_ids": [
+    "jbb-1",
+    "jbb-51"
+  ],
+  "selected_categories": [
+    "Harassment/Discrimination",
+    "Disinformation"
+  ],
+  "source_counts": {
+    "benign": 100,
+    "harmful": 100,
+    "three_verified_artifact_methods": 79
+  },
+  "source_fields_not_present": [
+    "human label for new target response",
+    "sequential attack design",
+    "validated benign semantic match",
+    "model-independent attack efficacy"
+  ],
+  "source_files_sha256": {
+    "data\\external\\jbb_artifacts_909e68c\\GCG-transfer-gpt-3.5-turbo-1106.json": "ff185b1dc73732d830e96efdb3f4a92294ee72e9c88a1800b1d11d4ecb3d4cdf",
+    "data\\external\\jbb_artifacts_909e68c\\JBC-manual-vicuna-13b-v1.5.json": "1d5df5aa451c3d1bb8a4c048a7b2e1e6132e72f2970cb9d94ffc77f44e0edb39",
+    "data\\external\\jbb_artifacts_909e68c\\PAIR-black_box-vicuna-13b-v1.5.json": "18b101386419a98fbdf45cb987069f83af3a40d5e0f7f0d32c4e9dc5ecc049b4",
+    "data\\external\\jbb_behaviors_886acc3\\benign-behaviors.csv": "3cda234d21a991fa309bbfea4b6d9dae31ccdf8e9d452424b6a983e4fdc33468",
+    "data\\external\\jbb_behaviors_886acc3\\harmful-behaviors.csv": "4a8ec6832056b631eb092dccc60d37a61c3d441268268888b3d006288afeffa1"
+  },
+  "source_revisions": {
+    "attack_artifacts": "909e68c01d94222b8ad2e397a017e2e12e2adb73",
+    "behaviors": "886acc352a31533ffbcf4ef22c744658688086fc"
+  },
+  "source_urls": {
+    "attack_artifacts": "https://github.com/JailbreakBench/artifacts",
+    "behaviors": "https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors"
+  },
+  "split": "exploratory_pilot_only; no development/validation/held-out claim"
+}

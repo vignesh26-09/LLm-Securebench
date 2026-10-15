@@ -15,6 +15,7 @@ class GenerationConfig:
     max_new_tokens: int | None = None
     max_tokens: int | None = None
     timeout_seconds: float | None = None
+    top_p: float | None = None
 
     def __post_init__(self) -> None:
         if self.temperature < 0:
@@ -27,6 +28,8 @@ class GenerationConfig:
             raise ValueError("Specify max_new_tokens or max_tokens, not both")
         if self.timeout_seconds is not None and self.timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
+        if self.top_p is not None and not (0 < self.top_p <= 1):
+            raise ValueError("top_p must be in (0, 1]")
 
     @property
     def resolved_max_new_tokens(self) -> int:

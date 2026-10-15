@@ -29,3 +29,6 @@ for ($attempt = 0; $attempt -lt 15; $attempt++) {
 }
 if (-not $verified) { throw "Local services failed verification. Inspect $logDirectory service logs and check for port conflicts." }
 Write-Output 'Verified backend http://127.0.0.1:8000 and dashboard http://127.0.0.1:5173'
+if (Test-Path -LiteralPath (Join-Path $projectRoot '.tmp\grafana-runtime\grafana-13.2.3\bin\grafana.exe')) {
+    & (Join-Path $PSScriptRoot 'start_grafana.ps1')
+}

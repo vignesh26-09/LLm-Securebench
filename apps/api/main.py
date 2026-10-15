@@ -1,4 +1,4 @@
-"""Safe Phase 11 FastAPI surface: health/readiness and read-only scientific records."""
+"""FastAPI surface for persisted evidence, local runs, and ephemeral metric computation."""
 import uuid
 import os
 import json
@@ -17,11 +17,15 @@ from core.health import health_status
 from apps.api.resources import register_resources,project
 from sqlalchemy.exc import SQLAlchemyError
 from apps.api.local_execution import register_execution
-def create_app(database_url:str="sqlite:///./securellmbench.db", *, enable_local_runs:bool=False, enable_remote_runs:bool=False):
+from apps.api.auth import register_auth
+from apps.api.metric_compute import register_metric_compute
+def create_app(database_url:str="sqlite:///./securellmbench.db", *, enable_local_runs:bool=False, enable_remote_runs:bool=False, require_auth:bool=False):
  app=FastAPI(title="SecureLLMBench API"); engine=make_engine(database_url); factory=sessionmaker(engine,expire_on_commit=False,class_=Session)
  if database_url.startswith("sqlite"): Base.metadata.create_all(engine)
  app.state.session_factory=factory
+ register_auth(app,engine,required=require_auth)
  register_resources(app,factory)
+ register_metric_compute(app,factory)
  register_execution(app,database_url,enable_local_runs,enable_remote_runs)
  @app.exception_handler(SQLAlchemyError)
  async def database_error(request,exc):
@@ -66,4 +70,4 @@ def create_app(database_url:str="sqlite:///./securellmbench.db", *, enable_local
    return {"review_id":review.id,"decision":review.decision,"claim_validated":False}
  return app
 app=create_app(enable_local_runs=os.environ.get('SECURELLM_ENABLE_LOCAL_RUNS')=='1',
-               enable_remote_runs=os.environ.get('SECURELLM_ENABLE_REMOTE_RUNS')=='1')
+               enable_remote_runs=os.environ.get('SECURELLM_ENABLE_REMOTE_RUNS')=='1',require_auth=True)

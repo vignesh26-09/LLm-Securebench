@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: SecureLLMBench
+    orgId: 1
+    folder: SecureLLMBench
+    type: file
+    disableDeletion: true
+    editable: false
+    options:
+      path: F:/SecureLLM/grafana/dashboards

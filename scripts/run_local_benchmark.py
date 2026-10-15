@@ -1,4 +1,4 @@
-"""Execute installed Ollama models on existing example input and persist real outputs."""
+"""Execute a bounded, checksum-verified engineering benchmark selection."""
 import argparse
 import hashlib
 import json
@@ -15,8 +15,8 @@ from sqlalchemy.orm import Session
 from core.benchmark.engine import BenchmarkEngine
 from core.benchmark.models import BenchmarkConfig
 from core.benchmark.storage import JsonBenchmarkStore
-from core.dataset.loaders import JsonDatasetLoader
 from core.dataset.normalization import TextNormalizer
+from core.dataset.benchmark_catalog import EXAMPLE_KEY, load_selection
 from core.detection.aggregation import LayerOneAggregator
 from core.detection.detectors import RegexDetector, RegexRule, KeywordDetector, KeywordRule, PatternDetector, PatternRule
 from core.draa import EvidenceExtractor
@@ -31,11 +31,12 @@ from core.persistence.models import ModelConfigEntity, BenchmarkRunEntity, Evalu
 from core.pri.models import SystemConfigurationIdentity, BenchmarkPopulationIdentity, PRIProfileCell, PRIStatus, HierarchyIdentifiers
 from core.pri.profile import PRIProfileBuilder
 from core.statistics.descriptive import summarize
-from scripts.import_repository_data import import_example
+from scripts.import_repository_data import import_example, import_large_source_manifest
 
 
 def run_model(model_name, *, database_url=None, run_id=None, provider=None, inventory=None, output_directory=None,
-              provider_kind='ollama-local', endpoint=None, api_key=None, progress_callback=None):
+              provider_kind='ollama-local', endpoint=None, api_key=None, progress_callback=None,
+              dataset_key=EXAMPLE_KEY, case_offset=0, case_count=None):
     def progress(stage, **details):
         if progress_callback is not None:
             progress_callback(stage, **details)
@@ -60,16 +61,20 @@ def run_model(model_name, *, database_url=None, run_id=None, provider=None, inve
     if not run_id.isalnum():
         raise ValueError('Run identity must be alphanumeric')
     progress('Loading the existing benchmark source')
-    source = ROOT / 'data/raw/example.json'
-    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
-    dataset = TextNormalizer().process(JsonDatasetLoader().load(source))
+    selection = load_selection(dataset_key, offset=case_offset, count=case_count)
+    source_hash = selection.source_sha256
+    dataset = TextNormalizer().process(selection.dataset)
     generation = GenerationConfig(temperature=0, max_new_tokens=128, timeout_seconds=180)
     model = ModelMetadata(model_name, model_provider, info['digest'], capabilities=frozenset(info.get('capabilities', [])))
     config_id = hashlib.sha256(json.dumps({'model': model_name, 'provider': model_provider, 'digest': info['digest'],
                                            'endpoint': endpoint_provenance, 'generation': asdict(generation), 'seed': 2026}, sort_keys=True).encode()).hexdigest()
-    provenance = {'source': 'data/raw/example.json', 'source_sha256': source_hash,
-        'kind': 'local_model_pilot', 'scientifically_validated': False, 'synthetic_fixture': provider is not None,
-        'dataset_kind': 'repository_example', 'normalization': 'TextNormalizer',
+    provenance = {'source': str(selection.source_path.relative_to(ROOT)).replace('\\', '/'),
+        'source_sha256': source_hash, 'source_count': selection.source_count,
+        'case_offset': selection.offset, 'case_count': selection.count,
+        'kind': 'local_model_engineering_run', 'scientifically_validated': False,
+        'synthetic_fixture': provider is not None,
+        'dataset_id': selection.dataset_id, 'dataset_version_id': selection.version_id,
+        'dataset_kind': selection.evidence_class, 'normalization': 'TextNormalizer',
         'detector_recipe': 'scripts/end_to_end_smoke.py',
         'detector_limitation': 'Existing smoke-rule heuristic signals applied to actual responses; not security verdicts.',
         'model_digest': info['digest'], 'provider': model_provider, 'endpoint': endpoint_provenance,
@@ -77,7 +82,10 @@ def run_model(model_name, *, database_url=None, run_id=None, provider=None, inve
     engine = make_engine(database_url or f"sqlite:///{ROOT / 'securellmbench.db'}")
     try:
         with Session(engine) as session:
-            import_example(session)
+            if selection.key == EXAMPLE_KEY:
+                import_example(session)
+            else:
+                import_large_source_manifest(session, selection)
         store = JsonBenchmarkStore(output_directory or ROOT / 'experiments/local-runs')
         if store.path_for(run_id).exists():
             raise ValueError('Run artifact already exists; use a new run identity')
@@ -100,7 +108,7 @@ def run_model(model_name, *, database_url=None, run_id=None, provider=None, inve
                     'details': info.get('details', {}), 'endpoint': endpoint_provenance,
                     'provenance': {k: v for k, v in provenance.items() if k != 'benchmark_run_id'}}))
                 session.flush()
-            session.add(BenchmarkRunEntity(id=run_id, model_config_id=config_id, dataset_version_id=f'repository:example:{source_hash}',
+            session.add(BenchmarkRunEntity(id=run_id, model_config_id=config_id, dataset_version_id=selection.version_id,
                 status=run.status, payload={'generation': asdict(generation), 'seed': 2026, 'provenance': provenance,
                                           'artifact': f'experiments/local-runs/{run_id}.json', 'evaluation_count': len(run.results)}))
             session.flush()
@@ -130,13 +138,15 @@ def run_model(model_name, *, database_url=None, run_id=None, provider=None, inve
                         hierarchy=HierarchyIdentifiers(category=category, base_case_id=evaluation.case.record_id, stochastic_run_id=run_id),
                         provenance={**provenance, 'evaluation_id': evaluation.evaluation_id}))
                 draa = EvidenceExtractor().build(identities={'evaluation_id': evaluation.evaluation_id, 'run_id': run_id,
-                    'case_id': evaluation.case.record_id, 'model_id': config_id, 'dataset_id': 'repository:example',
+                    'case_id': evaluation.case.record_id, 'model_id': config_id,
+                    'dataset_id': selection.dataset_id,
                     'dataset_version': dataset.metadata.version.version}, layer_one=report, provenance=provenance)
                 session.add(metric_record(record_id=f'{evaluation.evaluation_id}:draa', family='draa', scope='EVALUATION',
                     owner_id=evaluation.evaluation_id, status=draa.status.value, domain=draa, provenance=provenance))
             profile = PRIProfileBuilder().build(
                 SystemConfigurationIdentity(config_id, model.provider, model.version, generation=asdict(generation), seeds=(2026,), provenance=provenance),
-                BenchmarkPopulationIdentity(run_id, 'local-pilot-v1', source_hash, 'repository:example', dataset.metadata.version.version,
+                BenchmarkPopulationIdentity(run_id, selection.key, source_hash,
+                    selection.dataset_id, dataset.metadata.version.version,
                     None, None, tuple(sorted({r.category for r in dataset.records if r.category}))), cells=tuple(cells),
                 benchmark_run_ids=(run_id,), provenance=provenance)
             session.add(metric_record(record_id=f'{run_id}:pri', family='pri', scope='BENCHMARK_RUN', owner_id=run_id,

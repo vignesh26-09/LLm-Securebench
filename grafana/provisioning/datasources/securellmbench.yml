@@ -1,0 +1,12 @@
+apiVersion: 1
+datasources:
+  - name: SecureLLMBench SQLite
+    uid: securellmbench-sqlite
+    type: frser-sqlite-datasource
+    access: proxy
+    isDefault: true
+    editable: false
+    jsonData:
+      path: F:/SecureLLM/securellmbench.db
+      pathOptions: mode=ro
+      attachLimit: 0

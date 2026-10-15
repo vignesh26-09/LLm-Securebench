@@ -1,0 +1,41 @@
+{
+  "counts_by_canary_status": {
+    "canary_not_applicable": 100
+  },
+  "counts_by_condition": {
+    "baseline": 28,
+    "benign_control": 12,
+    "benign_recovery": 8,
+    "isolated_attack": 12,
+    "recovery": 16,
+    "sequential_attack": 24
+  },
+  "counts_by_context_status": {
+    "retained": 100
+  },
+  "counts_by_model": {
+    "gemma3:4b": 50,
+    "qwen3.5:2b": 50
+  },
+  "counts_by_status": {
+    "completed": 100
+  },
+  "database_observation_count": 100,
+  "dataset": {
+    "hash": "9c815d6d89b35a5ed5729a883e037c2e52e6411d97f7de0a06361844bdcfc1ba",
+    "id": "jbb-phase4-exploratory-subset",
+    "version": "behaviors-886acc3-artifacts-909e68c-v1"
+  },
+  "experiment_id": "phase4-jbb-exploratory-pilot-v1",
+  "first_observation_at": "2026-10-10T15:55:48.841139+00:00",
+  "human_labels": 0,
+  "isolation_ledger": {
+    "isolation_unverifiable": 24
+  },
+  "last_observation_at": "2026-10-10T15:57:52.156394+00:00",
+  "manifest_sha256": "6fd36674fc88ba0777ef13741a35e7796de4caf91f4b811c8cc71376dd0354eb",
+  "scientific_metrics": "insufficient_data",
+  "scientific_reason": "real-source exploratory pilot; no independent human labels or validated behavioral states",
+  "source_observation_count": 100,
+  "status": "exploratory_unlabeled"
+}

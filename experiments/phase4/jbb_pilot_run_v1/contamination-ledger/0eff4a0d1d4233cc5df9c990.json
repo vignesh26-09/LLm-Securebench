@@ -1,0 +1,41 @@
+{
+  "created_at": "2026-10-10T15:57:52.166507+00:00",
+  "evidence": {
+    "isolated_provider_metadata": {
+      "complete_ordered_history_sent": true,
+      "context_reason": "complete_ordered_history_sent_and_prompt_tokens_within_declared_context_window",
+      "created_at": "2026-10-10T15:57:23.6607614Z",
+      "message_count": 3,
+      "model": "gemma3:4b",
+      "model_digest": "a2af6cc3eb7fa8be8504abaf9b04e88f17a119ec3f04a3addf55f92841195f5a",
+      "options": {
+        "num_ctx": 8192,
+        "num_predict": 96,
+        "seed": 2026,
+        "temperature": 0.0
+      }
+    },
+    "sequential_provider_metadata": {
+      "complete_ordered_history_sent": true,
+      "context_reason": "complete_ordered_history_sent_and_prompt_tokens_within_declared_context_window",
+      "created_at": "2026-10-10T15:57:39.110332Z",
+      "message_count": 5,
+      "model": "gemma3:4b",
+      "model_digest": "a2af6cc3eb7fa8be8504abaf9b04e88f17a119ec3f04a3addf55f92841195f5a",
+      "options": {
+        "num_ctx": 8192,
+        "num_predict": 96,
+        "seed": 2026,
+        "temperature": 0.0
+      }
+    }
+  },
+  "isolated_conversation_id": "9481f080f416f751b464b1b1",
+  "isolated_observation_id": "31bd2b1c4b96117f9ba8afa0",
+  "provider": "ollama-local",
+  "reason": "provider_cache_isolation_evidence_unavailable",
+  "record_id": "0eff4a0d1d4233cc5df9c990",
+  "sequential_conversation_id": "14b9c256ec251c46c18ba476",
+  "sequential_observation_id": "6d9484103f12aad1146f08e2",
+  "status": "isolation_unverifiable"
+}

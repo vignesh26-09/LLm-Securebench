@@ -28,6 +28,8 @@ class OllamaProvider:
         seed = request.requested_seed if request.requested_seed is not None else self.seed
         options = {'temperature': request.generation.temperature,
                    'num_predict': request.generation.resolved_max_new_tokens, 'seed': seed}
+        if request.generation.top_p is not None:
+            options['top_p'] = request.generation.top_p
         body = {'model': request.model.name, 'prompt': request.prompt, 'stream': False,
                 'options': options, 'keep_alive': '5m'}
         if 'thinking' in request.model.capabilities:
@@ -55,7 +57,9 @@ class OllamaProvider:
             value.get('done_reason'),
             {**{key: value.get(key) for key in ('model', 'created_at', 'total_duration', 'load_duration', 'eval_duration', 'prompt_eval_duration')},
              'options': options, 'thinking_enabled': body.get('think'), 'model_digest': request.model.version,
-             'requested_seed': request.requested_seed, 'effective_seed': seed, 'provider_supports_seed': True})
+             'requested_seed': request.requested_seed, 'effective_seed': seed, 'provider_supports_seed': True,
+             'requested_options': options, 'effective_options': None,
+             'effective_options_reason': 'ollama_generation_response_does_not_echo_effective_options'})
 
     def generate_conversation(self, request: ConversationRequest) -> ConversationResponse:
         seed = request.requested_seed if request.requested_seed is not None else self.seed
@@ -65,6 +69,8 @@ class OllamaProvider:
         messages.extend({'role': item.role, 'content': item.content} for item in request.messages)
         options = {'temperature': request.generation.temperature,
                    'num_predict': request.generation.resolved_max_new_tokens, 'seed': seed}
+        if request.generation.top_p is not None:
+            options['top_p'] = request.generation.top_p
         if request.model.context_window is not None:
             options['num_ctx'] = request.model.context_window
         body = {'model': request.model.name, 'messages': messages, 'stream': False,
@@ -80,6 +86,8 @@ class OllamaProvider:
             text = value['message']['content']
             if value.get('done') is not True or not isinstance(text, str):
                 raise InferenceError('Ollama returned an incomplete or invalid conversation response')
+            if not text.strip():
+                raise InferenceError('Ollama returned an empty conversation response')
         except (TimeoutError, socket.timeout) as exc:
             raise InferenceTimeoutError('Local Ollama conversation generation timed out') from exc
         except HTTPError as exc:
@@ -106,5 +114,7 @@ class OllamaProvider:
             {'model': value.get('model'), 'created_at': value.get('created_at'),
              'model_digest': request.model.version, 'options': options,
              'message_count': len(messages), 'context_reason': context_reason,
-             'complete_ordered_history_sent': True},
+             'complete_ordered_history_sent': True,
+             'requested_options': options, 'effective_options': None,
+             'effective_options_reason': 'ollama_generation_response_does_not_echo_effective_options'},
         )

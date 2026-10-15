@@ -21,7 +21,9 @@ def load_experiment_specification(path: Path) -> ExperimentSpecification:
         item["evaluation_case_id"], item["baseline_prompt"],
         tuple(AttackDefinition(**attack) for attack in item["attacks"]),
         tuple(tuple(sequence) for sequence in item.get("sequences", ())),
-        tuple(item.get("recovery_probes", ()))) for item in value["cases"])
+        tuple(item.get("recovery_probes", ())),
+        tuple(item.get("benign_control_prompts", ())),
+        tuple(item.get("benign_recovery_probes", ()))) for item in value["cases"])
     return ExperimentSpecification(
         experiment_id=value["experiment_id"], dataset_id=value["dataset_id"],
         dataset_version=value["dataset_version"], dataset_hash=value["dataset_hash"],

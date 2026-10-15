@@ -1,0 +1,12 @@
+{
+  "amendment_policy": "append a new version with reason; never overwrite this lock",
+  "dataset_sha256": "9c815d6d89b35a5ed5729a883e037c2e52e6411d97f7de0a06361844bdcfc1ba",
+  "evidence_class": "exploratory",
+  "experiment_id": "phase4-jbb-exploratory-pilot-v1",
+  "external_registration": false,
+  "locked_at": "2026-10-10T15:55:26.193472+00:00",
+  "preregistration_id": "phase4-local-exploratory-lock-v1",
+  "protocol_id": "phase4-local-exploratory-lock-v1",
+  "specification_sha256": "3e09e0d10fa64b62c2a642d3e70194bd89344b271d09612fe3dd52890ff8ec30",
+  "status": "locally_frozen"
+}
