@@ -56,7 +56,7 @@ REQUIRED_FIELDS = {
     "ml": ("experiment_id", "task", "schema", "features", "targets", "manifest", "logistic_config"),
     "statistics": ("values",),
 }
-LOCAL_RUN_PERSISTS = frozenset({"draa", "pri", "ml", "statistics"})
+LOCAL_RUN_PERSISTS = frozenset(METRIC_FAMILIES)
 _SECRET_SHAPE = re.compile(r"SLB-[A-Z2-9]{20}")
 
 

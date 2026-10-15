@@ -15,7 +15,7 @@ LARGE_PATH = ROOT / "data/processed/benchmark_10000.jsonl"
 LARGE_MANIFEST = ROOT / "data/benchmark_10000.manifest.json"
 LARGE_KEY = "mixed-source-10000-v1"
 EXAMPLE_KEY = "repository-example"
-MAX_JOB_CASES = 1000
+MAX_JOB_CASES = 10000
 
 
 @dataclass(frozen=True)
@@ -64,7 +64,7 @@ def dataset_options() -> list[dict]:
                     "evidence_class": "unvalidated_mixed_source",
                     "max_cases_per_job": MAX_JOB_CASES,
                     "note": ("5,000 benign task sources + 5,000 first-turn red-team seeds; "
-                             "run in batches, no attack-success labels or validated safety rating.")
+                             "full user-facing runs cover all 10,000; no attack-success labels or validated safety rating.")
                             if available else "Build and verify the pinned local source corpus first."})
     return options
 
@@ -98,7 +98,7 @@ def load_selection(key: str = EXAMPLE_KEY, *, offset: int = 0,
         max_cases = MAX_JOB_CASES
     source_count = len(all_data.records)
     if count is None:
-        count = source_count if key == EXAMPLE_KEY else 100
+        count = source_count
     if type(count) is not int or count < 1 or count > max_cases:
         raise ValueError(f"Case count must be between 1 and {max_cases}")
     if offset + count > source_count:

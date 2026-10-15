@@ -8,12 +8,12 @@ is required for computation when API authentication is enabled.
 
 | Metric path | Existing source engine | Required POST body | Ordinary local run |
 | --- | --- | --- | --- |
-| `bsda` | `core.metrics.bsda.compute_bsda` | `value`: versioned `BSDAInput`; optional caller-supplied `calibration`, `semantic_adapter` (`lexical` or `none`) | Does not create matched baseline/perturbed responses |
-| `recovery` | `RecoveryCapabilityEngine.evaluate_run` | `value`: `RecoveryRunInput`; optional `calibration` | Does not create baseline/attack/recovery state trajectories |
-| `saea` | `SAEAEngine.evaluate` | `value`: `SAEAInput` with matched isolated controls and context status | Does not create sequential/isolated behavioral states |
+| `bsda` | `core.metrics.bsda.compute_bsda` | `value`: versioned `BSDAInput`; optional caller-supplied `calibration`, `semantic_adapter` (`lexical` or `none`) | Full platform runs create two matched pairs per source case |
+| `recovery` | `RecoveryCapabilityEngine.evaluate_run` | `value`: `RecoveryRunInput`; optional `calibration` | Full platform runs create baseline/attack/recovery trajectories; indices remain uncalibrated without an artifact |
+| `saea` | `SAEAEngine.evaluate` | `value`: `SAEAInput` with matched isolated controls and context status | Full platform runs create sequential/isolated observations and exploratory judge states, subject to context and measurement gates |
 | `draa` | `core.draa.diagnostics.summarize` | `records`: nonempty list of `DRAAEvidenceRecord` | Mode A evidence is computed and persisted per completed evaluation |
 | `pri` | `core.pri.diagnostics.summarize` | `profile`: `PRIProfileRecord` | Mode A profile is computed and persisted per run |
-| `dqi` | `core.dataset.quality.calculate_dqi` | `dataset`: `Dataset`; optional `embeddings` and `weights` | Repository example DQI is persisted; a new dataset needs its own calculation |
+| `dqi` | `core.dataset.quality.calculate_dqi` | `dataset`: `Dataset`; optional `embeddings` and `weights` | Full platform runs calculate full-corpus components; semantic novelty/total require embeddings |
 | `ml` | `core.prediction.training.train_fixture_baselines` | `experiment_id`, `task`, `schema`, `features`, `targets`, `manifest`, `logistic_config` | Readiness record is persisted; training needs independent labels and an admissible split |
 | `statistics` | `core.statistics.descriptive.summarize` | `values`: finite observations | Latency summary is computed and persisted per run |
 
@@ -52,6 +52,11 @@ Content-Type: application/json
 
 {"values":[120.0,145.0,130.0]}
 ```
+
+The user-facing benchmark route now requires all 10,000 verified source prompts,
+an installed judge, and explicit full-workload confirmation. It uses the
+checkpointed controlled pipeline described in [FULL_CORPUS_METRIC_EXECUTION.md](FULL_CORPUS_METRIC_EXECUTION.md).
+Legacy subset runs are preserved but do not acquire missing observations.
 
 Inspect `GET /openapi.json` for the route and `GET /metrics/catalog` for the
 current database record counts. Each metric page reads saved records and offers

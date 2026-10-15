@@ -168,36 +168,18 @@ def register_resources(app, factory):
                     "observed_detector_signals": signals,
                 })
             payload = score_record.payload if score_record else {}
-            coverage = payload.get("coverage", completed / len(evaluations) if evaluations else 0.0)
+            planned_cases = run.payload.get('planned_cases', len(evaluations))
+            coverage = completed / planned_cases if planned_cases else 0.0
             related_owners = [run_id, *evaluation_ids]
             if run.dataset_version_id:
                 related_owners.append(run.dataset_version_id)
-            metric_rows = list(session.scalars(select(models.ScientificRecordEntity).where(
-                models.ScientificRecordEntity.owner_id.in_(related_owners),
-                models.ScientificRecordEntity.family.in_(['bsda', 'rc', 'recovery', 'saea', 'draa', 'pri', 'dqi', 'ml', 'statistics']),
-            ).order_by(models.ScientificRecordEntity.created_at.desc())))
-            metric_profiles = []
-            for family in ['bsda', 'rc', 'saea', 'draa', 'pri', 'dqi', 'ml', 'statistics']:
-                from apps.api.metric_projection import measurements
-                matching = [row for row in metric_rows if row.family == family or (family == 'rc' and row.family == 'recovery')]
-                source_payload = matching[0].payload if matching else {}
-                source_score = source_payload.get('score') if family == 'dqi' else None
-                if isinstance(source_score, bool) or not isinstance(source_score, (int, float)):
-                    source_score = None
-                raw_components = source_payload.get('components', {})
-                components = {key: value for key, value in raw_components.items()
-                              if value is None or isinstance(value, (int, float)) and not isinstance(value, bool)} if isinstance(raw_components, dict) else {}
-                metric_profiles.append({'family': family, 'record_count': len(matching),
-                                        'status': matching[0].status if matching else 'not_measured',
-                                        'value': source_score, 'components': components,
-                                        'measurements': measurements(family, source_payload, units=str(matching[0].provenance.get('units', 'source units')) if matching else 'source units'),
-                                        'note': 'Novelty uses an implementation default because embeddings were not supplied.'
-                                        if family == 'dqi' and matching and matching[0].provenance.get('embeddings_supplied') is False else None})
+            from apps.api.metric_projection import project_profiles
+            metric_profiles = project_profiles(session, related_owners, evaluation_ids)
             return {
                 "metric_profiles": metric_profiles,
                 "run": {"id": run.id, "status": run.status, "model_name": model.model_name if model else None,
                         "model_config_id": run.model_config_id, "created_at": run.created_at},
-                "execution": {"total_cases": len(evaluations), "completed_cases": completed, "failed_cases": failed,
+                "execution": {"total_cases": planned_cases, "completed_cases": completed, "failed_cases": failed,
                               "coverage": coverage, "mean_latency_ms": sum(latencies) / len(latencies) if latencies else None},
                 "detector_summary": sorted(detector_summary.values(), key=lambda item: str(item["detector"])),
                 "cases": cases,
@@ -213,7 +195,9 @@ def register_resources(app, factory):
                 "selection": {
                     "status": "evidence_review_required",
                     "label": "More evidence required before model selection",
-                    "reason": "This run records execution and detector-native observations only. It has no independent human outcome labels or validated safety decision rule.",
+                    "reason": "This run includes controlled engineering measurements and automated judge outputs, but has no independent human outcome labels or validated safety decision rule."
+                    if run.payload.get('provenance', {}).get('protocol') == 'full-corpus-controlled-v1'
+                    else "This run records execution and detector-native observations only. It has no independent human outcome labels or validated safety decision rule.",
                 },
                 "interpretation": {
                     "observed_detector_signals": "Detector signals are observations, not confirmed successful attacks or ground-truth safety outcomes.",

@@ -10,6 +10,7 @@ frontend/.npm-cache/
 securellmbench.db
 *.db
 experiments/feasibility_pilot/restricted/
+experiments/local-runs/controlled/
 experiments/phase4/restricted_annotation/
 experiments/phase5/restricted_annotation/
 experiments/phase5/restricted_annotation_v2/

@@ -52,7 +52,9 @@ def register_auth(app, engine, *, required=False):
         guest_read = request.method == "GET" and (path in public_reads or path.startswith("/benchmark-jobs/") or (path.startswith("/benchmark-runs/") and path.endswith("/report")))
         if required and not path.startswith("/auth/") and not guest_read:
             if not identity(request):
-                if path == "/internal/benchmark-jobs" and request.method == "POST":
+                if path.startswith("/internal/benchmark-jobs/") and path.endswith("/stop") and request.method == "POST":
+                    request.state.guest_stop = True
+                elif path == "/internal/benchmark-jobs" and request.method == "POST":
                     try:
                         body = await request.json()
                     except ValueError:
@@ -61,8 +63,8 @@ def register_auth(app, engine, *, required=False):
                         return JSONResponse(status_code=422, content={"detail": "Invalid test configuration"})
                     if body.get("provider", "ollama-local") != "ollama-local" or body.get("model") not in {"gemma3:4b", "qwen3.5:2b", "llama3.2:3b"}:
                         return JSONResponse(status_code=401, content={"detail": "Sign in to connect your own model."})
-                    if not isinstance(body.get("case_count"), int) or not 1 <= body["case_count"] <= 10:
-                        return JSONResponse(status_code=422, content={"detail": "Guest tests support 1–10 cases. Sign in for larger tests."})
+                    if body.get("dataset_key") != "mixed-source-10000-v1" or body.get("case_count") != 10000 or body.get("case_offset", 0) != 0 or body.get("confirm_full_corpus") is not True:
+                        return JSONResponse(status_code=422, content={"detail": "Predefined tests use all 10,000 prompts. Confirm the full run budget before starting."})
                 else:
                     return JSONResponse(status_code=401, content={"detail": "Please sign in to your workspace."})
         if request.method not in {"GET", "HEAD", "OPTIONS"}:

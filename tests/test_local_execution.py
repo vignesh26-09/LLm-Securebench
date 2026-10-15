@@ -91,10 +91,10 @@ class LocalExecutionTests(unittest.TestCase):
         with patch('apps.api.local_execution.installed_models', return_value=INVENTORY):
             self.assertEqual(client.post('/internal/benchmark-jobs', json={'model': 'missing'}, headers={'X-SecureLLM-Local': '1'}).status_code, 422)
             with patch('apps.api.local_execution.threading.Thread'):
-                first = client.post('/internal/benchmark-jobs', json={'model': 'test-model'}, headers={'X-SecureLLM-Local': '1'})
+                first = client.post('/internal/benchmark-jobs', json={'model': 'test-model', 'confirm_full_corpus': True}, headers={'X-SecureLLM-Local': '1'})
                 self.assertEqual(first.status_code, 202)
                 self.assertEqual(client.get(f"/benchmark-jobs/{first.json()['id']}").status_code, 200)
-                self.assertEqual(client.post('/internal/benchmark-jobs', json={'model': 'test-model'}, headers={'X-SecureLLM-Local': '1'}).status_code, 409)
+                self.assertEqual(client.post('/internal/benchmark-jobs', json={'model': 'test-model', 'confirm_full_corpus': True}, headers={'X-SecureLLM-Local': '1'}).status_code, 409)
 
     def test_discovery_failure_is_separate_from_empty_inventory(self):
         client = TestClient(create_app('sqlite:///:memory:'))
@@ -117,9 +117,9 @@ class LocalExecutionTests(unittest.TestCase):
 
     def test_remote_input_never_appears_in_job_response(self):
         client = TestClient(create_app('sqlite:///:memory:', enable_local_runs=True, enable_remote_runs=True), client=('127.0.0.1', 50000))
-        with patch('apps.api.local_execution.threading.Thread'):
+        with patch('apps.api.local_execution.threading.Thread'), patch('apps.api.local_execution.installed_models', return_value=INVENTORY):
             response = client.post('/internal/benchmark-jobs', json={
-                'model': 'remote-model', 'provider': 'openai-compatible', 'endpoint': 'https://example.test/v1', 'api_key': 'ephemeral'
+                'model': 'remote-model', 'provider': 'openai-compatible', 'endpoint': 'https://example.test/v1', 'api_key': 'ephemeral', 'judge_model': 'test-model', 'confirm_full_corpus': True
             }, headers={'X-SecureLLM-Local': '1'})
         self.assertEqual(response.status_code, 202)
         self.assertNotIn('ephemeral', response.text)

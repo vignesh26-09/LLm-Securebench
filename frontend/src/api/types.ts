@@ -99,6 +99,10 @@ export interface BenchmarkJob {
   completed_at?: string;
   completed_cases?: number;
   total_cases?: number;
+  planned_target_calls?: number;
+  planned_judge_calls?: number;
+  judge_model?: string;
+  context_window?: number;
   last_case_id?: string | null;
   last_latency_ms?: number | null;
 }
@@ -116,6 +120,10 @@ export interface BenchmarkRunInput {
   dataset_key: "repository-example" | "mixed-source-10000-v1";
   case_offset: number;
   case_count: number;
+  judge_model?: string;
+  context_window?: number;
+  confirm_full_corpus?: boolean;
+  resume_run_id?: string;
   endpoint?: string;
   api_key?: string;
 }
@@ -132,7 +140,7 @@ export interface BenchmarkDataset {
 }
 
 export interface BenchmarkRunReport {
-  metric_profiles?: { family: string; record_count: number; status: string | null; value: number | null; components?: Record<string, number | null>; measurements?: { label: string; value: number; unit: string }[]; note?: string | null }[];
+  metric_profiles?: { family: string; record_count: number; status: string | null; status_counts?: Record<string, number>; measured_case_count?: number; value: number | null; components?: Record<string, number | null>; measurements?: { label: string; value: number; unit: string; sample_count?: number }[]; note?: string | null }[];
   run: { id: string; status: string; model_name: string | null; model_config_id: string; created_at: string };
   execution: { total_cases: number; completed_cases: number; failed_cases: number; coverage: number; mean_latency_ms: number | null };
   detector_summary: { detector: string; max_score: number; observed_signal_count: number }[];

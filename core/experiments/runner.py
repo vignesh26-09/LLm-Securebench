@@ -7,6 +7,7 @@ import json
 import re
 from dataclasses import asdict
 from pathlib import Path
+from typing import Callable
 
 from core.experiments.models import (
     AttackDefinition, ControlMatchIdentity, ExperimentalCondition,
@@ -16,6 +17,10 @@ from core.experiments.models import (
 from core.experiments.canary import CanaryPolicy, inject_canary, marker_for, verify_canary
 from core.experiments.contamination import ContaminationLedgerStore, assess_isolation
 from core.inference.contracts import ConversationMessage, ConversationRequest
+
+
+class BenchmarkStopRequested(Exception):
+    """Cooperative stop between provider calls; never an observation failure."""
 
 
 class ObservationStore:
@@ -43,12 +48,14 @@ class ObservationStore:
 
 
 class ExperimentRunner:
-    def __init__(self, provider, store: ObservationStore, *, require_locked_preregistration: bool = False) -> None:
+    def __init__(self, provider, store: ObservationStore, *, require_locked_preregistration: bool = False,
+                 stop_requested: Callable[[], bool] | None = None) -> None:
         if not callable(getattr(provider, "generate_conversation", None)):
             raise TypeError("provider does not support conversation-aware inference")
         self.provider = provider
         self.store = store
         self.require_locked_preregistration = require_locked_preregistration
+        self.stop_requested = stop_requested
         self.ledger = ContaminationLedgerStore(store.root.parent / "contamination-ledger")
 
     def run(self, spec: ExperimentSpecification, *, force: bool = False) -> tuple[ExperimentalObservation, ...]:
@@ -143,6 +150,8 @@ class ExperimentRunner:
             return restored
         if existing is not None and force:
             raise FileExistsError("force cannot overwrite immutable observations; use a new experiment identity")
+        if self.stop_requested is not None and self.stop_requested():
+            raise BenchmarkStopRequested()
         conversation_id = _stable_id(run_id, case.evaluation_case_id, lane.split("-")[0], sequence_id)
         turn_index = 1 + max((item.turn_index for item in messages), default=-1)
         policy = CanaryPolicy(**dict(spec.canary_policy)) if spec.canary_policy else CanaryPolicy()
@@ -217,7 +226,7 @@ class ExperimentRunner:
             str(response.metadata.get("context_reason")) if response.metadata.get("context_reason") else None,
             response.conversation_id, response.turn_index,
             tuple(asdict(item) for item in messages), response.text,
-            ObservationStatus.COMPLETED, control, dict(response.metadata), None,
+            ObservationStatus.COMPLETED, control, {**dict(response.metadata), "client_elapsed_latency_ms": response.latency_ms}, None,
             dict(measurement.layer1_configuration), dict(measurement.layer2_judge_configuration),
             dict(measurement.measurement_parameters),
             {"marker_id": evidence.marker_id, "marker": evidence.marker, "turn_index": evidence.turn_index,

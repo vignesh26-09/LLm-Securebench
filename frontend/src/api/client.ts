@@ -31,6 +31,7 @@ export const apiClient = {
   benchmarkDatasets: () => request<{ items: BenchmarkDataset[]; note: string }>("/benchmark-datasets"),
   jobs: () => request<{ items: BenchmarkJob[] }>("/benchmark-jobs"),
   job: (jobId: string) => request<BenchmarkJob>(`/benchmark-jobs/${encodeURIComponent(jobId)}`),
+  stopRun: (jobId: string) => request<BenchmarkJob>(`/internal/benchmark-jobs/${encodeURIComponent(jobId)}/stop`, { method: "POST", headers: { "X-SecureLLM-Local": "1" } }),
   calibrationSummary: () => request<CalibrationSummary>("/calibration-summary"),
   startRun: (input: BenchmarkRunInput) => request<BenchmarkJob>("/internal/benchmark-jobs", { method: "POST", headers: { "Content-Type": "application/json", "X-SecureLLM-Local": "1" }, body: JSON.stringify(input) }),
   resources: (resource: string, offset = 0, filterBy?: string, value?: string) => {

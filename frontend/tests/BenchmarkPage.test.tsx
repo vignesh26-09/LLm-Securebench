@@ -5,7 +5,7 @@ import { renderWithProviders } from "./test-utils";
 const response = (payload: unknown) => Promise.resolve(new Response(JSON.stringify(payload), { status: 200, headers: { "Content-Type": "application/json" } }));
 const datasets = { items: [
   { id: "repository-example", name: "Repository example", case_count: 3, available: true, category_counts: { example: 3 }, evidence_class: "engineering_example", max_cases_per_job: 3, note: "Example cases." },
-  { id: "mixed-source-10000-v1", name: "10,000 sourced prompts", case_count: 10000, available: true, category_counts: { benign_control_source: 5000, red_team_source_seed: 5000 }, evidence_class: "unvalidated_mixed_source", max_cases_per_job: 1000, note: "Engineering source corpus." },
+  { id: "mixed-source-10000-v1", name: "10,000 sourced prompts", case_count: 10000, available: true, category_counts: { benign_control_source: 5000, red_team_source_seed: 5000 }, evidence_class: "unvalidated_mixed_source", max_cases_per_job: 10000, note: "Engineering source corpus." },
 ], note: "Source count only." };
 
 describe("benchmark workspace", () => {
@@ -26,9 +26,11 @@ describe("benchmark workspace", () => {
     renderWithProviders(<App />, "/benchmark");
     expect(await screen.findByText("Gemma 3 4B")).toBeInTheDocument();
     expect(screen.getAllByText("Showcase preset")).toHaveLength(3);
-    expect(screen.getByRole("button", { name: "Run selected batch" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
-    expect(screen.getByRole("button", { name: "Run selected batch" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Run all 10,000 prompts" })).toBeDisabled();
+    fireEvent.click(await screen.findByRole("button", { name: "Select" }));
+    expect(screen.getByRole("button", { name: "Run all 10,000 prompts" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("checkbox", { name: /I understand the full/ }));
+    expect(screen.getByRole("button", { name: "Run all 10,000 prompts" })).toBeEnabled();
   });
 
   it("requires an enabled server before allowing a remote endpoint run", async () => {
@@ -45,10 +47,10 @@ describe("benchmark workspace", () => {
     fireEvent.change(screen.getByLabelText("Model identifier"), { target: { value: "external-model" } });
     fireEvent.change(screen.getByLabelText("HTTPS endpoint"), { target: { value: "https://provider.example/v1" } });
     expect(await screen.findByText("Remote endpoint execution is disabled on this server.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Run selected batch" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Run all 10,000 prompts" })).toBeDisabled();
   });
 
-  it("shows 10,000 distinct source cases and sends a bounded selected window", async () => {
+  it("requires all 10,000 prompts, an installed judge, and workload confirmation", async () => {
     const fetchMock = vi.fn((input: string, init?: RequestInit) => {
       if (input.includes("benchmark-datasets")) return response(datasets);
       if (input.includes("showcase-models")) return response({ items: [
@@ -62,13 +64,14 @@ describe("benchmark workspace", () => {
     vi.stubGlobal("fetch", fetchMock);
     renderWithProviders(<App />, "/benchmark");
     expect(await screen.findByText(/10,000 sourced prompts/)).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Benchmark dataset"), { target: { value: "mixed-source-10000-v1" } });
-    fireEvent.click(screen.getByRole("button", { name: "Select" }));
-    fireEvent.change(screen.getByLabelText("Start case (1-based)"), { target: { value: "1001" } });
-    fireEvent.change(screen.getByLabelText("Cases in this batch"), { target: { value: "1000" } });
-    expect(screen.getByText(/cases 1,001–2,000 of 10,000/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Run selected batch" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Select" }));
+    expect(screen.getByLabelText("Benchmark dataset")).toBeDisabled();
+    expect(screen.getByLabelText("Start case (1-based)")).toHaveAttribute("readonly");
+    expect(screen.getByLabelText("Cases in this test")).toHaveValue(10000);
+    expect(screen.getByText(/Cases 1–10,000 of 10,000/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("checkbox", { name: /I understand the full/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Run all 10,000 prompts" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("internal/benchmark-jobs"),
-      expect.objectContaining({ method: "POST", body: JSON.stringify({ model: "gemma3:4b", provider: "ollama-local", dataset_key: "mixed-source-10000-v1", case_offset: 1000, case_count: 1000 }) })));
+      expect.objectContaining({ method: "POST", body: JSON.stringify({ model: "gemma3:4b", provider: "ollama-local", dataset_key: "mixed-source-10000-v1", case_offset: 0, case_count: 10000, judge_model: "gemma3:4b", context_window: 4096, confirm_full_corpus: true }) })));
   });
 });

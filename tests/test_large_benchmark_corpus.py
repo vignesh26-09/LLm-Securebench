@@ -105,13 +105,13 @@ class LargeCorpusTests(unittest.TestCase):
                                     "external:mixed-source-10000-v1" for record in records))
             app.state.session_factory.kw["bind"].dispose()
 
-    def test_api_exposes_bounded_dataset_selection_without_generation(self):
+    def test_api_requires_full_dataset_selection_without_generation(self):
         client = TestClient(create_app("sqlite:///:memory:", enable_local_runs=True),
                             client=("127.0.0.1", 50000))
         catalog = client.get("/benchmark-datasets").json()
         large = next(item for item in catalog["items"] if item["id"] == LARGE_KEY)
         self.assertTrue(large["available"])
-        self.assertEqual((large["case_count"], large["max_cases_per_job"]), (10000, 1000))
+        self.assertEqual((large["case_count"], large["max_cases_per_job"]), (10000, 10000))
         with patch("apps.api.local_execution.installed_models", return_value=INVENTORY), \
              patch("apps.api.local_execution.threading.Thread") as thread:
             invalid = client.post("/internal/benchmark-jobs", json={
@@ -120,10 +120,10 @@ class LargeCorpusTests(unittest.TestCase):
             self.assertEqual(invalid.status_code, 422)
             valid = client.post("/internal/benchmark-jobs", json={
                 "model": "test-model", "dataset_key": LARGE_KEY,
-                "case_offset": 1000, "case_count": 100}, headers={"X-SecureLLM-Local": "1"})
+                "case_offset": 0, "case_count": 10000, "confirm_full_corpus": True}, headers={"X-SecureLLM-Local": "1"})
             self.assertEqual(valid.status_code, 202)
             self.assertEqual(valid.json()["source_count"], 10000)
-            self.assertEqual(valid.json()["case_count"], 100)
+            self.assertEqual(valid.json()["case_count"], 10000)
             thread.return_value.start.assert_called_once()
 
 

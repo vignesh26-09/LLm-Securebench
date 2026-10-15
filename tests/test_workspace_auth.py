@@ -41,7 +41,7 @@ class WorkspaceAuthTests(unittest.TestCase):
 
     def test_public_presets_and_custom_model_gate(self):
         self.assertEqual(self.client.get('/showcase-models').status_code, 200)
-        preset = {'model': 'gemma3:4b', 'provider': 'ollama-local', 'case_count': 3}
+        preset = {'model': 'gemma3:4b', 'provider': 'ollama-local', 'case_count': 10000, 'dataset_key': 'mixed-source-10000-v1', 'confirm_full_corpus': True}
         # The request passes authentication and reaches the disabled execution gate.
         result = self.client.post('/internal/benchmark-jobs', json=preset)
         self.assertEqual(result.status_code, 403)

@@ -36,7 +36,15 @@ from scripts.import_repository_data import import_example, import_large_source_m
 
 def run_model(model_name, *, database_url=None, run_id=None, provider=None, inventory=None, output_directory=None,
               provider_kind='ollama-local', endpoint=None, api_key=None, progress_callback=None,
-              dataset_key=EXAMPLE_KEY, case_offset=0, case_count=None):
+              dataset_key=EXAMPLE_KEY, case_offset=0, case_count=None,
+              full_corpus=False, judge_model=None, context_window=4096, stop_requested=None):
+    if full_corpus:
+        from scripts.run_full_benchmark import run_full_model
+        return run_full_model(model_name, database_url=database_url, run_id=run_id,
+            provider_kind=provider_kind, endpoint=endpoint, api_key=api_key,
+            judge_model=judge_model, context_window=context_window,
+            progress_callback=progress_callback, provider=provider, inventory=inventory,
+            output_directory=output_directory, stop_requested=stop_requested)
     def progress(stage, **details):
         if progress_callback is not None:
             progress_callback(stage, **details)
