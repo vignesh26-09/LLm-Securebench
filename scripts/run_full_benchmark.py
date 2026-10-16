@@ -6,7 +6,7 @@ approval. Every committed case includes its observations and metric statuses.
 import hashlib
 import json
 import uuid
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from fastapi.encoders import jsonable_encoder
 
@@ -15,6 +15,8 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from core.dataset.benchmark_catalog import LARGE_KEY, load_selection
+from core.dataset.models import Dataset
+from core.dataset.sample_rotation import PILOT_CASES
 from core.dataset.quality import calculate_dqi
 from core.detection.aggregation import LayerOneAggregator
 from core.draa.evidence import EvidenceExtractor
@@ -61,7 +63,7 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
                    provider_kind="ollama-local", endpoint=None, api_key=None,
                    judge_model=None, context_window=4096, progress_callback=None,
                    provider=None, judge=None, inventory=None, output_directory=None,
-                   stop_requested=None):
+                   stop_requested=None, sample_indices=None, sample_cycle=None):
     def progress(stage, **details):
         if progress_callback:
             progress_callback(stage, **details)
@@ -87,6 +89,16 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
     selection = load_selection(LARGE_KEY, offset=0, count=CORPUS_CASES)
     if selection.count != CORPUS_CASES or len(selection.dataset.records) != CORPUS_CASES:
         raise ValueError("Full corpus execution requires every verified source record")
+    if sample_indices is not None:
+        if (len(sample_indices) != PILOT_CASES or len(set(sample_indices)) != PILOT_CASES
+                or any(type(index) is not int or index < 0 or index >= CORPUS_CASES for index in sample_indices)
+                or tuple(sample_indices) != tuple(sorted(sample_indices))
+                or type(sample_cycle) is not int or sample_cycle < 0):
+            raise ValueError("Invalid frozen 50-case pilot allocation")
+        selection = replace(selection,
+            dataset=Dataset(records=tuple(selection.dataset.records[index] for index in sample_indices),
+                            metadata=selection.dataset.metadata), count=PILOT_CASES)
+    total_cases = selection.count
     run_id = run_id or uuid.uuid4().hex
     if not run_id.isalnum():
         raise ValueError("Run identity must be alphanumeric")
@@ -95,14 +107,17 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
     generation = GenerationConfig(temperature=0, max_new_tokens=128, timeout_seconds=180)
     configuration = {"model": model_name, "digest": model.version, "provider": provider_kind,
         "endpoint": endpoint, "judge_model": judge_model, "judge_digest": by_name[judge_model].get("digest"),
-        "context_window": context_window, "generation": asdict(generation), "protocol": PROTOCOL}
+        "context_window": context_window, "generation": asdict(generation), "protocol": PROTOCOL,
+        **({"sample_indices": list(sample_indices), "sample_cycle": sample_cycle} if sample_indices is not None else {})}
     config_id = hashlib.sha256(json.dumps(configuration, sort_keys=True).encode()).hexdigest()
     provenance = {"protocol": PROTOCOL, "reporting_class": "engineering_only",
         "scientifically_validated": False, "synthetic_fixture": fixture_injected,
         "data_origin": "synthetic_fixture" if fixture_injected else "real_persisted",
         "source_sha256": selection.source_sha256, "dataset_id": selection.dataset_id,
         "dataset_version_id": selection.version_id, "source_count": CORPUS_CASES,
-        "case_count": CORPUS_CASES, "case_offset": 0, "benchmark_run_id": run_id,
+        "case_count": total_cases, "case_offset": 0, "benchmark_run_id": run_id,
+        "sample_mode": "balanced_rotating_50" if sample_indices is not None else "full_corpus",
+        "sample_selection_sha256": hashlib.sha256(json.dumps(sample_indices, separators=(",", ":")).encode()).hexdigest() if sample_indices is not None else None,
         "judge_model": judge_model, "judge_is_target_model": judge_model == model_name,
         "judge_validation": "not_established", "helpfulness": "instruction_following_proxy",
         "semantic_adapter": "lexical-token-hash-v1", "calibration": "not_supplied"}
@@ -120,13 +135,17 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
             if saved_run is not None:
                 if saved_run.model_config_id != config_id or saved_run.dataset_version_id != selection.version_id:
                     raise ValueError("Resume configuration or corpus differs from saved run")
+                if saved_run.payload.get("sample_indices") != (list(sample_indices) if sample_indices is not None else None):
+                    raise ValueError("Resume allocation differs from saved run")
                 saved_run.status = "running"
             else:
                 session.add(BenchmarkRunEntity(id=run_id, model_config_id=config_id,
                     dataset_version_id=selection.version_id, status="running",
-                    payload={"provenance": provenance, "planned_cases": CORPUS_CASES,
-                        "planned_target_calls": CORPUS_CASES * TARGET_CALLS_PER_CASE,
-                        "planned_judge_calls": CORPUS_CASES * JUDGE_CALLS_PER_CASE}))
+                    payload={"provenance": provenance, "planned_cases": total_cases,
+                        "sample_indices": list(sample_indices) if sample_indices is not None else None,
+                        "sample_cycle": sample_cycle,
+                        "planned_target_calls": total_cases * TARGET_CALLS_PER_CASE,
+                        "planned_judge_calls": total_cases * JUDGE_CALLS_PER_CASE}))
         detectors = DetectorSafetyClassifier().detectors
         for index, record in enumerate(selection.dataset.records):
             if stop_requested is not None and stop_requested():
@@ -134,10 +153,10 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
             evaluation_id = hashlib.sha256(f"{run_id}:{index}:{record.id}".encode()).hexdigest()[:24]
             with Session(engine) as session:
                 if session.get(EvaluationResultEntity, evaluation_id) is not None:
-                    progress("Resuming committed cases", completed_cases=index + 1, total_cases=CORPUS_CASES)
+                    progress("Resuming committed cases", completed_cases=index + 1, total_cases=total_cases)
                     continue
             progress("Collecting paired, isolated, sequential and recovery answers", completed_cases=index,
-                total_cases=CORPUS_CASES, last_case_id=record.id)
+                total_cases=total_cases, last_case_id=record.id)
             measured = collect_case(record=record, evaluation_id=evaluation_id, model=model,
                 generation=generation, run_id=run_id, selection=selection,
                 provider=execution_provider, judge=judge, root=root / evaluation_id,
@@ -155,7 +174,7 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
                 session.add(EvaluationResultEntity(id=evaluation_id, benchmark_run_id=run_id,
                     case_id=record.id, execution_status="completed" if measured["all_responses_completed"] else "failed",
                     prompt=record.prompt, response=baseline.response, latency_ms=latency,
-                    hierarchy={"dataset_index": index}, provider_metadata={"provenance": provenance,
+                    hierarchy={"dataset_index": index, "source_index": sample_indices[index] if sample_indices is not None else index}, provider_metadata={"provenance": provenance,
                         "observation_artifacts": str(observation_paths.relative_to(root)),
                         "all_controlled_responses_completed": measured["all_responses_completed"],
                         "detector_scope": "maximum detector value across this case's controlled answers"}))
@@ -194,14 +213,14 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
                 session.add(metric_record(record_id=f"{evaluation_id}:draa", family="draa",
                     scope="EVALUATION", owner_id=evaluation_id, status=draa.status.value, domain=draa, provenance=provenance))
             progress("Case observations and metrics committed", completed_cases=index + 1,
-                total_cases=CORPUS_CASES, last_case_id=record.id, last_latency_ms=latency)
+                total_cases=total_cases, last_case_id=record.id, last_latency_ms=latency)
         if stop_requested is not None and stop_requested():
             raise BenchmarkStopRequested()
         _finalize(engine, run_id, config_id, model, generation, selection, provenance, detectors)
         with Session(engine) as session:
             saved = session.get(BenchmarkRunEntity, run_id)
             return {"run_id": run_id, "model": model_name, "provider": provider_kind,
-                "status": saved.status, "evaluations": CORPUS_CASES,
+                "status": saved.status, "evaluations": total_cases,
                 "completed": saved.payload["completed_cases"]}
     except BenchmarkStopRequested:
         with Session(engine) as session, session.begin():
@@ -213,7 +232,7 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
                 saved.payload = {**saved.payload, "completed_cases": count,
                                  "stop_reason": "user_requested"}
         progress("Stopped by user; committed cases and partial observations retained",
-                 completed_cases=count, total_cases=CORPUS_CASES)
+                 completed_cases=count, total_cases=total_cases)
         return {"run_id": run_id, "model": model_name, "provider": provider_kind,
                 "status": "stopped", "evaluations": count, "completed": count}
     finally:
@@ -248,7 +267,7 @@ def _finalize(engine, run_id, config_id, model, generation, selection, provenanc
             "dqi": ("unavailable", calculate_dqi(selection.dataset)),
             "ml": ("blocked", ml_readiness_payload(run_id=run_id, target_labels_available=False)),
             "model_score": ("engineering_only", score_model_run(run_id=run_id, model_name=model.name,
-                total_evaluations=CORPUS_CASES, evaluation_scores=tuple(scores), provenance=provenance)),
+                total_evaluations=selection.count, evaluation_scores=tuple(scores), provenance=provenance)),
         }
         for family, (status, value) in final.items():
             identity = f"{run_id}:full:{family}"
@@ -258,7 +277,7 @@ def _finalize(engine, run_id, config_id, model, generation, selection, provenanc
                     owner_id=run_id, status=str(source_status), domain=value,
                     provenance={**provenance, **({"units": "ms", "measurement": "client_elapsed_latency_ms"} if family == "statistics" else {})}))
         saved = session.get(BenchmarkRunEntity, run_id)
-        saved.status = "completed" if completed == CORPUS_CASES else "completed_with_errors"
+        saved.status = "completed" if completed == selection.count else "completed_with_errors"
         saved.payload = {**saved.payload, "completed_cases": completed, "evaluation_count": len(evaluations)}
 
 

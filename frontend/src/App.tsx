@@ -1,6 +1,6 @@
 import { Link, Route, Routes, useLocation } from "react-router-dom";
 import { AppShell } from "./components/shell/AppShell";
-import { BSDAPage, DQIPage, DRAAPage, MLPredictionPage, PRIPage, RecoveryPage, SAEAPage, StatisticalPage } from "./pages/MetricPages";
+import { BSDAPage, DQIPage, DRAAPage, MatchedHallucinationPage, MLPredictionPage, PRIPage, RecoveryPage, SAEAPage, StatisticalPage } from "./pages/MetricPages";
 import { EntityPage } from "./pages/EntityPage";
 import { StudioDashboard } from "./pages/StudioDashboard";
 import { LandingPage } from "./pages/LandingPage";
@@ -32,6 +32,7 @@ export default function App() {
     <Route path="/evaluations" element={<EntityPage title="Evaluation results" resource="evaluations" description="Stored responses and execution status, with links to source-native layer evidence." />} />
     <Route path="/security" element={<EntityPage title="Security analysis · Layer 1" resource="layer1-results" description="Persisted detector evidence. Explore Layer 2 from each evaluation or the navigation." />} />
     <Route path="/metrics/bsda" element={<BSDAPage />} /><Route path="/metrics/recovery" element={<RecoveryPage />} /><Route path="/metrics/saea" element={<SAEAPage />} /><Route path="/metrics/draa" element={<DRAAPage />} /><Route path="/metrics/pri" element={<PRIPage />} /><Route path="/metrics/dqi" element={<DQIPage />} />
+    <Route path="/metrics/mchl" element={<MatchedHallucinationPage />} />
     <Route path="/ml" element={<MLPredictionPage />} /><Route path="/statistics" element={<StatisticalPage />} />
     <Route path="/comparison" element={<ComparisonPage />} />
     <Route path="/dataset-versions" element={<EntityPage title="Dataset versions" resource="dataset-versions" description="Immutable source snapshots, content hashes and original payloads." />} />

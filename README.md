@@ -66,7 +66,7 @@ Open **Run benchmark** in the dashboard. A local run can use only a model alread
 
 The local startup script enables loopback-only local execution. To allow an OpenAI-compatible endpoint in a controlled deployment, the server operator must explicitly set `SECURELLM_ENABLE_REMOTE_RUNS=1` before starting the API. Remote URLs must use HTTPS unless they target `localhost`, `127.0.0.1`, or `::1`. A submitted key is used for the active request only and is not written to the database or returned by the API.
 
-Each current dashboard run executes the repository's identified three-record engineering example. Its saved response, latency, detector evidence, formula, and provenance are reviewable in the dashboard. It is a pilot implementation, not a validated security benchmark or scientific model ranking.
+The dashboard defaults to a fast ten-prompt response check: five benign and five red-team source prompts sampled without replacement within a rotation cycle. It makes one target-model call per prompt, no judge calls, and saves responses, timing, detector-native evidence, source identity, and sample allocation. The controlled 50-prompt pilot and full 10,000-prompt run remain separate choices; they collect the additional observations needed for BSDA, recovery, and SAEA. The fast check does not measure those controlled metrics or establish a validated security ranking. The 50-prompt run can be stopped and resumed with its original allocation.
 
 ## Paper Dry-Run
 

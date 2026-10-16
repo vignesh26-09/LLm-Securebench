@@ -12,6 +12,7 @@ from core.inference.contracts import InferenceError
 from core.inference.openai_compatible_provider import normalize_endpoint
 from scripts.run_local_benchmark import run_model
 from core.dataset.benchmark_catalog import dataset_options, load_selection, LARGE_KEY
+from core.dataset.sample_rotation import PILOT_CASES, QUICK_CASES, allocate_pilot, allocate_rotating
 
 SHOWCASE_MODELS = (
     {"id": "gemma3:4b", "name": "Gemma 3 4B", "ollama_model": "gemma3:4b",
@@ -63,21 +64,24 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
             output = []
             for saved in session.scalars(statement):
                 config = session.get(ModelConfigEntity, saved.model_config_id)
-                if config is None or config.payload.get('protocol') != 'full-corpus-controlled-v1':
+                if config is None or config.payload.get('protocol') not in {'full-corpus-controlled-v1', 'quick-response-check-v1'}:
                     continue
+                quick = config.payload.get('protocol') == 'quick-response-check-v1'
                 count = session.scalar(select(func.count()).select_from(EvaluationResultEntity).where(
                     EvaluationResultEntity.benchmark_run_id == saved.id))
                 interrupted = saved.status not in {'completed', 'completed_with_errors', 'stopped'}
+                planned = saved.payload.get('planned_cases', 10000)
                 output.append({'id': saved.id, 'model': config.model_name,
-                    'provider': config.payload['provider'], 'judge_model': config.payload['judge_model'],
-                    'context_window': config.payload['context_window'], 'dataset_key': LARGE_KEY,
-                    'case_offset': 0, 'case_count': 10000, 'source_count': 10000,
+                    'provider': config.payload['provider'], 'judge_model': config.payload.get('judge_model'),
+                    'context_window': config.payload.get('context_window'), 'dataset_key': LARGE_KEY,
+                    'case_offset': 0, 'case_count': planned, 'source_count': 10000,
+                    'sample_mode': f'rotating_quick_{planned}' if quick else 'balanced_rotating_50' if planned == PILOT_CASES else 'full_corpus',
                     'status': 'interrupted' if interrupted else saved.status,
                     'stage': ('Server stopped; resume this saved run' if interrupted else
                               'Stopped by user; saved work can be resumed' if saved.status == 'stopped' else 'Completed and persisted'),
                     'error': 'Saved observations and committed cases are retained. Resume with the same configuration.' if interrupted else None,
                     'submitted_at': saved.created_at.isoformat(), 'completed_cases': count,
-                    'total_cases': 10000, 'planned_target_calls': 100000, 'planned_judge_calls': 200000})
+                    'total_cases': planned, 'planned_target_calls': planned * 10, 'planned_judge_calls': planned * 20})
             return output
 
     @app.post('/internal/model-connections', status_code=201)
@@ -189,6 +193,8 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
             job = jobs.get(job_id)
             if job is None:
                 raise HTTPException(404, 'Active benchmark job not found on this server')
+            if job['case_count'] == QUICK_CASES:
+                raise HTTPException(409, 'Quick checks finish after ten bounded calls and cannot be resumed.')
             if getattr(request.state, 'guest_stop', False) and (job['provider'] != 'ollama-local' or job['model'] not in
                     {item['ollama_model'] for item in SHOWCASE_MODELS}):
                 raise HTTPException(401, 'Sign in to stop a custom-model run')
@@ -218,20 +224,22 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
                 raise HTTPException(422, 'Choose an installed model')
         if body.provider == 'openai-compatible' and not remote_enabled:
             raise HTTPException(403, 'Remote model execution is disabled on this server')
-        if body.dataset_key != LARGE_KEY or body.case_offset != 0 or body.case_count != 10000:
-            raise HTTPException(422, 'Every platform test must cover all 10,000 prompts from the verified corpus, starting at case 1.')
-        if not body.confirm_full_corpus:
+        if body.dataset_key != LARGE_KEY or body.case_offset != 0 or body.case_count not in {QUICK_CASES, PILOT_CASES, 10000}:
+            raise HTTPException(422, 'Choose a ten-prompt quick check, rotating 50-prompt pilot, or all 10,000 prompts.')
+        if body.case_count == 10000 and not body.confirm_full_corpus:
             raise HTTPException(422, 'Confirm the full run budget: 100,000 target calls plus up to 200,000 local judge calls.')
-        judge_model = body.judge_model or body.model
-        try:
-            judge_names = {model['name'] for model in installed_models()}
-        except InferenceError:
-            raise HTTPException(503, 'Local Ollama judge is unreachable') from None
-        if judge_model not in judge_names:
-            raise HTTPException(422, 'Choose an installed local judge model. No models are downloaded automatically.')
+        quick = body.case_count == QUICK_CASES
+        judge_model = None if quick else body.judge_model or body.model
+        if not quick:
+            try:
+                judge_names = {model['name'] for model in installed_models()}
+            except InferenceError:
+                raise HTTPException(503, 'Local Ollama judge is unreachable') from None
+            if judge_model not in judge_names:
+                raise HTTPException(422, 'Choose an installed local judge model. No models are downloaded automatically.')
         try:
             selection = load_selection(body.dataset_key, offset=body.case_offset,
-                                       count=body.case_count)
+                                       count=10000)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
         with lock:
@@ -240,26 +248,57 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
             while len(jobs) >= 50:
                 del jobs[next(iter(jobs))]
             job_id = body.resume_run_id or uuid.uuid4().hex
+            sample_indices = None
+            sample_cycle = None
             if body.resume_run_id:
+                if quick:
+                    raise HTTPException(422, 'Quick checks cannot be resumed; start a new rotating sample.')
                 from core.persistence.models import BenchmarkRunEntity, ModelConfigEntity
                 with app.state.session_factory() as session:
                     saved = session.get(BenchmarkRunEntity, job_id)
                     config = session.get(ModelConfigEntity, saved.model_config_id) if saved else None
                     if saved is None or config is None or config.model_name != body.model or config.payload.get('protocol') != 'full-corpus-controlled-v1':
                         raise HTTPException(422, 'Resume requires an existing full-corpus run for this model.')
+                    if saved.payload.get('planned_cases', 10000) != body.case_count or config.payload.get('judge_model') != judge_model or config.payload.get('context_window') != body.context_window or config.payload.get('provider') != body.provider:
+                        raise HTTPException(422, 'Resume requires the original case count, judge, provider and context settings.')
+                    sample_indices = saved.payload.get('sample_indices')
+                    sample_cycle = saved.payload.get('sample_cycle')
+                    if body.case_count == PILOT_CASES and (not isinstance(sample_indices, list) or len(sample_indices) != PILOT_CASES):
+                        raise HTTPException(422, 'Saved pilot allocation is unavailable for resume.')
+            elif body.case_count in {QUICK_CASES, PILOT_CASES}:
+                from sqlalchemy import select
+                from core.persistence.models import ScientificRecordEntity
+                with app.state.session_factory() as session, session.begin():
+                    prior = [row.payload for row in session.scalars(select(ScientificRecordEntity).where(
+                        ScientificRecordEntity.family == 'benchmark_sample_allocation'))
+                        if row.payload.get('source_sha256') == selection.source_sha256]
+                    allocated = allocate_rotating(selection, prior, 5) if quick else allocate_pilot(selection, prior)
+                    sample_indices = list(allocated.indices)
+                    sample_cycle = allocated.cycle
+                    session.add(ScientificRecordEntity(id=f'{job_id}:sample-allocation',
+                        family='benchmark_sample_allocation', schema_version='rotating-quick-10-v1' if quick else 'balanced-rotating-50-v1',
+                        scope='BENCHMARK_RUN', owner_id=job_id, status='assigned',
+                        payload={'sample_indices': sample_indices, 'sample_cycle': sample_cycle,
+                                 'selection_sha256': allocated.selection_sha256,
+                                 'source_sha256': selection.source_sha256},
+                        provenance={'reporting_class': 'engineering_only',
+                                    'scientifically_validated': False, 'assignment': 'without_replacement_within_cycle'}))
             jobs[job_id] = {'id': job_id, 'model': body.model, 'provider': body.provider,
                             'dataset_key': selection.key, 'case_offset': selection.offset,
-                            'case_count': selection.count, 'source_count': selection.source_count,
-                            'judge_model': judge_model, 'context_window': body.context_window, 'total_cases': 10000, 'completed_cases': 0,
-                            'planned_target_calls': 100000, 'planned_judge_calls': 200000,
+                            'case_count': body.case_count, 'source_count': selection.source_count,
+                            'judge_model': judge_model, 'context_window': body.context_window, 'total_cases': body.case_count, 'completed_cases': 0,
+                            'sample_mode': 'rotating_quick_10' if quick else 'balanced_rotating_50' if body.case_count == PILOT_CASES else 'full_corpus',
+                            'planned_target_calls': body.case_count if quick else body.case_count * 10,
+                            'planned_judge_calls': 0 if quick else body.case_count * 20,
                             'status': 'running',
                             'stage': 'Job accepted; preparing benchmark source', 'submitted_at': datetime.now(timezone.utc).isoformat()}
             stop_events[job_id] = threading.Event()
             result = dict(jobs[job_id])
         run_spec = {'model_name': body.model, 'provider_kind': body.provider,
                     'dataset_key': selection.key, 'case_offset': selection.offset,
-                    'case_count': selection.count, 'full_corpus': True,
-                    'judge_model': judge_model, 'context_window': body.context_window}
+                    'case_count': body.case_count, 'full_corpus': not quick,
+                    'judge_model': judge_model, 'context_window': body.context_window,
+                    'sample_indices': sample_indices, 'sample_cycle': sample_cycle}
         if body.provider == 'openai-compatible':
             run_spec.update(endpoint=body.endpoint, api_key=body.api_key)
         threading.Thread(target=execute, args=(job_id, run_spec), daemon=True).start()

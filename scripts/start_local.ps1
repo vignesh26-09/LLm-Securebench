@@ -21,9 +21,9 @@ for ($attempt = 0; $attempt -lt 15; $attempt++) {
     try {
         $health = Invoke-RestMethod 'http://127.0.0.1:8000/health'
         $ready = Invoke-RestMethod 'http://127.0.0.1:8000/ready'
-        $proxy = Invoke-RestMethod 'http://127.0.0.1:5173/dashboard-summary' -Headers @{Accept='application/json'}
+        $proxy = Invoke-RestMethod 'http://127.0.0.1:5173/benchmark-datasets' -Headers @{Accept='application/json'}
         $page = Invoke-WebRequest 'http://127.0.0.1:5173/' -Headers @{Accept='text/html'}
-        if ($health.service -eq 'securellmbench' -and $ready.status -eq 'ready' -and $null -ne $proxy.counts -and $page.Content.Contains('<div id="root"></div>')) { $verified = $true; break }
+        if ($health.service -eq 'securellmbench' -and $ready.status -eq 'ready' -and $null -ne $proxy.items -and $page.Content.Contains('<div id="root"></div>')) { $verified = $true; break }
     } catch { }
     Start-Sleep -Seconds 1
 }

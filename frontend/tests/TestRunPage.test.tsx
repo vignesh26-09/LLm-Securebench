@@ -33,4 +33,13 @@ describe("completed test navigation", () => {
     expect(screen.getByRole("link", { name: /Review settings & resume/ })).toHaveAttribute("href", expect.stringContaining("resume=run-1"));
     expect(screen.queryByRole("link", { name: "See the result" })).not.toBeInTheDocument();
   });
+  it("does not offer a misleading stop or resume for a ten-call check", async () => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(new Response(JSON.stringify({
+      id: "quick-1", status: "running", model: "test-model", provider: "ollama-local",
+      total_cases: 10, completed_cases: 1,
+    }), { status: 200, headers: { "Content-Type": "application/json" } }))));
+    renderWithProviders(<LiveProgress runId="quick-1" />);
+    expect(await screen.findByText("1 of 10 cases saved")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Stop test and keep saved work" })).not.toBeInTheDocument();
+  });
 });

@@ -53,7 +53,7 @@ class MetricComputeAPITests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         items = response.json()["items"]
         self.assertEqual({item["metric"] for item in items},
-                         {"bsda", "recovery", "saea", "draa", "pri", "dqi", "ml", "statistics"})
+                         {"bsda", "recovery", "saea", "draa", "pri", "dqi", "ml", "statistics", "mchl"})
         self.assertTrue(all(item["records"] == 0 for item in items))
 
     def test_bsda_computes_components_without_composite_or_prompt_echo(self):
@@ -138,6 +138,30 @@ class MetricComputeAPITests(unittest.TestCase):
         empty = self.compute("statistics", {"values": []})
         self.assertEqual(empty["status"], "insufficient_data")
 
+    def test_mchl_requires_human_label_references_and_preserves_missing_pairs(self):
+        digest = "a" * 64
+        def arm(pair_id, condition, outcome):
+            return {"observation_id": f"{pair_id}:{condition}", "arm": condition,
+                    "model_id": "local-model", "question_id": pair_id,
+                    "reference_sha256": digest, "configuration_id": "config-v1",
+                    "context_status": "retained_verified", "outcome": outcome,
+                    "label_id": f"human:{pair_id}:{condition}",
+                    "label_source": "human_adjudicated"}
+        pairs = [{"pair_id": "p1", "model_id": "local-model", "question_id": "p1",
+                  "reference_sha256": digest, "configuration_id": "config-v1",
+                  "adversarial": arm("p1", "adversarial", "hallucinated"),
+                  "topic_matched_benign": arm("p1", "topic_matched_benign", "verified_no_hallucination")},
+                 {"pair_id": "p2", "model_id": "local-model", "question_id": "p2",
+                  "reference_sha256": digest, "configuration_id": "config-v1"}]
+        result = self.compute("mchl", {"pairs": pairs})
+        self.assertEqual(result["status"], "descriptive_unvalidated")
+        self.assertEqual(result["result"]["complete_pair_lift"], 1.0)
+        self.assertEqual(result["result"]["assigned_pairs"], 2)
+        self.assertEqual(result["result"]["assigned_population_lower_bound"], 0.0)
+        self.assertEqual(result["result"]["assigned_population_upper_bound"], 1.0)
+        pairs[0]["adversarial"].pop("label_id")
+        self.assertEqual(self.client.post("/metrics/compute/mchl", json={"pairs": pairs}).status_code, 422)
+
     def test_ml_trains_fixture_baseline_only_with_explicit_labels_and_split(self):
         task = PredictionTask("task", "fixture_outcome", "target-v1", "binary_classification",
                               "evaluation_case", PredictionStage.POST_RESPONSE, "admissibility-v1",
@@ -187,7 +211,8 @@ class MetricComputeAPITests(unittest.TestCase):
         self.assertEqual(record.status_code, 200)
         self.assertEqual(record.json()["payload"]["values"]["mean"], 20)
         self.assertEqual(record.json()["provenance"]["reporting_class"], "engineering_only")
-        self.assertEqual(self.client.get("/metrics/catalog").json()["items"][-1]["records"], 1)
+        self.assertEqual(next(item for item in self.client.get("/metrics/catalog").json()["items"]
+                              if item["metric"] == "statistics")["records"], 1)
         self.assertEqual(self.client.post("/metrics/compute/statistics/save", json=payload).status_code, 409)
 
     def test_metric_computation_requires_workspace_session_when_auth_is_enabled(self):

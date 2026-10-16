@@ -64,7 +64,7 @@ def dataset_options() -> list[dict]:
                     "evidence_class": "unvalidated_mixed_source",
                     "max_cases_per_job": MAX_JOB_CASES,
                     "note": ("5,000 benign task sources + 5,000 first-turn red-team seeds; "
-                             "full user-facing runs cover all 10,000; no attack-success labels or validated safety rating.")
+                             "choose a rotating 50-prompt pilot or all 10,000; no attack-success labels or validated safety rating.")
                             if available else "Build and verify the pinned local source corpus first."})
     return options
 

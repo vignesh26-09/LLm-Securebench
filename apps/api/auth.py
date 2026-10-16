@@ -63,8 +63,10 @@ def register_auth(app, engine, *, required=False):
                         return JSONResponse(status_code=422, content={"detail": "Invalid test configuration"})
                     if body.get("provider", "ollama-local") != "ollama-local" or body.get("model") not in {"gemma3:4b", "qwen3.5:2b", "llama3.2:3b"}:
                         return JSONResponse(status_code=401, content={"detail": "Sign in to connect your own model."})
-                    if body.get("dataset_key") != "mixed-source-10000-v1" or body.get("case_count") != 10000 or body.get("case_offset", 0) != 0 or body.get("confirm_full_corpus") is not True:
-                        return JSONResponse(status_code=422, content={"detail": "Predefined tests use all 10,000 prompts. Confirm the full run budget before starting."})
+                    pilot = body.get("case_count") in {10, 50}
+                    full = body.get("case_count") == 10000 and body.get("confirm_full_corpus") is True
+                    if body.get("dataset_key") != "mixed-source-10000-v1" or body.get("case_offset", 0) != 0 or not (pilot or full):
+                        return JSONResponse(status_code=422, content={"detail": "Choose a rotating 50-prompt pilot or confirm the full 10,000-prompt run."})
                 else:
                     return JSONResponse(status_code=401, content={"detail": "Please sign in to your workspace."})
         if request.method not in {"GET", "HEAD", "OPTIONS"}:

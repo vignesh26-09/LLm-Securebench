@@ -10,6 +10,7 @@ const fields: Record<string, string> = {
   dqi: "dataset; embeddings optional for semantic novelty",
   ml: "experiment_id, task, schema, features, targets, manifest, logistic_config",
   statistics: "values (finite numbers in one unit)",
+  mchl: "pairs (assigned adversarial and topic-matched benign factual observations with human label references)",
 };
 
 export function MetricWorkbench({ fixedMetric, onSaved }: { fixedMetric?: string; onSaved?: () => void } = {}) {

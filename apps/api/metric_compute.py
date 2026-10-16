@@ -24,6 +24,7 @@ from core.dataset.quality import DqiWeights, calculate_dqi
 from core.draa.diagnostics import summarize as summarize_draa
 from core.draa.models import DRAAEvidenceRecord
 from core.metrics.bsda import BSDAInput, BSDACalibrationArtifact, BSDAValidationError
+from core.metrics.matched_hallucination import MatchedFactualPair, compute_matched_hallucination_lift
 from core.metrics.bsda_adapters import (
     DetectorSafetyClassifier, LexicalSemanticRepresentation, compute_bsda_with_adapters,
 )
@@ -49,12 +50,14 @@ METRIC_FAMILIES = {
     "dqi": ("dqi",),
     "ml": ("ml",),
     "statistics": ("statistics",),
+    "mchl": ("mchl",),
 }
 REQUIRED_FIELDS = {
     "bsda": ("value",), "recovery": ("value",), "saea": ("value",),
     "draa": ("records",), "pri": ("profile",), "dqi": ("dataset",),
     "ml": ("experiment_id", "task", "schema", "features", "targets", "manifest", "logistic_config"),
     "statistics": ("values",),
+    "mchl": ("pairs",),
 }
 LOCAL_RUN_PERSISTS = frozenset(METRIC_FAMILIES)
 _SECRET_SHAPE = re.compile(r"SLB-[A-Z2-9]{20}")
@@ -169,6 +172,15 @@ def compute_metric(metric: str, payload: dict[str, Any]) -> dict[str, Any]:
         if len(values) > 100000:
             raise HTTPException(422, "too_many_statistical_values")
         return _result(metric, summarize_statistics(values))
+    if metric == "mchl":
+        pairs = _parse(tuple[MatchedFactualPair, ...], _required(payload, "pairs"))
+        if len(pairs) > 10000:
+            raise HTTPException(422, "too_many_mchl_pairs")
+        try:
+            result = compute_matched_hallucination_lift(pairs)
+        except ValueError:
+            raise HTTPException(422, "invalid_mchl_pair_identity") from None
+        return _result(metric, result)
     task = _parse(PredictionTask, _required(payload, "task"))
     schema = _parse(FeatureSchema, _required(payload, "schema"))
     features = _parse(tuple[FeatureRecord, ...], _required(payload, "features"))

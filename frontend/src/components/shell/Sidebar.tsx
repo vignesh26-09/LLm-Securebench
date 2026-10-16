@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 const workspace = [["/workspace", "Dashboard"], ["/benchmark", "Test a model"], ["/import", "Import your model"], ["/models", "Model library"]] as const;
 const metrics = [
   ["/reviews", "Scientific reviews"], ["/metrics/bsda", "BSDA"], ["/metrics/recovery", "Recovery capability"], ["/metrics/saea", "SAEA"],
-  ["/metrics/draa", "DRAA"], ["/metrics/pri", "PRI"], ["/metrics/dqi", "DQI"], ["/ml", "ML prediction"], ["/statistics", "Statistical analysis"],
+  ["/metrics/draa", "DRAA"], ["/metrics/pri", "PRI"], ["/metrics/dqi", "DQI"], ["/metrics/mchl", "Hallucination lift"], ["/ml", "ML prediction"], ["/statistics", "Statistical analysis"],
 ] as const;
 
 function NavigationLinks({ items }: { items: readonly (readonly [string, string])[] }) {

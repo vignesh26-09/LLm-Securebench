@@ -4,7 +4,7 @@ import hashlib
 import json
 import sys
 import uuid
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +16,9 @@ from core.benchmark.engine import BenchmarkEngine
 from core.benchmark.models import BenchmarkConfig
 from core.benchmark.storage import JsonBenchmarkStore
 from core.dataset.normalization import TextNormalizer
-from core.dataset.benchmark_catalog import EXAMPLE_KEY, load_selection
+from core.dataset.benchmark_catalog import EXAMPLE_KEY, LARGE_KEY, load_selection
+from core.dataset.sample_rotation import QUICK_CASES
+from core.dataset.models import Dataset
 from core.detection.aggregation import LayerOneAggregator
 from core.detection.detectors import RegexDetector, RegexRule, KeywordDetector, KeywordRule, PatternDetector, PatternRule
 from core.draa import EvidenceExtractor
@@ -37,14 +39,16 @@ from scripts.import_repository_data import import_example, import_large_source_m
 def run_model(model_name, *, database_url=None, run_id=None, provider=None, inventory=None, output_directory=None,
               provider_kind='ollama-local', endpoint=None, api_key=None, progress_callback=None,
               dataset_key=EXAMPLE_KEY, case_offset=0, case_count=None,
-              full_corpus=False, judge_model=None, context_window=4096, stop_requested=None):
+              full_corpus=False, judge_model=None, context_window=4096, stop_requested=None,
+              sample_indices=None, sample_cycle=None):
     if full_corpus:
         from scripts.run_full_benchmark import run_full_model
         return run_full_model(model_name, database_url=database_url, run_id=run_id,
             provider_kind=provider_kind, endpoint=endpoint, api_key=api_key,
             judge_model=judge_model, context_window=context_window,
             progress_callback=progress_callback, provider=provider, inventory=inventory,
-            output_directory=output_directory, stop_requested=stop_requested)
+            output_directory=output_directory, stop_requested=stop_requested,
+            sample_indices=sample_indices, sample_cycle=sample_cycle)
     def progress(stage, **details):
         if progress_callback is not None:
             progress_callback(stage, **details)
@@ -69,10 +73,20 @@ def run_model(model_name, *, database_url=None, run_id=None, provider=None, inve
     if not run_id.isalnum():
         raise ValueError('Run identity must be alphanumeric')
     progress('Loading the existing benchmark source')
-    selection = load_selection(dataset_key, offset=case_offset, count=case_count)
+    selection = load_selection(dataset_key, offset=case_offset, count=10000 if sample_indices is not None else case_count)
+    if sample_indices is not None:
+        if (dataset_key != LARGE_KEY or len(sample_indices) != QUICK_CASES or len(set(sample_indices)) != QUICK_CASES
+                or tuple(sample_indices) != tuple(sorted(sample_indices))
+                or any(type(index) is not int or index < 0 or index >= 10000 for index in sample_indices)
+                or type(sample_cycle) is not int or sample_cycle < 0):
+            raise ValueError('Invalid frozen ten-case quick-check allocation')
+        selection = replace(selection, dataset=Dataset(
+            records=tuple(selection.dataset.records[index] for index in sample_indices),
+            metadata=selection.dataset.metadata), count=QUICK_CASES)
     source_hash = selection.source_sha256
     dataset = TextNormalizer().process(selection.dataset)
-    generation = GenerationConfig(temperature=0, max_new_tokens=128, timeout_seconds=180)
+    generation = GenerationConfig(temperature=0, max_new_tokens=64 if sample_indices is not None else 128,
+                                  timeout_seconds=20 if sample_indices is not None else 180)
     model = ModelMetadata(model_name, model_provider, info['digest'], capabilities=frozenset(info.get('capabilities', [])))
     config_id = hashlib.sha256(json.dumps({'model': model_name, 'provider': model_provider, 'digest': info['digest'],
                                            'endpoint': endpoint_provenance, 'generation': asdict(generation), 'seed': 2026}, sort_keys=True).encode()).hexdigest()
@@ -87,6 +101,9 @@ def run_model(model_name, *, database_url=None, run_id=None, provider=None, inve
         'detector_limitation': 'Existing smoke-rule heuristic signals applied to actual responses; not security verdicts.',
         'model_digest': info['digest'], 'provider': model_provider, 'endpoint': endpoint_provenance,
         'benchmark_run_id': run_id}
+    if sample_indices is not None:
+        provenance.update(sample_mode='rotating_quick_10', sample_indices=list(sample_indices),
+                          sample_cycle=sample_cycle, protocol='quick-response-check-v1')
     engine = make_engine(database_url or f"sqlite:///{ROOT / 'securellmbench.db'}")
     try:
         with Session(engine) as session:
@@ -114,10 +131,12 @@ def run_model(model_name, *, database_url=None, run_id=None, provider=None, inve
                 session.add(ModelConfigEntity(id=config_id, model_name=model_name, payload={
                     'provider': model.provider, 'digest': model.version, 'generation': asdict(generation), 'seed': 2026,
                     'details': info.get('details', {}), 'endpoint': endpoint_provenance,
+                    'protocol': 'quick-response-check-v1' if sample_indices is not None else 'local-engineering-v1',
                     'provenance': {k: v for k, v in provenance.items() if k != 'benchmark_run_id'}}))
                 session.flush()
             session.add(BenchmarkRunEntity(id=run_id, model_config_id=config_id, dataset_version_id=selection.version_id,
                 status=run.status, payload={'generation': asdict(generation), 'seed': 2026, 'provenance': provenance,
+                                          'planned_cases': selection.count,
                                           'artifact': f'experiments/local-runs/{run_id}.json', 'evaluation_count': len(run.results)}))
             session.flush()
             for evaluation in run.results:
