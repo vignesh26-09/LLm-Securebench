@@ -1,0 +1,4 @@
+# Preserve bytes used by pinned evidence hashes and the immutable corpus builder.
+experiments/phase4/jbb_pilot_dataset_v1.json text eol=lf
+experiments/phase4/jbb_pilot_specification_v1.json text eol=lf
+data/benchmark_10000.manifest.json text eol=lf

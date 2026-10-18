@@ -1,0 +1,7 @@
+# Fast response check
+
+The dashboard's default test size is ten rotating source prompts: five benign and five red-team. The backend draws them from the checksum-verified 10,000-prompt corpus without replacement within each ten-case rotation cycle and stores the assigned indices and source hash before inference. This is an engineering connection and response check, not a substitute for the 50-case controlled pilot or a scientific model-safety evaluation.
+
+Each selected prompt receives one direct target-model response. The quick generation contract uses a 64-token output cap, 20-second per-call timeout, zero retries, and no LLM judge. The run persists response status, latency, source provenance, detector-native signals, and an engineering-only report. BSDA, recovery capability, and SAEA stay `not_measured` because their paired and sequential observations are absent. Time to completion depends on model loading and hardware; a live ten-prompt Gemma check completed all cases in 20.5 seconds on the local host on 16 October 2026. This is an observed example, not a time guarantee.
+
+The controlled 50-prompt mode is still available for exploratory metric evidence. It makes up to 10 target and 20 judge calls per source prompt, preserves its original random allocation on resume, and can take substantially longer. The full 10,000-prompt mode requires explicit workload confirmation. Neither engineering mode replaces human outcome labels or metric calibration.

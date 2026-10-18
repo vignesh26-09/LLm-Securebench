@@ -1,0 +1,46 @@
+# SecureLLMBench: preliminary novelty and prior-work review
+
+**Reviewed:** 10 October 2026. **Cost:** free, using open papers and public proceedings.  
+**Purpose:** assess defensible contribution wording, not certify priority or validate metric performance.
+
+## Scope and method
+
+I compared the current repository's implemented protocol and evidence gates with primary benchmark and evaluation papers. Searches covered standardized jailbreak evaluation, human agreement of automated judges, multi-turn safety, sequence effects, and recovery after misalignment. The comparison is selective, not a systematic review: unpublished work, differently worded work, and papers outside these searches may change the assessment. A claim that a feature is absent from a cited paper means only that it was not established in the reviewed description; it is not proof that nobody has built it.
+
+The repository's current implementation evidence is in `core/experiments/`, `core/metrics/bsda.py`, `core/recovery/`, `core/saea/`, `core/reporting/charts.py`, and `tests/`. The claim restrictions are in `docs/PAPER_CLAIM_EVIDENCE_MATRIX.md`. Some older phase documents describe features as planned even though the code was subsequently implemented; prefer the current code and claim matrix over those historical status sentences.
+
+## Closest primary literature
+
+| Work | What it already establishes | Overlap with SecureLLMBench | What remains potentially distinct here |
+|---|---|---|---|
+| [JailbreakBench, NeurIPS 2024](https://proceedings.neurips.cc/paper_files/paper/2024/hash/63092d79154adebd7305dfd498cbff70-Abstract-Datasets_and_Benchmarks_Track.html) | Open attack artifacts, 100 behaviors, standardized threat model, prompts, scoring, and leaderboard. | Reproducible jailbreak benchmark execution, outcome scoring, model comparison. | Explicit matched isolated-versus-sequential condition records and downstream evidence gates, if demonstrated against comparable baselines. |
+| [HarmBench, 2024](https://arxiv.org/abs/2402.04249) | Standardized automated red teaming and robust-refusal evaluation, with large empirical comparisons. | Benchmark framework, attack evaluation, model-level results. | A protocol that preserves unsupported values and blocks paper charts may be a software contribution, but standardization itself is established. |
+| [StrongREJECT, NeurIPS 2024](https://proceedings.neurips.cc/paper_files/paper/2024/file/e2e06adf560b0706d3b1ddfca9f29756-Paper-Datasets_and_Benchmarks_Track.pdf) | Shows that jailbreak evaluations can overstate effectiveness; validates a more human-aligned evaluator. | Need for independent human comparison and caution about automated judges. | The local Gemma calibration is a case-specific negative result, not a new general discovery about judge unreliability. |
+| [An Empirical Measurement of Jailbreaking Evaluators, 2026](https://arxiv.org/abs/2609.10594) | Compares six evaluators on common human-labeled material and analyzes agreement and error types. | Judge calibration and disagreement analysis. | SecureLLMBench's contribution, if any, is enforcement of judge-readiness status throughout its own reporting path, not the idea of calibration. |
+| [SafeDialBench, ICLR 2026](https://proceedings.iclr.cc/paper_files/paper/2026/hash/cbd213baf0ad155f460ddee93f31d5ee-Abstract-Conference.html) | Fine-grained multi-turn safety evaluation across multiple attack strategies and safety dimensions. | Multi-turn trajectories and multidimensional safety measurements. | Matched isolated controls and explicit context retention checks require a direct full-method comparison before claiming a difference. |
+| [MultiBreak, 2026](https://arxiv.org/abs/2605.01687) | A large, diverse multi-turn jailbreak benchmark with empirical model results. | Sequential attacks and analysis beyond a single prompt. | SecureLLMBench is currently a measurement protocol, not a competing large dataset or demonstrated multi-turn finding. |
+| [Learning from Mistakes: Can LLM Self-Recover after Misalignment?, 2026](https://arxiv.org/abs/2606.00003) | Models safety trajectories and recovery trends after jailbreak-related misalignment. | Recovery as a trajectory rather than a terminal pass/fail. | The exact RC formula, applicability floor, and explicit null handling could be compared, but recovery trajectory analysis itself is prior work. |
+| [CarryOnBench, 2026](https://arxiv.org/abs/2604.27093) | Measures recovery of helpfulness under benign intent clarification while tracking safety. | Longitudinal recovery and safety/helpfulness tradeoff. | Its question differs from post-attack recovery, but it rules out broad claims that multi-turn recovery evaluation is new. |
+| [AgentDojo, 2024](https://arxiv.org/abs/2406.13352) | Dynamic prompt-injection evaluation in tool-using agents with realistic tasks and security outcomes. | Traceable, adversarial evaluation in a stateful setting. | Threat model differs: SecureLLMBench's current controlled target is conversational model behavior rather than agent tool actions. |
+
+## Assessment by proposed contribution
+
+| Proposed claim | Assessment from this review | Paper-safe wording now | Evidence needed to strengthen it |
+|---|---|---|---|
+| A new LLM jailbreak benchmark | **Not established.** Open standardized and multi-turn benchmarks already exist. | “An implemented research software framework for traceable, controlled evaluation.” | Dataset scale, coverage, public protocol, baseline comparison, and external reuse. |
+| BSDA's four-component behavioral displacement | **Potential metric proposal; empirical novelty untested.** Multidimensional and fine-grained safety evaluation precede it. | “Implements an exploratory four-component displacement profile.” | Independent human-defined constructs, component ablations, calibration, reliability, and incremental value beyond ASR and strong existing evaluators. |
+| Recovery Capability (RC) | **Concept overlaps direct prior work.** Post-misalignment recovery trajectories are already studied. | “Implements a specified, applicability-aware recovery calculation.” | Head-to-head comparison with prior recovery definitions on the same real trajectories, sensitivity and external validation. |
+| Sequential Attack Evaluation Algorithm (SAEA) | **Multi-turn testing is established; the precise matched-control contrast is a candidate differentiation.** | “Implements matched isolated and sequential observations with explicit conditions for a defined context-effect estimate.” | Real randomized or otherwise controlled sequences, verified context retention, non-adversarial drift controls, matched isolated responses, repeated cases/models, and uncertainty analysis. |
+| Judge calibration result | **Real local negative finding, not a new field-level discovery.** | “Under the fixed mapping, this Gemma judge had 295 usable outputs from 300 records, 53.9% agreement, and Cohen's kappa 0.211; it cannot replace independent human labels here.” | Broader judges, datasets, adjudicated labels, and mapping sensitivity for a general claim. |
+| Provenance gates, preregistration, contamination and null-preserving chart exports | **Credible software-methodology contribution; uniqueness is unproven.** | “The implementation enforces evidence eligibility and exposes unavailable results instead of replacing them with scores.” | Comparative feature audit, end-to-end replication by another group, and documented failure-injection tests. |
+| A safer-model recommendation or validated risk score | **Unsupported.** | No model-safety ranking or recommendation. | Approved outcome labels, sufficient real cases and repetitions, validated metric thresholds, and held-out model comparison. |
+
+## Verdict and recommended paper framing
+
+The strongest defensible current contribution is **research software for controlled, auditable LLM safety measurement**: versioned trajectories, matched isolated controls, context-status evidence, immutable artifacts, and reporting that refuses to turn missing or engineering-only measurements into scientific figures. This is an implementation contribution, not proof that the combination is the first of its kind. A formal novelty claim needs a broader, reproducible literature search and an explicit feature-by-feature audit of the closest systems.
+
+The current repository does **not** establish empirical novelty for BSDA, RC, or SAEA. The only real paper-ready numerical result is the fixed judge-comparison calibration, and that negative result should be framed narrowly. The three-case dashboard example is engineering evidence. The next study should compare the proposed metrics with ASR and relevant prior methods on the same labeled, repeated, controlled runs, reporting uncertainty and missingness.
+
+## Search record and update trigger
+
+Search phrases used included: “jailbreak benchmark standardized evaluation,” “human agreement jailbreak evaluator,” “multi-turn jailbreak benchmark,” “LLM self-recover after misalignment,” “multi-turn safety recovery,” and “isolated sequential jailbreak matched control.” Sources were the papers' own arXiv pages and conference proceedings, accessed without paid databases. Re-run the search before submission: this field changes quickly, and this review is not exhaustive.

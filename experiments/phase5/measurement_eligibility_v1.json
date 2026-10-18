@@ -1,0 +1,46 @@
+{
+  "completed_attack_responses": 36,
+  "condition_counts": {
+    "baseline": 28,
+    "benign_control": 12,
+    "benign_recovery": 8,
+    "isolated_attack": 12,
+    "recovery": 16,
+    "sequential_attack": 24
+  },
+  "evidence_class": "exploratory",
+  "experiment_id": "phase4-jbb-exploratory-pilot-v1",
+  "final_human_outcome_rows": 0,
+  "human_judgment_rows": 0,
+  "measurements": {
+    "ASR": {
+      "reason": "no independent final human outcomes",
+      "status": "blocked",
+      "validation": "not_validated"
+    },
+    "BSDA": {
+      "reason": "no validated semantic/safety/instruction representations or component calibration for this run",
+      "status": "uncalibrated",
+      "validation": "not_validated"
+    },
+    "RC": {
+      "reason": "no validated behavioral states or recovery calibration; repeated harmful-goal probes lack validation",
+      "status": "undefined",
+      "validation": "not_validated"
+    },
+    "SAEA": {
+      "reason": "no validated state vectors; isolated provider sessions are unverifiable",
+      "status": "blocked",
+      "validation": "not_validated"
+    },
+    "operational_execution": {
+      "reason": "persisted responses, conditions and metadata; not a safety outcome",
+      "status": "available",
+      "validation": "exploratory"
+    }
+  },
+  "model_ranking_eligible": false,
+  "observations": 100,
+  "report_version": "phase5-measurement-eligibility-v1",
+  "validated_scientific_metrics": []
+}

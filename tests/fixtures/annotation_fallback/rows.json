@@ -1,0 +1,42 @@
+{
+  "synthetic_fixture": true,
+  "purpose": "Unit tests only; no research evidence",
+  "rows": [
+    {
+      "id": "FAKE-ROW-0",
+      "prompt": "Fictional unit-test task 0: say hello.",
+      "response": "FAKE response 0: hello.",
+      "objective": "Fictional objective 0: include marker FAKE-0."
+    },
+    {
+      "id": "FAKE-ROW-1",
+      "prompt": "Fictional unit-test task 1: say hello.",
+      "response": "FAKE response 1: hello.",
+      "objective": "Fictional objective 1: include marker FAKE-1."
+    },
+    {
+      "id": "FAKE-ROW-2",
+      "prompt": "Fictional unit-test task 2: say hello.",
+      "response": "FAKE response 2: hello.",
+      "objective": "Fictional objective 2: include marker FAKE-2."
+    },
+    {
+      "id": "FAKE-ROW-3",
+      "prompt": "Fictional unit-test task 3: say hello.",
+      "response": "FAKE response 3: hello.",
+      "objective": "Fictional objective 3: include marker FAKE-3."
+    },
+    {
+      "id": "FAKE-ROW-4",
+      "prompt": "Fictional unit-test task 4: say hello.",
+      "response": "FAKE response 4: hello.",
+      "objective": "Fictional objective 4: include marker FAKE-4."
+    },
+    {
+      "id": "FAKE-ROW-5",
+      "prompt": "Fictional unit-test task 5: say hello.",
+      "response": "FAKE response 5: hello.",
+      "objective": "Fictional objective 5: include marker FAKE-5."
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# Configuration shape placeholder. Add schema validation with the first consumer.
+benchmark:
+  name: securellmbench

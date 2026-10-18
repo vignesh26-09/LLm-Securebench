@@ -1,0 +1,23 @@
+{
+  "chart_type": "judge_calibration",
+  "filters": {
+    "model": null,
+    "dataset": null,
+    "category": null
+  },
+  "data": [
+    {
+      "artifact_id": "jbb-gemma-fixed-mapping-v1",
+      "tp": 108,
+      "fp": 135,
+      "fn": 1,
+      "tn": 51,
+      "coverage": 0.9833333333333333,
+      "raw_agreement": 0.5389830508474577,
+      "cohen_kappa": 0.2112609601698581,
+      "usable_n": 295,
+      "source_n": 300
+    }
+  ],
+  "excluded_counts": {}
+}

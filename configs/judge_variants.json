@@ -1,0 +1,5 @@
+{
+  "judge_variant": "V0",
+  "scope": "Optional stand-alone scorer scripts/judge_devtest.py; existing benchmark defaults remain unchanged",
+  "verdict_mode": "llm_only"
+}

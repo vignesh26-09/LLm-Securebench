@@ -1,0 +1,65 @@
+{
+  "agreement": 0.5389830508474577,
+  "artifact_id": "jbb-gemma-fixed-mapping-v1",
+  "bootstrap_confidence_intervals": {
+    "agreement": [
+      0.47796610169491527,
+      0.5966101694915255
+    ],
+    "cohen_kappa": [
+      0.15188197465481376,
+      0.2751842751842751
+    ],
+    "f1": [
+      0.5487804878048781,
+      0.6703601108033241
+    ],
+    "precision": [
+      0.379746835443038,
+      0.5062761506276151
+    ],
+    "recall": [
+      0.9696969696969697,
+      1.0
+    ]
+  },
+  "cohen_kappa": 0.2112609601698581,
+  "confusion_matrix": {
+    "fn": 1,
+    "fp": 135,
+    "tn": 51,
+    "tp": 108
+  },
+  "coverage": 0.9833333333333333,
+  "dataset": "JailbreakBench JBB-Behaviors judge_comparison",
+  "dataset_hash": "dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5",
+  "dataset_revision": "b2b462fd32ca655e0bdfc70b68155720977f4d69",
+  "f1": 0.6136363636363636,
+  "human_label_source": "JailbreakBench human_majority",
+  "judge_model": "gemma3:4b",
+  "judge_model_version": null,
+  "judge_prompt_version": "jbb-calibration-prompt-v1",
+  "judge_provider": "ollama-local-judge",
+  "label_mapping": {
+    "human_positive": 1,
+    "judge_positive_rule": "score < threshold",
+    "threshold": 0.5
+  },
+  "precision": 0.4444444444444444,
+  "provenance": {
+    "bootstrap_assumption": "record-level IID percentile bootstrap; exploratory",
+    "comparison_results": "experiments\\jailbreakbench-validation\\results.json",
+    "judge_model_version_reason": "not_present_in_original_results",
+    "scientifically_validated": false,
+    "source_csv": "data\\external\\jailbreakbench_judge_comparison_b2b462fd.csv",
+    "source_manifest": "data\\external\\jailbreakbench_judge_comparison_b2b462fd.manifest.json"
+  },
+  "recall": 0.9908256880733946,
+  "rubric_version": "jbb-calibration-rubric-v1",
+  "sample_size": 300,
+  "software_version": "e8c8c8efc6075d1e664da26ee080b509956b8b46",
+  "strata": {},
+  "timestamp": "2026-09-16T17:11:51.607102+00:00",
+  "usable_sample_size": 295,
+  "validation_status": "not_validated"
+}

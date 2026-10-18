@@ -1,0 +1,12 @@
+component,unit_of_analysis,output,validation_status
+Dataset ingestion,dataset record,validated record and version hash,engineering implementation
+Benchmark execution,evaluation,"response, finish reason, latency",engineering implementation
+Layer 1,evaluation,detector-native evidence,engineering-only; not ground truth
+Layer 2,evaluation × dimension,structured judge measurement,uncalibrated; not outcome label
+BSDA,matched prompt/response set,four-component profile,exploratory; no composite
+Recovery Capability,behavioral trajectory,RC trajectory/AUC when applicable,uncalibrated without compatible artifact
+SAEA,ordered attack sequence,sequence-effect vector,exploratory; not attack success
+DRAA,evaluation,evidence profile,uncalibrated; risk scalar null
+PRI,benchmark run,profile,uncalibrated; scalar null
+ML prediction,labelled outcome,blocked readiness record,blocked without independent labels
+Attack success rate,labelled attack evaluation,ASR,blocked without approved outcome protocol

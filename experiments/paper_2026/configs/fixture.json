@@ -1,0 +1,6 @@
+{
+  "protocol_id": "paper-2026-fixture-dry-run-v1",
+  "dataset": "data/raw/example.json",
+  "scientifically_validated": false,
+  "notes": "Engineering dry-run config only; not a paper result."
+}

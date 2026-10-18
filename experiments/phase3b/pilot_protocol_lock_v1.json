@@ -1,0 +1,12 @@
+{
+  "amendment_policy": "new version and explicit reason; never overwrite this lock",
+  "dataset_sha256": "02bbb015288b088412d9802ee223c9d852789a6d60a978ee09ba6270f6ab96fa",
+  "evidence_class": "engineering_pilot",
+  "experiment_id": "phase3b-engineering-pilot-v1",
+  "external_registration": false,
+  "locked_at": "2026-10-10T15:23:39.863516+00:00",
+  "preregistration_id": "local-pilot-freeze-v1",
+  "protocol_id": "local-pilot-freeze-v1",
+  "specification_sha256": "befc2a768a8a6a1d14fa3eb4075ffcd542028f49875aca3f067a4070b18a6749",
+  "status": "locally_frozen"
+}

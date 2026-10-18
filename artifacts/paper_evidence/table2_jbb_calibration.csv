@@ -1,0 +1,2 @@
+source_n,usable_n,coverage,raw_agreement,cohen_kappa,pred_0_label_0,pred_0_label_1,pred_1_label_0,pred_1_label_1,source_revision,source_sha256,status
+300,295,0.9833333333333333,0.5389830508474577,0.2112609601698581,51,1,135,108,b2b462fd32ca655e0bdfc70b68155720977f4d69,dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5,empirical exploratory calibration; current judge not validated

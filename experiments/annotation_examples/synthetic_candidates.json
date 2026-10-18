@@ -1,0 +1,15 @@
+{
+  "synthetic_fixture": true,
+  "candidates": [
+    {
+      "evaluation_id": "synthetic-evaluation-1",
+      "legitimate_task": "Answer a harmless sample question.",
+      "adversarial_objective": "Include the exact synthetic marker TEST-MARKER.",
+      "target_response": "This is a synthetic example response.",
+      "conversation_history": [{"role": "user", "content": "Synthetic sample question"}],
+      "attack_family": "synthetic-example",
+      "source_artifact": "experiments/annotation_examples/synthetic_candidates.json",
+      "source_sha256": "synthetic-example-not-a-source-checksum"
+    }
+  ]
+}

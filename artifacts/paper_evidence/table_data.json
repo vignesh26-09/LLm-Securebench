@@ -1,0 +1,98 @@
+{
+  "table1": [
+    {
+      "component": "Dataset ingestion",
+      "unit_of_analysis": "dataset record",
+      "output": "validated record and version hash",
+      "validation_status": "engineering implementation"
+    },
+    {
+      "component": "Benchmark execution",
+      "unit_of_analysis": "evaluation",
+      "output": "response, finish reason, latency",
+      "validation_status": "engineering implementation"
+    },
+    {
+      "component": "Layer 1",
+      "unit_of_analysis": "evaluation",
+      "output": "detector-native evidence",
+      "validation_status": "engineering-only; not ground truth"
+    },
+    {
+      "component": "Layer 2",
+      "unit_of_analysis": "evaluation \u00d7 dimension",
+      "output": "structured judge measurement",
+      "validation_status": "uncalibrated; not outcome label"
+    },
+    {
+      "component": "BSDA",
+      "unit_of_analysis": "matched prompt/response set",
+      "output": "four-component profile",
+      "validation_status": "exploratory; no composite"
+    },
+    {
+      "component": "Recovery Capability",
+      "unit_of_analysis": "behavioral trajectory",
+      "output": "RC trajectory/AUC when applicable",
+      "validation_status": "uncalibrated without compatible artifact"
+    },
+    {
+      "component": "SAEA",
+      "unit_of_analysis": "ordered attack sequence",
+      "output": "sequence-effect vector",
+      "validation_status": "exploratory; not attack success"
+    },
+    {
+      "component": "DRAA",
+      "unit_of_analysis": "evaluation",
+      "output": "evidence profile",
+      "validation_status": "uncalibrated; risk scalar null"
+    },
+    {
+      "component": "PRI",
+      "unit_of_analysis": "benchmark run",
+      "output": "profile",
+      "validation_status": "uncalibrated; scalar null"
+    },
+    {
+      "component": "ML prediction",
+      "unit_of_analysis": "labelled outcome",
+      "output": "blocked readiness record",
+      "validation_status": "blocked without independent labels"
+    },
+    {
+      "component": "Attack success rate",
+      "unit_of_analysis": "labelled attack evaluation",
+      "output": "ASR",
+      "validation_status": "blocked without approved outcome protocol"
+    }
+  ],
+  "table2": [
+    {
+      "source_n": 300,
+      "usable_n": 295,
+      "coverage": 0.9833333333333333,
+      "raw_agreement": 0.5389830508474577,
+      "cohen_kappa": 0.2112609601698581,
+      "pred_0_label_0": 51,
+      "pred_0_label_1": 1,
+      "pred_1_label_0": 135,
+      "pred_1_label_1": 108,
+      "source_revision": "b2b462fd32ca655e0bdfc70b68155720977f4d69",
+      "source_sha256": "dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5",
+      "status": "empirical exploratory calibration; current judge not validated"
+    }
+  ],
+  "table3": [
+    {
+      "models": "qwen3.5:2b; gemma3:4b",
+      "benchmark_runs": 4,
+      "evaluations": 12,
+      "layer1_records": 36,
+      "layer2_records": 0,
+      "scientific_records": 25,
+      "families_and_statuses": "dqi:computed=1; draa:uncalibrated=12; ml:blocked=2; model_score:computed=2; pri:uncalibrated=4; statistics:computed=4",
+      "status": "local engineering demonstration; not scientific model comparison"
+    }
+  ]
+}

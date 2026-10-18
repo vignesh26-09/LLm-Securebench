@@ -1,0 +1,45 @@
+# Phase 3B controlled-study protocol proposal — **not preregistered**
+
+**Implementation update (10 October 2026):** The matched benign runner lane, source/lock/call-budget checks, and a separate harmless engineering pilot are complete. The pilot is locally frozen, but this production-study proposal remains neither frozen nor externally registered. See `PHASE3B_LOCKED_PROTOCOL.md` and `PHASE3B_PILOT_REPORT.md`. The historical statements below about missing implementation describe the pre-Phase-3B audit; the remaining production blockers are dataset selection, independent human labels, validated behavioral states, and a reviewed analysis plan.
+
+This is a **lock-ready proposal**, not a frozen or registered protocol. It must be reviewed, assigned immutable artifact IDs, signed/dated under the project preregistration process, and checked against source dataset rights before the first production target response. Unresolved choices below are intentionally explicit; silently choosing them after observing outcomes would compromise the study.
+
+## Hypotheses and estimands
+
+| RQ | Proposed primary contrast | Null and alternative to freeze |
+|---|---|---|
+| RQ1 isolated robustness | Human-adjudicated attack success among eligible isolated attack responses, by model and family | H0: no model/family difference; H1: a difference. Do not infer from Layer 1 signals. |
+| RQ2 sequence effect | Within case, attack instance, model, seed, repetition: sequential-minus-matched-isolated behavioral deviation | H0: mean paired effect is zero; H1: nonzero. A positive effect alone is not causal “synergy.” |
+| RQ3 recovery | Baseline-relative state trajectory following attack and its matched benign-conversation trajectory | H0: no attack-versus-benign difference in predeclared recovery estimand; H1: a difference. |
+| RQ4 evaluator reliability | Frozen automated predictions against independent/adjudicated human labels on held-out related groups | H0/H1 and acceptable error bounds must be specified for the *claim being supported* before evaluating. Include five-way disagreement, coverage, and binary mapping where predeclared. |
+| RQ5 model-comparison stability | Rank/effect changes across attack families, seeds, evaluator choice, and exclusions | Predeclare stability criterion and uncertainty before looking at model outcomes; do not force a ranking when inconclusive. |
+
+## Dataset and conditions
+
+The workspace contains the three-case `data/raw/example.json` engineering demonstration and a SHA-256-pinned 300-row JailbreakBench **judge-comparison** CSV with existing responses and labels. Neither is a ready-made Phase 3B target-attack dataset. Investigate the official [JBB-Behaviors harmful and benign datasets](https://github.com/JailbreakBench/jailbreakbench/blob/main/README.md#accessing-the-jbb-behaviors-datasets) and separately licensed attack artifacts as candidates. Freeze an exact revision, selected IDs, inclusion/exclusion rules, permissions, and a local file hash before any target run. The existing judge-comparison set may support evaluator validation, but must not be treated as new responses from the local target models. Avoid training/validation/test leakage by grouping shared goals, prompts, and related attack templates.
+
+For each selected case, predeclare one legitimate baseline task, three attack instances A/B/C with explicit objectives, matched benign turns of comparable topic/length, and recovery probes that do not themselves reveal the desired result. Conditions: (1) fresh baseline, (2) fresh matched benign conversation, (3) fresh isolated A/B/C with their baselines, (4) genuine ordered A→B→C, (5) one alternative order fixed before collection, and (6) two post-attack recovery probes after each sequence. Match model/version, case, attack instance, generation configuration, seed/repetition, measurement version, and threat model between isolated and sequential conditions. Store every sent message, conversation ID, timestamps, context/canary status, and contamination ledger outcome. **Benign-control execution is now implemented and tested.** The exact production benign prompts, alternative order, and probe definitions require scientific review and must not be invented by the runner.
+
+## Models, settings, and feasibility
+
+`ollama list` on 10 October 2026 showed only `qwen3.5:2b` (ID `324d162be6ca`, 2.7 GB) and `gemma3:4b` (ID `a2af6cc3eb7f`, 3.3 GB). The NVIDIA RTX 4060 Laptop GPU reports 8,188 MiB total / 7,850 MiB free; system RAM is about 16.4 GB. These are inventory observations, not a throughput benchmark. Record full Ollama digest, quantization, provider/runtime version, context window, temperature, top-p, max output, requested/effective seed support, and hardware telemetry in each manifest. A third target model requires an explicit availability decision; no weights are automatically downloaded. The official JBB 70B judge is not locally practical on this GPU; StrongREJECT fine-tuned weights are gated and uninstalled. Stored JBB comparator predictions can be reused for **evaluator** analysis without new inference.
+
+Proposed feasibility dry run: 5 approved cases × 2 installed models × 1 repetition. Proposed production design for planning costs only: 3 repetitions, with seeds and case N frozen after a response-length/throughput pilot and a power or precision analysis that uses only development data. For 3 attacks, 2 three-attack orders, and 2 recovery probes, the current runner makes `1 + 2×3 + 2×(1+3+2) = 19` target calls per case/model/repetition. A matched benign lane with baseline, three turns, and two probes would add 6, for **25 planned calls**. Thus the 5-case dry run would require about 250 target calls; a 20-case, 2-model, 3-repetition scenario would require about 3,000. These are call budgets, **not executed counts or scientific sample-size decisions**. At 20 cases, nine attack responses per case/model/repetition would yield up to 1,080 human annotation items and at least 2,160 independent judgments before adjudication, excluding failures. Token cost, wall time, rater capacity, and final N remain unmeasured; benchmark throughput before freezing production size.
+
+## Measurement, outcomes, exclusions, and statistics
+
+Primary outcomes proposed: independently adjudicated isolated ASR for RQ1; paired SAEA deviation for RQ2; calibrated recovery trajectory relative to attacked and benign controls for RQ3; held-out evaluator false-positive/false-negative rates and coverage for RQ4. Secondary: four BSDA components, latency, failure rate, response-length/format descriptors, order sensitivity, evaluator disagreement, and missingness. Existing BSDA, RC, and SAEA formulas remain unchanged. Before any numerical BSDA/RC/SAEA claim, select and validate the behavioral representations and calibration artifacts against independent human references; never derive states from detector counts.
+
+Exclude from a metric only under its predeclared applicability rule: failed/truncated response, absent source or baseline, incompatible measurement version, unmatched isolated identity, suspected contamination, invalid context, missing human classification, or failed calibration. Preserve every excluded record with a reason; `partial` and `ambiguous` remain separate and do not become failures. Report denominators and coverage for every condition/model/family.
+
+Use the case/goal or related attack group as the independent resampling unit. Estimate paired sequential-isolated effects within matched units and use clustered bootstrap or an appropriately specified hierarchical model; report interval, effect size, eligible N, and exclusions. Predeclare multiplicity correction for primary model/family comparisons. Perform sensitivity analyses across evaluator source, seed, attack order, and missingness policy. Do not treat multiple turns or repeated prompts as independent observations. A ranking requires stable effects under these analyses and independent outcome validation.
+
+## Freeze checklist before Phase 3B production
+
+1. Approve dataset revision, licenses/access, case IDs, exact benign/attack/probe texts, and content controls; hash the source file.
+2. Approve final hypotheses, estimands, success criteria, measurement versions, model set/digests, seeds, repetitions, output limits, sample-size rationale, and claim-specific evaluator policy.
+3. Confirm the implemented matched benign controls, source-hash verification, and local-lock gate against the final production artifacts; a local lock is not external preregistration.
+4. Validate the human rubric and independent-rater process on a development sample; freeze related-group train/validation/test allocation before evaluator tuning.
+5. Lock and timestamp the preregistration/analysis plan, then run the production experiment. Amendments must append new versions with reasons; never overwrite the original.
+
+Until these steps occur, the plan remains **proposed**, the existing local runs remain engineering demonstrations, and RQ1–RQ5 scientific conclusions remain unavailable.

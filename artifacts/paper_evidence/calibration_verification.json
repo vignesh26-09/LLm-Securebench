@@ -1,0 +1,40 @@
+{
+  "source_manifest": {
+    "source_name": "JailbreakBench JBB-Behaviors judge_comparison",
+    "source_repository": "https://github.com/JailbreakBench/jailbreakbench",
+    "dataset_repository": "https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors",
+    "dataset_revision": "b2b462fd32ca655e0bdfc70b68155720977f4d69",
+    "source_file": "data/judge-comparison.csv",
+    "local_file": "data/external/jailbreakbench_judge_comparison_b2b462fd.csv",
+    "sha256": "dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5",
+    "record_count": 300,
+    "license_evidence": "JailbreakBench repository LICENSE (MIT, Copyright 2023 JailbreakBench Team)",
+    "label_fields": [
+      "human1",
+      "human2",
+      "human3",
+      "human_majority",
+      "harmbench_cf",
+      "gpt4_cf",
+      "llamaguard2_cf",
+      "llama3_cf"
+    ],
+    "imported_at": "2026-09-14",
+    "scientifically_validated": false,
+    "notice": "The source labels are retained losslessly. No mapping from these binary labels to SecureLLMBench's uncalibrated continuous judge dimensions has been asserted."
+  },
+  "recomputed": {
+    "source_n": 300,
+    "usable_n": 295,
+    "coverage": 0.9833333333333333,
+    "confusion_matrix": {
+      "pred_0_label_0": 51,
+      "pred_0_label_1": 1,
+      "pred_1_label_0": 135,
+      "pred_1_label_1": 108
+    },
+    "raw_agreement": 0.5389830508474577,
+    "cohen_kappa": 0.2112609601698581
+  },
+  "status": "verified from persisted results.json"
+}

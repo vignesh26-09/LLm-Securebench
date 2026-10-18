@@ -1,0 +1,858 @@
+{
+  "artifact_complete_matching_indices": [
+    {
+      "attack_prompt_lengths": [
+        783,
+        189,
+        1787
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "0",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        987,
+        235,
+        1839
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "1",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        430,
+        238,
+        1848
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "2",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        535,
+        161,
+        1753
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "4",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        651,
+        203,
+        1801
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "5",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        563,
+        227,
+        1827
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "6",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        558,
+        179,
+        1786
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "7",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        600,
+        190,
+        1785
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "8",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        422,
+        160,
+        1777
+      ],
+      "category": "Harassment/Discrimination",
+      "index": "9",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        434,
+        176,
+        1778
+      ],
+      "category": "Malware/Hacking",
+      "index": "10",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        626,
+        176,
+        1782
+      ],
+      "category": "Malware/Hacking",
+      "index": "11",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        368,
+        223,
+        1816
+      ],
+      "category": "Malware/Hacking",
+      "index": "12",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        313,
+        180,
+        1781
+      ],
+      "category": "Malware/Hacking",
+      "index": "13",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        296,
+        199,
+        1802
+      ],
+      "category": "Malware/Hacking",
+      "index": "14",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        605,
+        121,
+        1732
+      ],
+      "category": "Malware/Hacking",
+      "index": "15",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        469,
+        154,
+        1753
+      ],
+      "category": "Malware/Hacking",
+      "index": "16",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        327,
+        218,
+        1806
+      ],
+      "category": "Malware/Hacking",
+      "index": "17",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        405,
+        216,
+        1808
+      ],
+      "category": "Malware/Hacking",
+      "index": "18",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        508,
+        172,
+        1774
+      ],
+      "category": "Malware/Hacking",
+      "index": "19",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        545,
+        136,
+        1746
+      ],
+      "category": "Physical harm",
+      "index": "20",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        518,
+        252,
+        1860
+      ],
+      "category": "Physical harm",
+      "index": "21",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        690,
+        213,
+        1809
+      ],
+      "category": "Physical harm",
+      "index": "22",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        346,
+        149,
+        1759
+      ],
+      "category": "Physical harm",
+      "index": "23",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        678,
+        185,
+        1789
+      ],
+      "category": "Physical harm",
+      "index": "25",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        503,
+        197,
+        1797
+      ],
+      "category": "Physical harm",
+      "index": "27",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        375,
+        206,
+        1804
+      ],
+      "category": "Physical harm",
+      "index": "28",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        554,
+        174,
+        1781
+      ],
+      "category": "Physical harm",
+      "index": "29",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        620,
+        233,
+        1833
+      ],
+      "category": "Economic harm",
+      "index": "30",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        446,
+        185,
+        1777
+      ],
+      "category": "Economic harm",
+      "index": "33",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        540,
+        220,
+        1809
+      ],
+      "category": "Economic harm",
+      "index": "34",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        696,
+        215,
+        1829
+      ],
+      "category": "Economic harm",
+      "index": "35",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        369,
+        176,
+        1799
+      ],
+      "category": "Economic harm",
+      "index": "36",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        367,
+        188,
+        1782
+      ],
+      "category": "Economic harm",
+      "index": "38",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        359,
+        165,
+        1789
+      ],
+      "category": "Economic harm",
+      "index": "39",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        726,
+        186,
+        1790
+      ],
+      "category": "Fraud/Deception",
+      "index": "41",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        453,
+        193,
+        1798
+      ],
+      "category": "Fraud/Deception",
+      "index": "42",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        596,
+        173,
+        1778
+      ],
+      "category": "Fraud/Deception",
+      "index": "44",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        556,
+        160,
+        1782
+      ],
+      "category": "Fraud/Deception",
+      "index": "45",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        317,
+        173,
+        1784
+      ],
+      "category": "Fraud/Deception",
+      "index": "46",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        434,
+        175,
+        1786
+      ],
+      "category": "Fraud/Deception",
+      "index": "48",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        585,
+        183,
+        1787
+      ],
+      "category": "Disinformation",
+      "index": "50",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        505,
+        192,
+        1772
+      ],
+      "category": "Disinformation",
+      "index": "51",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        492,
+        237,
+        1830
+      ],
+      "category": "Disinformation",
+      "index": "52",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        765,
+        160,
+        1764
+      ],
+      "category": "Disinformation",
+      "index": "53",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        456,
+        151,
+        1776
+      ],
+      "category": "Disinformation",
+      "index": "54",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        360,
+        190,
+        1782
+      ],
+      "category": "Disinformation",
+      "index": "57",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        431,
+        178,
+        1769
+      ],
+      "category": "Disinformation",
+      "index": "58",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        526,
+        150,
+        1744
+      ],
+      "category": "Sexual/Adult content",
+      "index": "60",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        464,
+        188,
+        1803
+      ],
+      "category": "Sexual/Adult content",
+      "index": "61",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        569,
+        193,
+        1803
+      ],
+      "category": "Sexual/Adult content",
+      "index": "62",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        493,
+        166,
+        1765
+      ],
+      "category": "Sexual/Adult content",
+      "index": "63",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        857,
+        163,
+        1771
+      ],
+      "category": "Sexual/Adult content",
+      "index": "64",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        495,
+        190,
+        1798
+      ],
+      "category": "Sexual/Adult content",
+      "index": "65",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        579,
+        163,
+        1782
+      ],
+      "category": "Sexual/Adult content",
+      "index": "66",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        537,
+        217,
+        1807
+      ],
+      "category": "Sexual/Adult content",
+      "index": "67",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        597,
+        178,
+        1772
+      ],
+      "category": "Sexual/Adult content",
+      "index": "69",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        516,
+        144,
+        1757
+      ],
+      "category": "Privacy",
+      "index": "70",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        617,
+        205,
+        1817
+      ],
+      "category": "Privacy",
+      "index": "71",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        628,
+        183,
+        1794
+      ],
+      "category": "Privacy",
+      "index": "73",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        536,
+        211,
+        1815
+      ],
+      "category": "Privacy",
+      "index": "74",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        570,
+        202,
+        1793
+      ],
+      "category": "Privacy",
+      "index": "75",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        375,
+        149,
+        1788
+      ],
+      "category": "Privacy",
+      "index": "77",
+      "source": "AdvBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        568,
+        167,
+        1783
+      ],
+      "category": "Privacy",
+      "index": "78",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        390,
+        199,
+        1805
+      ],
+      "category": "Privacy",
+      "index": "79",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        434,
+        175,
+        1787
+      ],
+      "category": "Expert advice",
+      "index": "80",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        303,
+        207,
+        1798
+      ],
+      "category": "Expert advice",
+      "index": "84",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        441,
+        213,
+        1833
+      ],
+      "category": "Expert advice",
+      "index": "86",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        663,
+        191,
+        1796
+      ],
+      "category": "Expert advice",
+      "index": "87",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        470,
+        218,
+        1816
+      ],
+      "category": "Expert advice",
+      "index": "88",
+      "source": "TDC/HarmBench"
+    },
+    {
+      "attack_prompt_lengths": [
+        495,
+        199,
+        1816
+      ],
+      "category": "Expert advice",
+      "index": "89",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        446,
+        196,
+        1782
+      ],
+      "category": "Government decision-making",
+      "index": "90",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        546,
+        193,
+        1801
+      ],
+      "category": "Government decision-making",
+      "index": "91",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        627,
+        194,
+        1798
+      ],
+      "category": "Government decision-making",
+      "index": "92",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        393,
+        227,
+        1845
+      ],
+      "category": "Government decision-making",
+      "index": "94",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        360,
+        193,
+        1788
+      ],
+      "category": "Government decision-making",
+      "index": "95",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        401,
+        190,
+        1793
+      ],
+      "category": "Government decision-making",
+      "index": "96",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        693,
+        228,
+        1848
+      ],
+      "category": "Government decision-making",
+      "index": "97",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        277,
+        177,
+        1765
+      ],
+      "category": "Government decision-making",
+      "index": "98",
+      "source": "Original"
+    },
+    {
+      "attack_prompt_lengths": [
+        438,
+        225,
+        1811
+      ],
+      "category": "Government decision-making",
+      "index": "99",
+      "source": "Original"
+    }
+  ],
+  "artifact_missing_or_mismatched_by_category": {
+    "Disinformation": 3,
+    "Economic harm": 3,
+    "Expert advice": 4,
+    "Fraud/Deception": 4,
+    "Government decision-making": 1,
+    "Harassment/Discrimination": 1,
+    "Physical harm": 2,
+    "Privacy": 2,
+    "Sexual/Adult content": 1
+  },
+  "artifact_revision": "909e68c01d94222b8ad2e397a017e2e12e2adb73",
+  "benign_rows": 100,
+  "dataset_revision": "886acc352a31533ffbcf4ef22c744658688086fc",
+  "harmful_benign_exact_goal_overlap": 0,
+  "harmful_categories": {
+    "Disinformation": 10,
+    "Economic harm": 10,
+    "Expert advice": 10,
+    "Fraud/Deception": 10,
+    "Government decision-making": 10,
+    "Harassment/Discrimination": 10,
+    "Malware/Hacking": 10,
+    "Physical harm": 10,
+    "Privacy": 10,
+    "Sexual/Adult content": 10
+  },
+  "harmful_goal_lexical_near_duplicate_pairs": [],
+  "harmful_rows": 100,
+  "historical_calibration_goal_overlap_count": 9,
+  "historical_calibration_goal_overlap_indices": [
+    "11",
+    "20",
+    "25",
+    "26",
+    "38",
+    "39",
+    "70",
+    "75",
+    "76"
+  ],
+  "historical_calibration_near_overlap_count": 13,
+  "historical_calibration_near_overlap_indices": [
+    "10",
+    "11",
+    "12",
+    "13",
+    "20",
+    "25",
+    "26",
+    "38",
+    "39",
+    "50",
+    "70",
+    "75",
+    "76"
+  ],
+  "source_hashes": {
+    "data\\external\\jbb_artifacts_909e68c\\GCG-transfer-gpt-3.5-turbo-1106.json": "ff185b1dc73732d830e96efdb3f4a92294ee72e9c88a1800b1d11d4ecb3d4cdf",
+    "data\\external\\jbb_artifacts_909e68c\\JBC-manual-vicuna-13b-v1.5.json": "1d5df5aa451c3d1bb8a4c048a7b2e1e6132e72f2970cb9d94ffc77f44e0edb39",
+    "data\\external\\jbb_artifacts_909e68c\\PAIR-black_box-vicuna-13b-v1.5.json": "18b101386419a98fbdf45cb987069f83af3a40d5e0f7f0d32c4e9dc5ecc049b4",
+    "data\\external\\jbb_behaviors_886acc3\\benign-behaviors.csv": "3cda234d21a991fa309bbfea4b6d9dae31ccdf8e9d452424b6a983e4fdc33468",
+    "data\\external\\jbb_behaviors_886acc3\\harmful-behaviors.csv": "4a8ec6832056b631eb092dccc60d37a61c3d441268268888b3d006288afeffa1"
+  }
+}

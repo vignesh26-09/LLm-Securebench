@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320">
+  <title>Verified SecureLLMBench backend architecture</title>
+  <rect width="1200" height="320" fill="#ffffff"/>
+  <style>
+    text{font-family:Arial,sans-serif;fill:#1d2932} .box{fill:#f7fafc;stroke:#527083;stroke-width:2} .arrow{stroke:#325d73;stroke-width:3;fill:none;marker-end:url(#head)} .top{font-size:23px;font-weight:700} .sub{font-size:17px} .note{font-size:16px;fill:#3c5260}
+  </style>
+  <defs><marker id="head" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M1,1 L11,6 L1,11 Z" fill="#325d73"/></marker></defs>
+  <rect class="box" x="25" y="75" width="194" height="110" rx="9"/><text class="top" x="122" y="113" text-anchor="middle">Source + model</text><text class="sub" x="122" y="145" text-anchor="middle">identity checks</text>
+  <path class="arrow" d="M225,130 H255"/>
+  <rect class="box" x="263" y="75" width="194" height="110" rx="9"/><text class="top" x="360" y="113" text-anchor="middle">Controlled</text><text class="sub" x="360" y="145" text-anchor="middle">conversation runner</text>
+  <path class="arrow" d="M463,130 H493"/>
+  <rect class="box" x="501" y="75" width="194" height="110" rx="9"/><text class="top" x="598" y="113" text-anchor="middle">Immutable</text><text class="sub" x="598" y="145" text-anchor="middle">observations</text>
+  <path class="arrow" d="M701,130 H731"/>
+  <rect class="box" x="739" y="75" width="194" height="110" rx="9"/><text class="top" x="836" y="113" text-anchor="middle">Existing metric</text><text class="sub" x="836" y="145" text-anchor="middle">eligibility</text>
+  <path class="arrow" d="M939,130 H969"/>
+  <rect class="box" x="977" y="75" width="194" height="110" rx="9"/><text class="top" x="1074" y="113" text-anchor="middle">Evidence-gated</text><text class="sub" x="1074" y="145" text-anchor="middle">report exports</text>
+  <text class="note" x="600" y="245" text-anchor="middle">Proposed delayed-disclosure checker and seven-arm protocol are not implemented in this verified path.</text>
+  <text class="note" x="600" y="274" text-anchor="middle">Separate ordinary benchmark route: dataset → provider inference → saved responses (no validated safety score).</text>
+</svg>

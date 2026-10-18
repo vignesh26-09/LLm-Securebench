@@ -1,0 +1,2 @@
+models,benchmark_runs,evaluations,layer1_records,layer2_records,scientific_records,families_and_statuses,status
+qwen3.5:2b; gemma3:4b,4,12,36,0,25,dqi:computed=1; draa:uncalibrated=12; ml:blocked=2; model_score:computed=2; pri:uncalibrated=4; statistics:computed=4,local engineering demonstration; not scientific model comparison

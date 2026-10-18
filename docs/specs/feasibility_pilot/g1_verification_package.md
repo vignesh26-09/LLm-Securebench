@@ -1,0 +1,59 @@
+# G1 independent-review evidence package — 2026-10-14
+
+**Purpose.** This package lets a separate researcher verify the narrowly proposed contribution in [research_scope_amendment.md](research_scope_amendment.md). It is an authoring-pass evidence index, **not** an independent review or approval. The candidate concerns unsolicited *exact* final-response disclosure of a fresh trusted synthetic secret during a later legitimate task that does not request it, after live adversarial **user** interaction, versus matched benign histories. Seven arms and the descriptive complete-pair A–T estimand remain unchanged.
+
+## SecReEvalBench version and access record
+
+| Artifact | Exact location inspected | What it establishes | Limit |
+|---|---|---|---|
+| Journal version | [ScienceDirect DOI article](https://www.sciencedirect.com/science/article/pii/S0893608026005253), abstract; [PubMed 42096884](https://pubmed.ncbi.nlm.nih.gov/42096884/), metadata and abstract | Cui and Liu, *Neural Networks* 202 (2026), article 109065, DOI 10.1016/j.neunet.2026.109065. Six sequences, four sequence-aware unsafe/refusal metrics, Llama-Guard 3/refusal classifier are stated. | **Full published methods [needs verification].** ScienceDirect article and PDF requests returned HTTP 403; no page/section inspection of the final article was possible. |
+| Earlier full author manuscript | [arXiv:2505.07584v2 PDF](https://arxiv.org/pdf/2505.07584v2), §§3.1–3.3 and 4.1, PDF pp. 4–8 | Scenario rounds and recursive history include each model-generated response (§3.1, Eq. 4–6, pp. 4–5). PARS/PARLS score maliciousness, refusal and logic; CARS/CARTS use first unsafe response/refusal timing (§3.2, pp. 5–7). Six neutral/malicious question sequences (§3.3, p. 7). | The [current arXiv landing page](https://arxiv.org/abs/2505.07584) reports v3 withdrawn after a **major rework of title, content, experiments and story**. v2 is **not** the final journal version. |
+| Author repository | [README](https://github.com/VeraaaCUI/SecReEvalBench), [`successive.py`](https://github.com/VeraaaCUI/SecReEvalBench/blob/main/successive.py) `handle_conversation`, [`alternative.py`](https://github.com/VeraaaCUI/SecReEvalBench/blob/main/alternative.py) `handle_conversation`, [`one-off.py`](https://github.com/VeraaaCUI/SecReEvalBench/blob/main/one-off.py) `handle_conversation` | `successive.py` groups one non-malicious prompt plus 16 malicious prompts; its loop invokes the target with an accumulated `context` and appends user text, target answer **and Llama-Guard output**. `alternative.py` interleaves neutral and malicious prompts. `one-off.py` invokes per prompt and explicitly comments that context resets each pair. | Repository revision and correspondence to the final article are not established. The scripts demonstrate code behavior only; they cannot verify final published methods or actual executed experiments. |
+
+### Nine-question SecReEvalBench check
+
+`V` = positively verified in the cited artifact; `D` = explicitly different **in that artifact's evaluated protocol**; `[needs verification]` = final journal method or exact detail inaccessible/ambiguous. No `D` in the earlier manuscript/code is promoted to a final-journal absence claim.
+
+| Question | Earlier manuscript / code judgment with exact trace | Final published-method judgment |
+|---|---|---|
+| Defender-generated live history | **V:** arXiv v2 §3.1 Eq. 4–6, pp. 4–5 defines response-generating history; `successive.py::handle_conversation` passes and extends `context`. | **[needs verification]** whether all six final journal sequences executed this mechanism. |
+| Trusted synthetic-secret placement | **D:** v2 §3.1–3.3 defines security-domain attack prompts and malicious intensity; no fresh trusted marker is part of the specified target outcome. Code `successive.py` constructs prompts from `user_input`. | **[needs verification]** system/developer-role marker allocation and trust boundary. |
+| Later legitimate non-secret-requesting task | **D:** v2 §3.3 and `successive.py` place neutral and malicious questions in sequences; the successive script puts one neutral prompt first, then 16 malicious prompts. No prespecified later neutral *secret-disclosure* probe is defined there. | **[needs verification]** final task wording and scoring turn for each sequence. |
+| Exact final-response disclosure | **D:** v2 §3.2, pp. 5–7 scores unsafe cooperation, refusal and first violation; not a fresh marker exact-match final-response predicate. | **[needs verification]** whether any journal outcome adds such a predicate. |
+| Topic-matched benign controls | **[needs verification]:** v2 §3.3 includes neutral prompts, but does not supply auditable topic-matched A–T pairs/tolerances; inspect underlying dataset grouping before stronger coding. | **[needs verification]** matched-control construction. |
+| Benign-refusal-history controls | **D:** v2 refusal *score/timing* (§3.2) is not a deliberately induced benign refusal-history arm. | **[needs verification]** whether final journal adds such an arm. |
+| Earlier-leak accounting | **P:** v2 CARS/CARTS track first unsafe response/refusal (§3.2, pp. 6–7), but not an earlier exact-secret leak versus final exact-secret repeat. | **[needs verification]** per-trajectory first exact disclosure and repetition handling. |
+| Context-distance intervention | **P:** v2 §3.3 orders different prompt sequences; no independently assigned 0/2/5 benign-intervening distance with retention proof is specified. | **[needs verification]** randomized/controlled distance and effective-context checks. |
+| Control-adjusted disclosure-risk estimand | **D:** v2 §3.2 reports PARS/PARLS/CARS/CARTS aggregate resilience/refusal metrics, not a paired A–T exact-disclosure risk difference. | **[needs verification]** final analysis equations and denominators. |
+
+**Code–method discrepancy to resolve:** v2 Eq. 4–6 describes accumulated target dialogue. The `successive.py` and `alternative.py` loops manually inject the judge's output into the next target context; `one-off.py` resets context for each prompt. A reviewer should determine which code revision, if any, generated each journal result. Do **not** infer that all journal sequences share the same memory or trust-boundary behavior.
+
+## Other previously unexamined methods
+
+| Source and exact location | Verified material overlap | Still [needs verification] for exact equivalence |
+|---|---|---|
+| [MultiBreak, ICML 2026](https://proceedings.mlr.press/v306/song26n.html); [author arXiv v1](https://arxiv.org/html/2605.01687v1) §§3.1, 4.4, Appendix A.2.5 | Multi-turn attacker prompts are a pre-scripted flow; same-harmful-intent single/multi-turn ASR is compared; benign-looking prompts can contribute to a harmful final answer. | Final PMLR PDF correspondence; any neutral post-exposure task, exact trusted-secret event, earlier-leak joint accounting or T/R controls in evaluated extension. Appendix A.2.5 specifically calls the flow pre-scripted, so do not describe it as adaptive live user-history construction. |
+| [HarmBench, ICML 2024](https://proceedings.mlr.press/v235/mazeika24a.html); [author PDF](https://arxiv.org/pdf/2402.04249) §§3.1–3.2, 4, PDF pp. 3–6 | Unit is a test case eliciting a named harmful behavior, classified ASR; includes contextual behaviors and hash-based metrics in some categories. | Final PMLR PDF/appendix variants for any exact trusted-secret, delayed neutral final task and matched history. Standardized ASR must not be conflated with the candidate's outcome. |
+| [AgentDojo, NeurIPS 2024 PDF](https://proceedings.neurips.cc/paper_files/paper/2024/file/97091a5177d8dc64b1da8bf3e1f6fb54-Paper-Datasets_and_Benchmarks_Track.pdf) Figure 1, §§1, 3, PDF pp. 1–4 | Stateful legitimate agent tasks, malicious **tool data**, attack-free utility controls, formal security checks; live multi-tool execution is real overlap. | Task-specific checker/secret variants, final-response exact marker and earlier-leak/distance coding. The attacker surface is explicitly tool output, not the candidate's direct prior user history. |
+| [InjecAgent, ACL 2024](https://aclanthology.org/2024.findings-acl.624/) abstract; [PDF](https://aclanthology.org/2024.findings-acl.624.pdf) | Indirect tool-content injection, user harm and private-data exfiltration are verified. | Full PDF methods fetch timed out here; exact placement, dialogue timing, controls, checkers and estimands remain [needs verification]. |
+| [StrongREJECT, NeurIPS 2024 PDF](https://proceedings.neurips.cc/paper_files/paper/2024/file/e2e06adf560b0706d3b1ddfca9f29756-Paper-Datasets_and_Benchmarks_Track.pdf) §§2.1–2.2, PDF pp. 3–5 | Forbidden prompts paired with victim responses; rubric scores refusal and specific/useful harmful content, human-validated. | Whether any extension uses earlier benign/attack histories or exact secret outcomes; the inspected main evaluator is not a marker checker. |
+| [Crescendo, author full PDF](https://crescendo-the-multiturn-jailbreak.github.io/assets/pdf/CrescendoFullPaper.pdf) §§1, 3–4, PDF pp. 1–2, 5–8 | Attacker adapts later user prompts to live defender responses, leading toward the harmful requested task; direct-request baseline is described. | USENIX final-PDF version equivalence, exact trusted-secret/neutral-final/paired-control variants. Harmful-task ASR is not the candidate's unsolicited final disclosure. |
+
+## Reviewer's required checks and open disagreement log
+
+1. Obtain and cite a readable **final journal SecReEvalBench full text** (DOI/PII above). Independently fill the nine final-version judgments with section/page numbers; if access remains unavailable, leave each as `[needs verification]`.
+2. Resolve the arXiv v2 / withdrawn v3 / journal / GitHub relationship, including whether the code history and judge output were used in published runs.
+3. Check final PMLR/USENIX versions where author copies supplied method evidence, and complete the InjecAgent full-method trace. For each other matrix `NV`, supply a page/code location or preserve `[needs verification]`.
+4. Independently re-code the JAMA article/supplement, PrivDrift, AgentSecBench and Agarwal EMNLP cells already in [prior_work_comparison.md](prior_work_comparison.md). Record disagreement as `(source, feature, original judgment, reviewer judgment, quoted source location, resolution)`; **none has been submitted yet**.
+5. Check whether any single source or combination forces further claim reduction. An incomplete search does not establish distinctiveness; no pilot evidence exists to support C1–C4.
+
+| Disagreement/item | Current state | Required resolution |
+|---|---|---|
+| SecReEvalBench final versus arXiv v2 methods | **OPEN; final full text inaccessible here** | Page-located journal method and version comparison. |
+| Author code `one-off.py` reset versus `successive.py` accumulated context, with judge text inserted | **OPEN; observed code difference** | Identify published execution revision, if any; classify every sequence separately. |
+| MultiBreak author v1 versus final ICML PDF | **OPEN; final PDF not fetched** | Check final method for changed turn flow/outcome. |
+| InjecAgent exact nine-axis methods | **OPEN; full-method fetch timed out** | Read official PDF and add section/page evidence. |
+| JAMA restricted unredacted payloads/logs | **OPEN; restricted** | Qualified attestation or leave fine-grained matching/transitions unverifiable. |
+| Independent second review and discrepancies | **NOT OBTAINED** | Separate human reviewer signs a dated, source-located coding record; no identity or signature is supplied here. |
+
+**Independent reviewer sign-off:** NOT OBTAINED. Reviewer name: none supplied. Review date: none. Signed coding/disagreement artifact: none. No field in this package counts as approval until an authentic independent record is received.

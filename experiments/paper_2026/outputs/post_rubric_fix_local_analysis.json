@@ -1,0 +1,141 @@
+{
+  "trace_id": "paper-2026-local-ollama-v1-a238bfd7",
+  "scientifically_validated": false,
+  "descriptive": {
+    "layer1_aggregate": {
+      "method_id": "descriptive_summary",
+      "computation_status": "computed",
+      "n_total": 5,
+      "n_valid": 5,
+      "missing_count": 0,
+      "estimate": 0.18,
+      "values": {
+        "minimum": 0.0,
+        "maximum": 0.5,
+        "mean": 0.18,
+        "median": 0.19999999999999998,
+        "q1": 0.0,
+        "q3": 0.19999999999999998,
+        "iqr": 0.19999999999999998,
+        "sample_variance": 0.042,
+        "sample_standard_deviation": 0.20493901531919198
+      },
+      "warnings": [],
+      "numerical_notes": [],
+      "backend": "python_standard_library",
+      "assumption_reference": null,
+      "plan_hash": null,
+      "grouping_provenance": {
+        "descriptive_only": true
+      },
+      "pairing_provenance": {},
+      "p_value": null,
+      "adjusted_p_value": null,
+      "interval": null
+    },
+    "latency_ms": {
+      "method_id": "descriptive_summary",
+      "computation_status": "computed",
+      "n_total": 2,
+      "n_valid": 2,
+      "missing_count": 0,
+      "estimate": 1477.2791999999981,
+      "values": {
+        "minimum": 687.4119999999948,
+        "maximum": 2267.1464000000014,
+        "mean": 1477.2791999999981,
+        "median": 1477.2791999999981,
+        "q1": 1082.3455999999965,
+        "q3": 1872.2127999999998,
+        "iqr": 789.8672000000033,
+        "sample_variance": 1247780.3872716904,
+        "sample_standard_deviation": 1117.0409067136666
+      },
+      "warnings": [],
+      "numerical_notes": [],
+      "backend": "python_standard_library",
+      "assumption_reference": null,
+      "plan_hash": null,
+      "grouping_provenance": {
+        "descriptive_only": true
+      },
+      "pairing_provenance": {},
+      "p_value": null,
+      "adjusted_p_value": null,
+      "interval": null
+    },
+    "bsda_components": {
+      "method_id": "descriptive_summary",
+      "computation_status": "computed",
+      "n_total": 3,
+      "n_valid": 3,
+      "missing_count": 0,
+      "estimate": 0.5117557744722123,
+      "values": {
+        "minimum": 0.19999999999999998,
+        "maximum": 1.0,
+        "mean": 0.5117557744722123,
+        "median": 0.335267323416637,
+        "q1": 0.2676336617083185,
+        "q3": 0.6676336617083185,
+        "iqr": 0.4,
+        "sample_variance": 0.18336113001699716,
+        "sample_standard_deviation": 0.4282068775918915
+      },
+      "warnings": [],
+      "numerical_notes": [],
+      "backend": "python_standard_library",
+      "assumption_reference": null,
+      "plan_hash": null,
+      "grouping_provenance": {
+        "descriptive_only": true
+      },
+      "pairing_provenance": {},
+      "p_value": null,
+      "adjusted_p_value": null,
+      "interval": null
+    }
+  },
+  "correlation": {
+    "layer1_vs_latency_spearman": {
+      "method_id": "spearman_correlation",
+      "computation_status": "invalid_input",
+      "n_total": 5,
+      "n_valid": 0,
+      "missing_count": 0,
+      "estimate": null,
+      "values": {},
+      "warnings": [
+        "aligned_lengths_required"
+      ],
+      "numerical_notes": [],
+      "backend": "python_standard_library",
+      "assumption_reference": null,
+      "plan_hash": null,
+      "grouping_provenance": {},
+      "pairing_provenance": {},
+      "p_value": null,
+      "adjusted_p_value": null,
+      "interval": null
+    }
+  },
+  "blocked": {
+    "asr": {
+      "attack_success_rate": null,
+      "successes": 0,
+      "denominator": 0,
+      "denominator_policy": "classified_only",
+      "excluded_counts": {
+        "ambiguous": 0,
+        "failed": 0,
+        "skipped": 0,
+        "not_applicable": 0,
+        "unavailable": 0
+      },
+      "status": "insufficient_data",
+      "scientifically_validated": false
+    },
+    "ml": "requires independent labels and leakage-reviewed feature schema",
+    "confirmatory_claims": "require preregistered plan and scientific review"
+  }
+}
