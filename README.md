@@ -122,7 +122,6 @@ Based on SecureLLMBench by vignesh26-09 (Apache-2.0)
 
 Raw pilot outputs are not published.
 
-
 - Only small local models (2B-4B) were tested; the Gemma judge is 4B. No generalization or production-suitability claims.
 - Original pilot: 50 prompts/model; LLM-only labels from small annotators include models under test and possible self-preference bias.
 - Synthetic canary set: 25 secret-leak tests, 25 instruction-override/injection tests and 10 benign controls; 180 outputs cached.
@@ -135,7 +134,9 @@ Raw pilot outputs are not published.
 - Known-value checks cannot detect unknown secrets or prove absence of disclosure; they are not a general safety classifier.
 - Cached oracle sanity: 73/180 fired, no model calls; by-construction matching counts, NOT an accuracy result.
 - The expanded oracle is broader than the original exact regex; no new accuracy claim follows from matching the same fixture values.
-- Validation by people is optional/pending. LLM annotations remain LLM-only.
+- Human check, n=30, enriched toward non-safe candidates, not a representative sample; labels: safe=30, unsafe=0, borderline=0; non-safe=0.
+- Judge vs human check: raw agreement 90.00%, Cohen's kappa 0.0000, Gwet AC1 0.8950; non-safe recall unavailable (Wilson 95% CI unavailable), precision 0.00% (Wilson 95% CI [0.00%, 56.15%]).
+- Human vs LLM-reference agreement 76.67%; LLM-annotated results remain LLM-annotated. This small selected check does not establish population accuracy; larger independent human studies are still needed.
 
 ### Recommended usage
 
@@ -144,9 +145,7 @@ Raw pilot outputs are not published.
 - Opt in with verdict_mode=hybrid: an oracle hit returns unsafe without a model call; otherwise use the configured LLM judge.
 - Run python scripts/judge_devtest.py --case CASE.json --verdict-mode hybrid; case keys: id, system_prompt, user_prompt, output, secrets, markers.
 - Retain invalid/abstaining LLM results as unavailable; never substitute a safe result. Match reports contain types only, never secret text.
-
 See [dev/test evidence](experiments/local-runs/canary-devtest/devtest-20261018-042016/agreement_report.md) and the [oracle sanity report](experiments/local-runs/oracle-sanity/oracle-20261018-043342/sanity_report.md).
-
 Conceptual crosswalk to the pinned OWASP Top 10 for LLM Applications **2025** edition:
 
 | Threat category | OWASP application-risk correspondence |
@@ -156,7 +155,6 @@ Conceptual crosswalk to the pinned OWASP Top 10 for LLM Applications **2025** ed
 | System-instruction disclosure | LLM07:2025 System Prompt Leakage |
 | Unsupported factual claims | LLM09:2025 Misinformation |
 | Violence, hate or fraud content requests | No direct one-to-one application-risk category |
-
 This crosswalk does not establish category coverage or exploits; benign controls are not threats.
 Source: [OWASP Gen AI Security Project, 2025 Top 10](https://genai.owasp.org/llm-top-10/).
 
