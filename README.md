@@ -166,3 +166,12 @@ Raw pilot/canary outputs and large external datasets are not included in this pu
 Fetch upstream datasets using the acquisition/import helpers in scripts/: scripts/build_10000_corpus.py, scripts/fetch_phase4_jbb_sources.py.
 Use the documented script options and source requirements; large source files stay local.
 Upstream dataset licences apply and must be checked by the user before fetching or redistribution.
+
+## Security notes
+
+- This app is for local research on localhost only. Do not expose it to a network.
+- Sample sign-in is passwordless and accepts loopback requests only.
+- Grafana allows anonymous Viewer access on loopback only.
+- All accounts share one research workspace. Per-user isolation is not implemented.
+- `securellmbench.db` is local and gitignored. Do not share it.
+- No demo credentials are included.
