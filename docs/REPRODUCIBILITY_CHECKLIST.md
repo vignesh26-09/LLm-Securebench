@@ -11,4 +11,4 @@
 - [ ] Report every metric's applicable count, excluded counts, versions, label source, and missingness. Do not plot fixture or engineering records as Phase 1 results.
 - [ ] Replay from archived artifacts, report factual differences, and retain original and amended records independently.
 
-Verification command: set `TEMP` and `TMP` to `F:\SecureLLM.tmp`, then run `F:\SecureLLM\.venv\Scripts\python.exe -m pytest -q` from the project root. Real model execution additionally requires already-installed Ollama models and the local service; no model is downloaded by the project.
+Verification command: set `TEMP` and `TMP` to `<LOCAL_PATH>`, then run `<LOCAL_PATH>` from the project root. Real model execution additionally requires already-installed Ollama models and the local service; no model is downloaded by the project.

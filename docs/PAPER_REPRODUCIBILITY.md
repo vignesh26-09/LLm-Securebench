@@ -7,10 +7,10 @@ This document records how to reproduce the current SecureLLMBench paper-readines
 Use the project workspace and interpreter:
 
 ```powershell
-cd F:\SecureLLM
-$env:TEMP='F:\SecureLLM.tmp'
-$env:TMP='F:\SecureLLM.tmp'
-F:\SecureLLM\.venv\Scripts\python.exe -m pytest
+cd <LOCAL_PATH>
+$env:TEMP='<LOCAL_PATH>'
+$env:TMP='<LOCAL_PATH>'
+<LOCAL_PATH> -m pytest
 ```
 
 No default test requires internet access, live Ollama, or PostgreSQL.
@@ -28,7 +28,7 @@ Fixture dry-run uses deterministic mock inference and mock judging. That validat
 Local experimental mode uses installed Ollama target and judge models. The runner does not pull or download models.
 
 ```powershell
-F:\SecureLLM\.venv\Scripts\python.exe experiments\paper_2026\run_experiment.py --target-model qwen3.5:2b --judge-model gemma3:4b --output experiments\paper_2026\outputs\local_trace.json
+<LOCAL_PATH> experiments\paper_2026\run_experiment.py --target-model qwen3.5:2b --judge-model gemma3:4b --output experiments\paper_2026\outputs\local_trace.json
 ```
 
 ## Experiment Command
@@ -36,19 +36,19 @@ F:\SecureLLM\.venv\Scripts\python.exe experiments\paper_2026\run_experiment.py -
 Fixture:
 
 ```powershell
-F:\SecureLLM\.venv\Scripts\python.exe experiments\paper_2026\run_experiment.py --fixture-dry-run --output experiments\paper_2026\outputs\fixture_trace.json
+<LOCAL_PATH> experiments\paper_2026\run_experiment.py --fixture-dry-run --output experiments\paper_2026\outputs\fixture_trace.json
 ```
 
 Local Ollama:
 
 ```powershell
-F:\SecureLLM\.venv\Scripts\python.exe experiments\paper_2026\run_experiment.py --target-model <installed-target-model> --judge-model <installed-judge-model> --output experiments\paper_2026\outputs\local_trace.json
+<LOCAL_PATH> experiments\paper_2026\run_experiment.py --target-model <installed-target-model> --judge-model <installed-judge-model> --output experiments\paper_2026\outputs\local_trace.json
 ```
 
 ## Analysis Command
 
 ```powershell
-F:\SecureLLM\.venv\Scripts\python.exe experiments\paper_2026\analyze_results.py --input experiments\paper_2026\outputs\fixture_trace.json --output experiments\paper_2026\outputs\fixture_analysis.json
+<LOCAL_PATH> experiments\paper_2026\analyze_results.py --input experiments\paper_2026\outputs\fixture_trace.json --output experiments\paper_2026\outputs\fixture_analysis.json
 ```
 
 The analysis currently exports descriptive summaries and a Spearman correlation where explicit pairing exists. ASR, supervised ML, and confirmatory claims remain blocked without their prerequisites.

@@ -13,10 +13,10 @@
 ```
 - Calibration verification: source N=300, usable N=295, coverage=98.333%, raw agreement=53.898%, Cohen’s κ=0.211.
 - Confusion matrix: {'pred_0_label_0': 51, 'pred_0_label_1': 1, 'pred_1_label_0': 135, 'pred_1_label_1': 108}.
-- Reproduce evidence bundle: `F:\SecureLLM\.venv\Scripts\python.exe scripts\build_paper_evidence.py`
-- Verify stored calibration without calling the judge: `F:\SecureLLM\.venv\Scripts\python.exe scripts\verify_persisted_judge_calibration.py`
-- Reproduce paper trace: `F:\SecureLLM\.venv\Scripts\python.exe experiments\paper_2026\run_experiment.py --target-model qwen3.5:2b --judge-model gemma3:4b --output experiments\paper_2026\outputs\local_trace.json`
-- Regression: `F:\SecureLLM\.venv\Scripts\python.exe -m pytest -q`; `F:\SecureLLM\.venv\Scripts\python.exe scripts\api_smoke.py`; frontend `npm test`, `npm run typecheck`, `npm run build`.
+- Reproduce evidence bundle: `<LOCAL_PATH>`
+- Verify stored calibration without calling the judge: `<LOCAL_PATH>`
+- Reproduce paper trace: `<LOCAL_PATH>`
+- Regression: `<LOCAL_PATH>`; `<LOCAL_PATH>`; frontend `npm test`, `npm run typecheck`, `npm run build`.
 
 ## Limitations and unsupported claims
 

@@ -1,3 +1,77 @@
+## Public snapshot status (public-clean)
+
+| Check | Count/status |
+|---|---|
+| Tracked files in published baseline | 589 |
+| Tracked blocker paths / archives / databases / files >10 MiB | 0 / 0 / 0 / 0 |
+| Secret shape scan, user-verified context; not rerun | 0 matches |
+| Reviewed benign lines, excluded from this scan; locations omitted | 8 |
+| Documentation path replacements | 151 across 33 files |
+| Code/data/other files with retained absolute paths | 11 files / 17 occurrences |
+| Name-like field keys | 35 files / 160 occurrences |
+| Requested personal/identity/name-term candidates | 0 files / 0 occurrences |
+| Ignore patterns added | 0 |
+
+This tracked snapshot supersedes the older working-tree inventory below. Name-like schema keys are not evidence of personal data; identity/institution/acronym candidates require contextual review. No matched values or reviewed benign locations are reproduced.
+Remaining dataset-licence review is required; upstream licences apply independently of the code licence. Counts describe the pre-edit tracked snapshot; no identity fields were edited. Extracted binary paper documents: 6; raster images without OCR: 8.
+
+### Retained code/data paths (not edited)
+
+| Path | Count | Use |
+|---|---|---|
+| artifacts/build_ieee_paper.py | 2 | functional default/path reference: 2 |
+| core/feasibility_pilot/restricted_store.py | 1 | functional default/path reference: 1 |
+| docs/paper/build_manuscript.ps1 | 2 | functional default/path reference: 2 |
+| experiments/jailbreakbench-validation/pilot_results.json | 1 | recorded artifact text; runtime use not established: 1 |
+| experiments/jailbreakbench-validation/results.json | 1 | recorded artifact text; runtime use not established: 1 |
+| experiments/jailbreakbench-validation/smoke_results.json | 1 | recorded artifact text; runtime use not established: 1 |
+| grafana/provisioning/dashboards/securellmbench.yml | 1 | functional configuration path: 1 |
+| grafana/provisioning/datasources/securellmbench.yml | 1 | functional configuration path: 1 |
+| scripts/build_paper_evidence.py | 5 | functional default/path reference: 5 |
+| scripts/feasibility_mock_smoke.py | 1 | functional default/path reference: 1 |
+| scripts/run_judge_variants.py | 1 | functional default/path reference: 1 |
+
+### Name categories (values omitted)
+
+| Path | Name-like field keys | Requested name-term candidates |
+|---|---|---|
+| apps/api/auth.py | 2 | 0 |
+| apps/api/local_execution.py | 3 | 0 |
+| artifacts/adapt_to_conference_template.py | 1 | 0 |
+| artifacts/build_ieee_paper.py | 1 | 0 |
+| core/dataset/benchmark_catalog.py | 2 | 0 |
+| core/experiments/manifest.py | 1 | 0 |
+| core/metrics/bsda.py | 1 | 0 |
+| data/benchmark_10000.manifest.json | 1 | 0 |
+| data/raw/example.json | 1 | 0 |
+| docs/paper/securellmbench_references.bib | 11 | 0 |
+| experiments/paper_2026/outputs/post_fix_local_trace.json | 42 | 0 |
+| experiments/paper_2026/outputs/post_rubric_fix_local_trace.json | 42 | 0 |
+| experiments/paper_2026/outputs/pre_fix_local_trace.json | 18 | 0 |
+| experiments/paper_2026/run_experiment.py | 1 | 0 |
+| experiments/phase3b/pilot_dataset_v1.json | 1 | 0 |
+| experiments/phase3b/pilot_specification_v1.json | 3 | 0 |
+| experiments/phase4/jbb_pilot_specification_v1.json | 2 | 0 |
+| frontend/package-lock.json | 2 | 0 |
+| frontend/package.json | 1 | 0 |
+| scripts/build_10000_corpus.py | 1 | 0 |
+| scripts/feasibility_provider_audit.py | 2 | 0 |
+| scripts/prepare_phase3b_pilot.py | 2 | 0 |
+| scripts/prepare_phase4_jbb_pilot.py | 2 | 0 |
+| scripts/process_dataset.py | 1 | 0 |
+| scripts/run_local_benchmark.py | 1 | 0 |
+| tests/test_dataset.py | 1 | 0 |
+| tests/test_feasibility_provider_audit.py | 2 | 0 |
+| tests/test_full_corpus_execution.py | 3 | 0 |
+| tests/test_large_benchmark_corpus.py | 1 | 0 |
+| tests/test_local_execution.py | 1 | 0 |
+| tests/test_model_connection.py | 1 | 0 |
+| tests/test_ollama_judge_provider.py | 1 | 0 |
+| tests/test_ollama_retries.py | 1 | 0 |
+| tests/test_production_preflight.py | 3 | 0 |
+| tests/test_workspace_auth.py | 1 | 0 |
+
+## Working-tree audit, superseded for the published snapshot
 # Publication audit
 
 Read-only scan performed 2026-10-18. Excluded `.git`, `.tmp`, `node_modules`, `venv`, `.venv`, build output, and `*.log` from file-content scans. Findings below contain paths, counts, and categories only; matched values are omitted.

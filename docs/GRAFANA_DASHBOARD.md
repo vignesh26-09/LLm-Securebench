@@ -6,11 +6,11 @@ It reads `securellmbench.db` through the SQLite datasource in read-only mode.
 Grafana binds to `127.0.0.1` and permits anonymous **Viewer** access on that
 local interface. Basic login is disabled for this local viewing service.
 
-From `F:\SecureLLM` in PowerShell:
+From `<LOCAL_PATH>` in PowerShell:
 
 ```powershell
-$env:TEMP = 'F:\SecureLLM.tmp'
-$env:TMP = 'F:\SecureLLM.tmp'
+$env:TEMP = '<LOCAL_PATH>'
+$env:TMP = '<LOCAL_PATH>'
 .\scripts\install_grafana.ps1
 .\scripts\start_grafana.ps1
 .\scripts\start_local.ps1

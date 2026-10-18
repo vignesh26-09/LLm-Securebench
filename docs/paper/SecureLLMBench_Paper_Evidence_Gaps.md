@@ -33,11 +33,11 @@ No claim that adversarial history increases delayed disclosure; no claim of perm
 
 The editable TeX uses `IEEEtran` conference class and retains mathematical source. The DOCX is editable and uses the repository's A4 conference artifact as a style/section reference. The PDF was exported from DOCX with Microsoft Word and visually reviewed; the built-in LaTeX compiler timed out, so a TeX-compiled PDF is not claimed.
 
-From `F:\SecureLLM`, with `TEMP` and `TMP` set to `F:\SecureLLM.tmp`:
+From `<LOCAL_PATH>`, with `TEMP` and `TMP` set to `<LOCAL_PATH>`:
 
 ```powershell
-$env:TEMP='F:\SecureLLM.tmp'; $env:TMP='F:\SecureLLM.tmp'
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts/verify_persisted_judge_calibration.py
+$env:TEMP='<LOCAL_PATH>'; $env:TMP='<LOCAL_PATH>'
+& '<LOCAL_PATH>' scripts/verify_persisted_judge_calibration.py
 & '<PROJECT_ROOT>\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' docs/paper/build_manuscript_docx.py
 ```
 

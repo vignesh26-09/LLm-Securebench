@@ -18,12 +18,12 @@
 ## Reproduction
 
 ```powershell
-$env:TEMP='F:\SecureLLM.tmp'
-$env:TMP='F:\SecureLLM.tmp'
-F:\SecureLLM\.venv\Scripts\python.exe experiments\paper_2026\run_experiment.py `
+$env:TEMP='<LOCAL_PATH>'
+$env:TMP='<LOCAL_PATH>'
+<LOCAL_PATH> experiments\paper_2026\run_experiment.py `
   --target-model qwen3.5:2b --judge-model gemma3:4b `
   --output experiments\paper_2026\outputs\local_trace.json
-F:\SecureLLM\.venv\Scripts\python.exe experiments\paper_2026\analyze_results.py `
+<LOCAL_PATH> experiments\paper_2026\analyze_results.py `
   --input experiments\paper_2026\outputs\local_trace.json
 ```
 

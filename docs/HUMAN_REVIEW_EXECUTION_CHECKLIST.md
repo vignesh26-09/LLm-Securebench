@@ -16,10 +16,10 @@
 
 Reviewer A and B receive their separate blank forms and the three hashed rubrics, never the private join map or each other's labels. The adjudicator receives only disagreement cases after both submissions are locked. See `docs/REVIEWER_DISTRIBUTION_INSTRUCTIONS.md` and `docs/PHASE6_HUMAN_HANDOFF.md`. Do not fill forms with generated labels, infer agreement from empty forms, or convert partial/ambiguous/unavailable responses into failures.
 
-The next command **after authentic completed A and B forms are returned** is the disagreement handoff, run from `F:\SecureLLM` with a new output directory:
+The next command **after authentic completed A and B forms are returned** is the disagreement handoff, run from `<LOCAL_PATH>` with a new output directory:
 
 ```powershell
-$env:TEMP='F:\SecureLLM.tmp'; $env:TMP='F:\SecureLLM.tmp'
+$env:TEMP='<LOCAL_PATH>'; $env:TMP='<LOCAL_PATH>'
 & .\.venv\Scripts\python.exe scripts/prepare_phase6_adjudication.py --reviewer-a 'ABSOLUTE_PATH_TO_COMPLETED_A.csv' --reviewer-b 'ABSOLUTE_PATH_TO_COMPLETED_B.csv' --output-dir 'ABSOLUTE_NEW_RESTRICTED_HANDOFF_DIR'
 ```
 

@@ -2,7 +2,7 @@
 
 **Status:** Documentation-only Phase 8.5 reconciliation. PRI application code is not authorized here.
 
-This reviews `D:\PRI_FORMAL_SPEC.md` against actual SecureLLMBench contracts. PRI must preserve upstream meanings, applicability, uncertainty, and provenance; it must not retrofit new semantics into Layer 1/2, BSDA, RC, SAEA, or DRAA.
+This reviews `<LOCAL_PATH>` against actual SecureLLMBench contracts. PRI must preserve upstream meanings, applicability, uncertainty, and provenance; it must not retrofit new semantics into Layer 1/2, BSDA, RC, SAEA, or DRAA.
 
 ## 1. Authoritative PRI role
 

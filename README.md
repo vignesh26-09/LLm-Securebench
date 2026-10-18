@@ -159,3 +159,10 @@ Conceptual crosswalk to the pinned OWASP Top 10 for LLM Applications **2025** ed
 
 This crosswalk does not establish category coverage or exploits; benign controls are not threats.
 Source: [OWASP Gen AI Security Project, 2025 Top 10](https://genai.owasp.org/llm-top-10/).
+
+## Data and raw outputs
+
+Raw pilot/canary outputs and large external datasets are not included in this public snapshot.
+Fetch upstream datasets using the acquisition/import helpers in scripts/: scripts/build_10000_corpus.py, scripts/fetch_phase4_jbb_sources.py.
+Use the documented script options and source requirements; large source files stay local.
+Upstream dataset licences apply and must be checked by the user before fetching or redistribution.

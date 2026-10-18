@@ -1,7 +1,7 @@
 # SecureLLMBench Backend Research Audit
 
 Audit date: 2026-09-16
-Repository: `F:\SecureLLM`
+Repository: `<LOCAL_PATH>`
 Audited commit: `e8c8c8efc6075d1e664da26ee080b509956b8b46`
 Scope: backend code, scripts, tests, persistence, and stored experiment artifacts. This audit changed no implementation code. Existing untracked local-run artifacts and the modified ZIP were left untouched.
 

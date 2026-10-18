@@ -19,7 +19,7 @@ The adapter at `core/inference/ollama_provider.py::OllamaProvider.generate_conve
 
 ## Verification and unresolved gate items
 
-- `F:\SecureLLM\.venv\Scripts\python.exe scripts/feasibility_provider_audit.py` reproduced the two digests and template hashes above from read-only metadata.
-- `F:\SecureLLM\.venv\Scripts\python.exe -m pytest tests/test_feasibility_provider_audit.py tests/test_feasibility_provider_options.py tests/test_feasibility_context.py tests/test_inference.py -q`: **15 passed**.
+- `<LOCAL_PATH>` reproduced the two digests and template hashes above from read-only metadata.
+- `<LOCAL_PATH>`: **15 passed**.
 - No harmless live rendering probe was authorized or run. Even such a probe would not by itself establish effective retention or Gemma system-priority equivalence. The team must decide whether the observed provider evidence can support the planned trusted-secret threat model; until then C3 and context-valid effects are unavailable.
 - G2 also requires approved restricted storage, retry/failure rules, and arm/distance/token-control choices in `implementation_decisions.md`. They are not yet approved. This is an engineering gate stop, not a claim that the research hypothesis is false.

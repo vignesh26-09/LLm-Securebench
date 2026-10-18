@@ -1,6 +1,6 @@
 # Phase 3A evaluator diagnostics — persisted JailbreakBench comparison
 
-**Evidence:** `experiments/jailbreakbench-validation/results.json`, `calibration_artifact_v1.json`, and the SHA-256-pinned source `data/external/jailbreakbench_judge_comparison_b2b462fd.csv`. Reproduce without invoking a model using `F:\SecureLLM\.venv\Scripts\python.exe scripts\verify_persisted_judge_calibration.py` and `F:\SecureLLM\.venv\Scripts\python.exe scripts\diagnose_judge_errors.py --output NEW_REPORT.json --error-rows NEW_ROWS.csv`. Machine-readable outputs from this pass are `artifacts/phase3a/jbb_error_diagnostics_v2.json` and `jbb_error_rows_v2.csv`. The CSV contains identifiers and derived descriptors, never raw prompts or responses.
+**Evidence:** `experiments/jailbreakbench-validation/results.json`, `calibration_artifact_v1.json`, and the SHA-256-pinned source `data/external/jailbreakbench_judge_comparison_b2b462fd.csv`. Reproduce without invoking a model using `<LOCAL_PATH>` and `<LOCAL_PATH>`. Machine-readable outputs from this pass are `artifacts/phase3a/jbb_error_diagnostics_v2.json` and `jbb_error_rows_v2.csv`. The CSV contains identifiers and derived descriptors, never raw prompts or responses.
 
 ## Evaluator and label conventions
 

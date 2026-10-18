@@ -17,10 +17,10 @@ The source audit verifies 36 saved attack observations, 36 blinded rows, one-to-
 
 ## Commands after genuine human submissions arrive
 
-Run from `F:\SecureLLM`. The paths prompted below must point to **copies of genuinely completed forms**, not the blank originals. The repaired local virtual environment runs Python 3.12.14:
+Run from `<LOCAL_PATH>`. The paths prompted below must point to **copies of genuinely completed forms**, not the blank originals. The repaired local virtual environment runs Python 3.12.14:
 
 ```powershell
-$env:TEMP='F:\SecureLLM.tmp'; $env:TMP='F:\SecureLLM.tmp'
+$env:TEMP='<LOCAL_PATH>'; $env:TMP='<LOCAL_PATH>'
 & .\.venv\Scripts\python.exe scripts/prepare_phase5_annotation.py
 $reviewerA=Read-Host 'Absolute path to completed Reviewer A CSV'
 $reviewerB=Read-Host 'Absolute path to completed Reviewer B CSV'

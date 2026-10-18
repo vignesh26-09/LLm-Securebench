@@ -15,14 +15,14 @@ The builder checks both source hashes, selects by a deterministic SHA-256 rank o
 
 ## Reproduce and use
 
-Run from `F:\SecureLLM` with `TEMP` and `TMP` set to `F:\SecureLLM.tmp`:
+Run from `<LOCAL_PATH>` with `TEMP` and `TMP` set to `<LOCAL_PATH>`:
 
 ```powershell
-$env:TEMP = 'F:\SecureLLM.tmp'
-$env:TMP = 'F:\SecureLLM.tmp'
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\build_10000_corpus.py --download
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\import_repository_data.py --large
-& 'F:\SecureLLM\.venv\Scripts\python.exe' -m pytest tests\test_large_benchmark_corpus.py -q
+$env:TEMP = '<LOCAL_PATH>'
+$env:TMP = '<LOCAL_PATH>'
+& '<LOCAL_PATH>' scripts\build_10000_corpus.py --download
+& '<LOCAL_PATH>' scripts\import_repository_data.py --large
+& '<LOCAL_PATH>' -m pytest tests\test_large_benchmark_corpus.py -q
 ```
 
 The builder downloads only the two pinned files, verifies their hashes, and refuses to overwrite a differing versioned output. The importer saves only a dataset manifest in SQLite; prompt text remains in the local ignored JSONL until a chosen batch is run. The API advertises availability and limits at `GET /benchmark-datasets`.

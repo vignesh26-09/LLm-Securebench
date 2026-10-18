@@ -1,6 +1,6 @@
 # SecureLLMBench Phase 2 repository audit
 
-**Audit date:** 10 October 2026. **Baseline:** 167 Python tests passed, one upstream TestClient deprecation warning. The project interpreter is `F:\SecureLLM\.venv\Scripts\python.exe`; sandboxed launches failed, while the same interpreter passed the suite with approved execution. Coverage percentage has not been measured.
+**Audit date:** 10 October 2026. **Baseline:** 167 Python tests passed, one upstream TestClient deprecation warning. The project interpreter is `<LOCAL_PATH>`; sandboxed launches failed, while the same interpreter passed the suite with approved execution. Coverage percentage has not been measured.
 
 ## Verified implementation and data flow
 

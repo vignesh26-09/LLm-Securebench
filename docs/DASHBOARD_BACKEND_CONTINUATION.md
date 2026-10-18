@@ -77,7 +77,7 @@ The UI uses a light sidebar, restrained green accents, spacious cards, clearer t
 - Live HTTP: 12 API paths returned 200 directly and through Vite, including request IDs; 19 dashboard navigation paths returned HTML.
 - Source import: validated, hash recorded, lossless payload tested, second import confirmed idempotent.
 - Backend restarted at `http://127.0.0.1:8000` using the workspace virtual-environment launcher. Frontend restarted at `http://127.0.0.1:5173`, with strict port binding.
-- TEMP/TMP for command executions: `F:\SecureLLM.tmp`; Python tempfile creation and cleanup passed. Implementation files and service logs remain in the project workspace. Logs are under `.tmp/`.
+- TEMP/TMP for command executions: `<LOCAL_PATH>`; Python tempfile creation and cleanup passed. Implementation files and service logs remain in the project workspace. Logs are under `.tmp/`.
 - Existing dependency warnings: Starlette/httpx deprecation and React Router future flags. No test or build failure remains.
 - Visual screenshot QA was not completed: automatic approval review rejected the headless-browser launch command as “blocked by policy,” without further explanation. HTTP navigation checks and component tests passed; these do not constitute visual browser verification.
 

@@ -5,7 +5,7 @@ The supplied scale-up request cannot be executed as a scientific experiment from
 Run the preflight before any production execution:
 
 ```powershell
-F:\SecureLLM\.venv\Scripts\python.exe scripts\production_preflight.py `
+<LOCAL_PATH> scripts\production_preflight.py `
   --dataset path\to\approved_corpus.json `
   --model qwen3.5:2b --model gemma3:4b --minimum-cases 100
 ```

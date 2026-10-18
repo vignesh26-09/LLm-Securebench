@@ -66,7 +66,7 @@ The original design checklist was reconciled to unchecked work before this imple
 ## Local commands
 
 ```powershell
-cd F:\SecureLLM\frontend
+cd <LOCAL_PATH>
 npm install --cache .npm-cache
 npm run dev
 npm run typecheck
@@ -78,7 +78,7 @@ npm run build
 For the backend contract and whole repository:
 
 ```powershell
-cd F:\SecureLLM
+cd <LOCAL_PATH>
 & .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
 & .\.venv\Scripts\python.exe -m scripts.smoke_check
 & .\.venv\Scripts\python.exe -m scripts.api_smoke

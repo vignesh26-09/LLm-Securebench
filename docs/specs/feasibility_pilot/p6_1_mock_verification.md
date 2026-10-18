@@ -4,11 +4,11 @@
 
 ## Reproduction and evidence
 
-From `F:\SecureLLM` in PowerShell:
+From `<LOCAL_PATH>` in PowerShell:
 
 ```powershell
-$env:TEMP='F:\SecureLLM.tmp'; $env:TMP='F:\SecureLLM.tmp'
-& .\.venv\Scripts\python.exe scripts/feasibility_mock_smoke.py --output F:\SecureLLM.tmp\p61_mock_report.json
+$env:TEMP='<LOCAL_PATH>'; $env:TMP='<LOCAL_PATH>'
+& .\.venv\Scripts\python.exe scripts/feasibility_mock_smoke.py --output <LOCAL_PATH>
 & .\.venv\Scripts\python.exe -m pytest tests/test_feasibility_e2e.py tests/test_feasibility_distance.py tests/test_feasibility_context_distance.py tests/test_feasibility_context.py tests/test_feasibility_resume.py tests/test_feasibility_restricted_store.py -q
 & .\.venv\Scripts\python.exe -m pytest -q
 ```

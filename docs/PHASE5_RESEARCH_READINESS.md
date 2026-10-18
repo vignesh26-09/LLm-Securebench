@@ -19,15 +19,15 @@ Verification on 11 October 2026: **212 Python tests passed, 0 failed**, with one
 
 ## Reproduction without model calls
 
-From PowerShell in `F:\SecureLLM`, use the specified interpreter and set `$env:TEMP='F:\SecureLLM.tmp'; $env:TMP='F:\SecureLLM.tmp'` for the session. The following commands recheck sources, package, measurement eligibility, and regressions without creating judgments:
+From PowerShell in `<LOCAL_PATH>`, use the specified interpreter and set `$env:TEMP='<LOCAL_PATH>'; $env:TMP='<LOCAL_PATH>'` for the session. The following commands recheck sources, package, measurement eligibility, and regressions without creating judgments:
 
 ```powershell
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\prepare_phase5_annotation.py
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\report_phase5_measurement_eligibility.py --output experiments\phase5\measurement_eligibility_v1.json
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\report_phase5_source_pool.py --output experiments\phase5\production_source_pool_v1.json
-& 'F:\SecureLLM\.venv\Scripts\python.exe' -m pytest -q
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\api_smoke.py
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\verify_persisted_judge_calibration.py
+& '<LOCAL_PATH>' scripts\prepare_phase5_annotation.py
+& '<LOCAL_PATH>' scripts\report_phase5_measurement_eligibility.py --output experiments\phase5\measurement_eligibility_v1.json
+& '<LOCAL_PATH>' scripts\report_phase5_source_pool.py --output experiments\phase5\production_source_pool_v1.json
+& '<LOCAL_PATH>' -m pytest -q
+& '<LOCAL_PATH>' scripts\api_smoke.py
+& '<LOCAL_PATH>' scripts\verify_persisted_judge_calibration.py
 ```
 
 Once two real reviewers return completed forms and independent adjudication is finished, validate with `scripts\import_phase5_annotation.py --reviewer-a FORM_A --reviewer-b FORM_B --adjudications ADJUDICATIONS --label-version NEW_VERSION --database experiments\phase5\annotation_labels_v1.db`; add `--commit` only after the validation report is reviewed. The blank distributed templates deliberately fail import. Repeat imports and changed source hashes are rejected. Preserve the private join map and completed forms in restricted storage.

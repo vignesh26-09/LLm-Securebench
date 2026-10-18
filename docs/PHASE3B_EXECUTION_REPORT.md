@@ -8,17 +8,17 @@ The controlled CLI now verifies the actual source dataset SHA-256 and case conte
 
 Added `core/experiments/dataset_audit.py` for future source manifests: provenance/license/revision/checksum, case IDs and objectives, declared split/group isolation, exact duplicate rejection, and lexical near-duplicate review flags. It cannot prove semantic non-leakage or dataset scientific fitness. `scripts/report_phase3b_pilot.py` verifies saved file hashes, database record count/class, and evidence counts; it deliberately computes no scientific score.
 
-## Exact reproducibility commands (PowerShell from `F:\SecureLLM`)
+## Exact reproducibility commands (PowerShell from `<LOCAL_PATH>`)
 
 ```powershell
-$env:TEMP='F:\SecureLLM.tmp'; $env:TMP='F:\SecureLLM.tmp'
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\prepare_phase3b_pilot.py
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\run_controlled_experiment.py experiments\phase3b\pilot_specification_v1.json --dataset-source experiments\phase3b\pilot_dataset_v1.json --protocol-lock experiments\phase3b\pilot_protocol_lock_v1.json --max-calls 50 --output experiments\phase3b\pilot_run_v1 --database experiments\phase3b\pilot_v1.db --evidence-class engineering_pilot --dry-run
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\run_controlled_experiment.py experiments\phase3b\pilot_specification_v1.json --dataset-source experiments\phase3b\pilot_dataset_v1.json --protocol-lock experiments\phase3b\pilot_protocol_lock_v1.json --max-calls 50 --output experiments\phase3b\pilot_run_v1 --database experiments\phase3b\pilot_v1.db --evidence-class engineering_pilot
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\report_phase3b_pilot.py --run-dir experiments\phase3b\pilot_run_v1 --database experiments\phase3b\pilot_v1.db --output experiments\phase3b\pilot_run_v1\audit_summary.json
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\verify_persisted_judge_calibration.py
-& 'F:\SecureLLM\.venv\Scripts\python.exe' -m pytest -q
-& 'F:\SecureLLM\.venv\Scripts\python.exe' scripts\api_smoke.py
+$env:TEMP='<LOCAL_PATH>'; $env:TMP='<LOCAL_PATH>'
+& '<LOCAL_PATH>' scripts\prepare_phase3b_pilot.py
+& '<LOCAL_PATH>' scripts\run_controlled_experiment.py experiments\phase3b\pilot_specification_v1.json --dataset-source experiments\phase3b\pilot_dataset_v1.json --protocol-lock experiments\phase3b\pilot_protocol_lock_v1.json --max-calls 50 --output experiments\phase3b\pilot_run_v1 --database experiments\phase3b\pilot_v1.db --evidence-class engineering_pilot --dry-run
+& '<LOCAL_PATH>' scripts\run_controlled_experiment.py experiments\phase3b\pilot_specification_v1.json --dataset-source experiments\phase3b\pilot_dataset_v1.json --protocol-lock experiments\phase3b\pilot_protocol_lock_v1.json --max-calls 50 --output experiments\phase3b\pilot_run_v1 --database experiments\phase3b\pilot_v1.db --evidence-class engineering_pilot
+& '<LOCAL_PATH>' scripts\report_phase3b_pilot.py --run-dir experiments\phase3b\pilot_run_v1 --database experiments\phase3b\pilot_v1.db --output experiments\phase3b\pilot_run_v1\audit_summary.json
+& '<LOCAL_PATH>' scripts\verify_persisted_judge_calibration.py
+& '<LOCAL_PATH>' -m pytest -q
+& '<LOCAL_PATH>' scripts\api_smoke.py
 ```
 
 The actual pilot completed 50/50 local calls and persisted 50/50 observations, 25/model, with zero provider failures. The output manifest SHA-256 is `86b54a35ba2ecf6281dc62dc2769b510a92dce7547f6e17dd854bc839cb210da`. Re-running the same command resumes; it should not reissue the saved target calls. A new pilot design requires a new version/experiment ID and lock, rather than `--force` overwriting evidence. The observation timestamp span is about 18 seconds; this is not a complete runtime benchmark. The pilot's call cap and 90-second per-call timeout bound call count and individual requests, not every possible process-level failure mode.

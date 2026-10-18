@@ -32,10 +32,10 @@ The pinned-source audit still yields **66** candidate goals across ten categorie
 
 The full Python suite passed **215 tests, 1 dependency deprecation warning**. The real-package re-audit passed with 36 blank forms. Persisted judge calibration verification returned source N=300, usable N=295, coverage=98.333%, agreement=53.898%, κ=0.2112609601698581 and the matrix above, source SHA-256 `dacaf76a1057785f11b0fc6aa07b9a73cdab588319ddfc5e8cef2909e5b112a5`. API smoke passed health/ready (200), review creation (201), and eight read-resource checks; the smoke explicitly reported `scientific_claims_validated=False`. The blank-form import negative test passed. No frontend work was required for this backend-only scientific gate.
 
-The local `.venv\Scripts\python.exe` launcher was repaired in place on 2026-10-11 using the available Python 3.12.14 base; all 43 installed distribution versions were preserved. `py -3.12` still points to a missing system executable, so use the project venv explicitly. Repair evidence is in `docs/PYTHON_ENVIRONMENT_REPAIR.md`. For exact current-environment checks from `F:\SecureLLM`:
+The local `.venv\Scripts\python.exe` launcher was repaired in place on 2026-10-11 using the available Python 3.12.14 base; all 43 installed distribution versions were preserved. `py -3.12` still points to a missing system executable, so use the project venv explicitly. Repair evidence is in `docs/PYTHON_ENVIRONMENT_REPAIR.md`. For exact current-environment checks from `<LOCAL_PATH>`:
 
 ```powershell
-$env:TEMP='F:\SecureLLM.tmp'; $env:TMP='F:\SecureLLM.tmp'
+$env:TEMP='<LOCAL_PATH>'; $env:TMP='<LOCAL_PATH>'
 & .\.venv\Scripts\python.exe scripts/prepare_phase5_annotation.py
 & .\.venv\Scripts\python.exe scripts/verify_persisted_judge_calibration.py
 & .\.venv\Scripts\python.exe scripts/api_smoke.py

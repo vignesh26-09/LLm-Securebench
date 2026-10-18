@@ -76,8 +76,8 @@ claim, attack-success-rate study, or human-labelled safety study.
 
 ## Evidence entry points
 
-Use [PAPER_EVIDENCE_MANIFEST.md](/F:/SecureLLM/docs/PAPER_EVIDENCE_MANIFEST.md),
-[PAPER_FREEZE_REPORT.md](/F:/SecureLLM/docs/PAPER_FREEZE_REPORT.md), and the
-machine-readable files in [artifacts/paper_evidence](/F:/SecureLLM/artifacts/paper_evidence)
+Use [PAPER_EVIDENCE_MANIFEST.md](/<LOCAL_PATH>),
+[PAPER_FREEZE_REPORT.md](/<LOCAL_PATH>), and the
+machine-readable files in [artifacts/paper_evidence](/<LOCAL_PATH>)
 as the authoritative evidence bundle. The claim-by-claim writer guidance is
-in [PAPER_CLAIM_EVIDENCE_MATRIX.md](/F:/SecureLLM/docs/PAPER_CLAIM_EVIDENCE_MATRIX.md).
+in [PAPER_CLAIM_EVIDENCE_MATRIX.md](/<LOCAL_PATH>).

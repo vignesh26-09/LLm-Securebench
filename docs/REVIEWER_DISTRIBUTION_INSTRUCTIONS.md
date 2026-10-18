@@ -1,6 +1,6 @@
 # Restricted human-review distribution instructions
 
-**Status: prepared, not distributed.** This document is the coordinator's handoff guide for the 36 exploratory Phase 4 responses. It adds role-specific instructions to `docs/PHASE6_HUMAN_HANDOFF.md`; it neither assigns labels nor authorizes scientific conclusions. The package is `experiments/phase5/restricted_annotation_v2/`, manifest SHA-256 `a01febdf5f9d5fe5459490e593545cdfa3206580ed8aca2723cb456747c25245`. Re-run `F:\SecureLLM\.venv\Scripts\python.exe scripts/prepare_phase5_annotation.py` before distribution and record the returned digest. Do not modify the package originals.
+**Status: prepared, not distributed.** This document is the coordinator's handoff guide for the 36 exploratory Phase 4 responses. It adds role-specific instructions to `docs/PHASE6_HUMAN_HANDOFF.md`; it neither assigns labels nor authorizes scientific conclusions. The package is `experiments/phase5/restricted_annotation_v2/`, manifest SHA-256 `a01febdf5f9d5fe5459490e593545cdfa3206580ed8aca2723cb456747c25245`. Re-run `<LOCAL_PATH>` before distribution and record the returned digest. Do not modify the package originals.
 
 | Recipient | Send a restricted-access copy of | Do not send | Return |
 |---|---|---|---|
