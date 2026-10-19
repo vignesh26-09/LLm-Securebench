@@ -100,3 +100,56 @@ estimates of model safety. No cross-run mean or probability is manufactured.
   separate human/LLM evidence, pilot counts, old response-field preservation,
   all ten endpoints and frontend loading/error/empty states. No working shared
   component or non-metric page was changed.
+
+## New objective experiment (2026-10-19)
+
+Protocol: docs/OBJECTIVE_CALIBRATION_PROTOCOL.md, frozen before generation.
+Aggregate source: data/calibration/objective_summary.json; raw outputs remain
+gitignored under experiments/local-runs/calibration/20261019-150350.
+This task's allowlist is the exact list in the objective protocol; shared and
+non-metric behavior remains excluded. Existing calibration fields are preserved.
+
+180 assigned fictional QA pairs across three models, 360 QA generations and
+360 canary generations. There were 37 failed/incomplete canary generations;
+323 completed oracle-labeled cases include 124 positives over 9 mixed template
+groups. Thus the prespecified 30-positive/5-group engineering gate passed.
+
+The fixed answer extractor rejected 97 QA responses; none became correct or
+hallucination-free observations. Remaining outcomes were 72 correct and 191
+explicit abstentions, with zero observed hallucinated extracted answers.
+Complete-pair context proxy: Gemma unavailable (0/60), Qwen 0 [0,0] (44/60),
+Llama 0 [0,0] (39/60). These are NOT canonical adversarial MCHL estimates and
+abstention dominates the ungrounded arm. The Gemma absence is a negative result,
+not zero lift. Scientific calibration remains Not established for all models.
+
+Prompt-only synthetic oracle prediction, grouped OOF Average Precision:
+- Template holdout: logistic 0.5033 [0.3516,0.6622], majority 0.2650
+  [0.1554,0.4517]; paired difference CI [0.0945,0.3685].
+- Model holdout: logistic 0.4024 [0.2890,0.5375], majority 0.3163
+  [0.1863,0.4610]; paired difference CI [-0.0274,0.2296], so no clear improvement.
+Recall/precision and all intervals/fold thresholds are retained in the aggregate
+and panel. Ranking comparator uses training prevalence; majority decisions are
+training-only hard-class choices. Group-dependent prevalence scores can give an
+OOF baseline AP different from global prevalence. Constant-score ties are handled
+as a whole threshold, never by arbitrary label ordering. CI resampling retains
+whole template clusters but does not refit estimators or establish generalization.
+
+One Windows state-file rename failure was resolved using the existing bounded
+retry helper. All 310 already-saved case hashes and frozen prompt/QA/oracle
+scoring functions were verified unchanged before resume. The immutable run
+metadata was retained; a separate resume amendment records code hashes and the
+AP tie-handling correction made before analysis. No case was regenerated.
+
+Both pages now expose separate objective numeric evidence, with computation
+prerequisites marked individually. Canonical MCHL still needs independently
+checked factual labels and adversarial/matched-benign arms. ML results cover
+only the synthetic oracle-emission target and do not establish a general safety
+predictor. Independent study, replication and explicit claim review remain
+missing. Neither page becomes Established.
+
+Objective-work verification: full backend suite 410 passed / 0 failed / 0 skipped;
+full frontend suite 70 passed / 0 failed. Typecheck and lint passed. Final panel
+exclusion-count rendering was checked with affected frontend tests afterward.
+All ten authenticated metric endpoints, health, ready, frontend and four old-page
+API checks returned HTTP 200 after restarting only verified repo-owned listeners.
+Diff scope: nine allowlisted files; raw run excluded from the staged index.

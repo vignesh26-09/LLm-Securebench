@@ -28,6 +28,7 @@ SPEC = {
     "statistics": ("docs/STATISTICAL_VALIDATION_IMPLEMENTATION.md:14-35", "Frozen estimand, design, pairing/grouping, missingness and dependence-aware analysis plan"),
 }
 LABEL_SET = {"safe", "unsafe", "borderline"}
+OBJECTIVE_SUMMARY = "data/calibration/objective_summary.json"
 
 
 def criterion(text, met, measured, threshold, source):
@@ -214,4 +215,38 @@ def build_calibration(metric, rows, projections, review_count, root=None):
                    "artifact_availability": "available" if sources else "unavailable",
                    "evidence_scope": "Descriptive local artifacts only; no approved scientific claim scope",
                    "missing_evidence": result["missing_evidence"] + missing})
+    if metric in {"ml", "mchl"}:
+        objective = Artifacts(ROOT if root is None else root)
+        summary = objective.json(OBJECTIVE_SUMMARY)
+        required = {"schema_version", "scope", "source_run", "gate", "hallucination_proxy", "prediction", "limitations", "feature_names"}
+        valid = (isinstance(summary, dict) and required <= summary.keys() and summary.get("schema_version") == "objective-calibration-v1"
+                 and isinstance(summary.get("gate"), dict) and summary["gate"].get("met") is True
+                 and isinstance(summary.get("hallucination_proxy"), dict) and isinstance(summary.get("prediction"), dict))
+        if valid:
+            key = "hallucination_proxy" if metric == "mchl" else "prediction"
+            result["objective_evidence"] = {k: summary[k] for k in ("scope", "source_run", "gate", "limitations", "feature_names", key)}
+            result["objective_evidence"]["kind"] = key
+            result["objective_evidence"]["source_path"] = OBJECTIVE_SUMMARY
+            result["artifact_sha256"].update(objective.sources)
+            if metric == "mchl":
+                per_model = summary[key]
+                for model, values in per_model.items():
+                    count = values.get("complete_pairs")
+                    result["criteria"].append(criterion("Objective context proxy: at least two complete pairs for " + model,
+                        count >= 2 if isinstance(count, int) else None, count,
+                        "2 complete pairs for computational CI only; not canonical MCHL or scientific calibration", OBJECTIVE_SUMMARY))
+            else:
+                for text, name, threshold in (("Objective oracle-positive data gate", "positives", 30), ("Mixed-class template-group gate", "mixed_template_groups", 5)):
+                    value = summary["gate"].get(name)
+                    result["criteria"].append(criterion(text, value >= threshold if isinstance(value, int) else None, value, threshold, OBJECTIVE_SUMMARY))
+                executed = all(isinstance(summary["prediction"].get(k), dict) and isinstance(summary["prediction"][k].get("folds"), list) and len(summary["prediction"][k]["folds"]) >= 2
+                               and all(f.get("status") == "computed" for f in summary["prediction"][k]["folds"]) for k in ("template_id", "model"))
+                result["criteria"].append(criterion("Prompt-only features and disjoint held-out template/model folds executed",
+                    executed, {k: len(v["folds"]) if isinstance(v.get("folds"), list) else None for k, v in summary["prediction"].items()},
+                    "Frozen prompt whitelist and leave-one-template/model-out protocol; not broad scientific calibration", OBJECTIVE_SUMMARY))
+            result["missing_evidence"].append("Objective synthetic evidence does not satisfy the canonical metric's independent study, replication and claim-review gates.")
+            result["missing_evidence"].extend(c["text"] for c in result["criteria"][4:] if c["met"] is not True)
+        else:
+            result["objective_evidence"] = None
+            result["missing_evidence"].append("Unavailable: needs an eligible objective aggregate at " + OBJECTIVE_SUMMARY)
     return result

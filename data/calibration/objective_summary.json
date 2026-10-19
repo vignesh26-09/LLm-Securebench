@@ -1,0 +1,476 @@
+{
+  "schema_version": "objective-calibration-v1",
+  "source_run": "experiments/local-runs/calibration/20261019-150350",
+  "scope": "Synthetic fictional context-availability proxy and prompt-only oracle-emission prediction; not canonical MCHL or general harmfulness",
+  "scientific_calibration": "not_established",
+  "model_digests": {
+    "gemma3:4b": "a2af6cc3eb7fa8be8504abaf9b04e88f17a119ec3f04a3addf55f92841195f5a",
+    "qwen3.5:2b": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+    "llama3.2:3b": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72"
+  },
+  "seed": 42,
+  "prompt_sha256": "7c0b2b2b1e7cdb060d4899e4a245e3a693aaeef3768a30424e81fd8359a14ef5",
+  "protocol_sha256": "92f2be0622445f1af907fc0aecb88d165f0d4d042953afb7f6173bfb0c69e0ab",
+  "generation_counts": {
+    "qa": {
+      "completed": 360
+    },
+    "canary": {
+      "completed": 323,
+      "failed": 37
+    }
+  },
+  "gate": {
+    "completed": 323,
+    "failed": 37,
+    "positives": 124,
+    "mixed_template_groups": 9,
+    "met": true
+  },
+  "hallucination_proxy": {
+    "gemma3:4b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 0,
+      "incomplete_pairs": 60,
+      "lift": null,
+      "ci95": null,
+      "counts": {
+        "grounded": {
+          "correct": 0,
+          "abstain": 0,
+          "hallucinated": 0,
+          "failed": 60
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42
+    },
+    "qwen3.5:2b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 44,
+      "incomplete_pairs": 16,
+      "lift": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "counts": {
+        "grounded": {
+          "correct": 34,
+          "abstain": 10,
+          "hallucinated": 0,
+          "failed": 16
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42
+    },
+    "llama3.2:3b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 39,
+      "incomplete_pairs": 21,
+      "lift": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "counts": {
+        "grounded": {
+          "correct": 38,
+          "abstain": 1,
+          "hallucinated": 0,
+          "failed": 21
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42
+    }
+  },
+  "prediction": {
+    "template_id": {
+      "group_key": "template_id",
+      "logistic": {
+        "n": 323,
+        "positives": 124,
+        "pr_auc": 0.5032893827282656,
+        "recall": 0.7661290322580645,
+        "precision": 0.5163043478260869,
+        "accuracy": 0.6346749226006192,
+        "reason": "One-class PR-AUC or zero-denominator rates are unavailable"
+      },
+      "majority": {
+        "n": 323,
+        "positives": 124,
+        "pr_auc": 0.2649639628529592,
+        "recall": 0.0,
+        "precision": null,
+        "accuracy": 0.6160990712074303,
+        "reason": "One-class PR-AUC or zero-denominator rates are unavailable"
+      },
+      "bootstrap": {
+        "logistic": {
+          "pr_auc": {
+            "ci95": [
+              0.35160260744108635,
+              0.6622312565110032
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.44083870967741934,
+              1.0
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": [
+              0.3280930812256809,
+              0.6755401687454144
+            ],
+            "undefined_resamples": 0
+          },
+          "accuracy": {
+            "ci95": [
+              0.47382798573975043,
+              0.7910911419235184
+            ],
+            "undefined_resamples": 0
+          }
+        },
+        "majority": {
+          "pr_auc": {
+            "ci95": [
+              0.15543694987341986,
+              0.4516512568411174
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": null,
+            "undefined_resamples": 1000
+          },
+          "accuracy": {
+            "ci95": [
+              0.4478492521753078,
+              0.7785371468706103
+            ],
+            "undefined_resamples": 0
+          }
+        },
+        "difference": {
+          "pr_auc": {
+            "ci95": [
+              0.09446507160573595,
+              0.36852758012885445
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.44083870967741934,
+              1.0
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": null,
+            "undefined_resamples": 1000
+          },
+          "accuracy": {
+            "ci95": [
+              -0.20128072861199864,
+              0.20001519756838912
+            ],
+            "undefined_resamples": 0
+          }
+        }
+      },
+      "folds": [
+        {
+          "group": "t00",
+          "status": "computed",
+          "train_n": 296,
+          "test_n": 27,
+          "threshold_train_only": 0.2
+        },
+        {
+          "group": "t01",
+          "status": "computed",
+          "train_n": 304,
+          "test_n": 19,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t02",
+          "status": "computed",
+          "train_n": 303,
+          "test_n": 20,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t03",
+          "status": "computed",
+          "train_n": 298,
+          "test_n": 25,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t04",
+          "status": "computed",
+          "train_n": 296,
+          "test_n": 27,
+          "threshold_train_only": 0.4
+        },
+        {
+          "group": "t05",
+          "status": "computed",
+          "train_n": 293,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t06",
+          "status": "computed",
+          "train_n": 293,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t07",
+          "status": "computed",
+          "train_n": 293,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t08",
+          "status": "computed",
+          "train_n": 293,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t09",
+          "status": "computed",
+          "train_n": 298,
+          "test_n": 25,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t10",
+          "status": "computed",
+          "train_n": 293,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t11",
+          "status": "computed",
+          "train_n": 293,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        }
+      ],
+      "beats_majority_pr_auc": true,
+      "comparison": "Logistic exceeds majority baseline on observed PR-AUC; check paired CI",
+      "threshold_policy": "Training scores only; grid .1-.9, max F1; ties nearest .5 then lower",
+      "bootstrap_unit": "template cluster of fixed out-of-fold predictions",
+      "resamples": 1000,
+      "seed": 42
+    },
+    "model": {
+      "group_key": "model",
+      "logistic": {
+        "n": 323,
+        "positives": 124,
+        "pr_auc": 0.4024008725327039,
+        "recall": 0.6451612903225806,
+        "precision": 0.47058823529411764,
+        "accuracy": 0.5851393188854489,
+        "reason": "One-class PR-AUC or zero-denominator rates are unavailable"
+      },
+      "majority": {
+        "n": 323,
+        "positives": 124,
+        "pr_auc": 0.31629851431234635,
+        "recall": 0.11290322580645161,
+        "precision": 0.11666666666666667,
+        "accuracy": 0.33126934984520123,
+        "reason": "One-class PR-AUC or zero-denominator rates are unavailable"
+      },
+      "bootstrap": {
+        "logistic": {
+          "pr_auc": {
+            "ci95": [
+              0.28895060977938425,
+              0.5374711813341895
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.26666666666666666,
+              0.9035401002506266
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": [
+              0.2173411371237458,
+              0.6346474358974359
+            ],
+            "undefined_resamples": 0
+          },
+          "accuracy": {
+            "ci95": [
+              0.3536958851763829,
+              0.7655900705498766
+            ],
+            "undefined_resamples": 0
+          }
+        },
+        "majority": {
+          "pr_auc": {
+            "ci95": [
+              0.18632784234632468,
+              0.46099147801529555
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.0,
+              0.2516667594189994
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": [
+              0.0,
+              0.31666666666666665
+            ],
+            "undefined_resamples": 0
+          },
+          "accuracy": {
+            "ci95": [
+              0.18011964308616868,
+              0.46155523255813957
+            ],
+            "undefined_resamples": 0
+          }
+        },
+        "difference": {
+          "pr_auc": {
+            "ci95": [
+              -0.027441692766171366,
+              0.22962116346994235
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.23995238095238094,
+              0.7777777777777777
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": [
+              0.18666666666666668,
+              0.4995357142857143
+            ],
+            "undefined_resamples": 0
+          },
+          "accuracy": {
+            "ci95": [
+              0.10734559703725874,
+              0.39378279320987647
+            ],
+            "undefined_resamples": 0
+          }
+        }
+      },
+      "folds": [
+        {
+          "group": "gemma3:4b",
+          "status": "computed",
+          "train_n": 224,
+          "test_n": 99,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "llama3.2:3b",
+          "status": "computed",
+          "train_n": 203,
+          "test_n": 120,
+          "threshold_train_only": 0.5
+        },
+        {
+          "group": "qwen3.5:2b",
+          "status": "computed",
+          "train_n": 219,
+          "test_n": 104,
+          "threshold_train_only": 0.3
+        }
+      ],
+      "beats_majority_pr_auc": true,
+      "comparison": "Logistic exceeds majority baseline on observed PR-AUC; check paired CI",
+      "threshold_policy": "Training scores only; grid .1-.9, max F1; ties nearest .5 then lower",
+      "bootstrap_unit": "template cluster of fixed out-of-fold predictions",
+      "resamples": 1000,
+      "seed": 42
+    }
+  },
+  "limitations": [
+    "Objective synthetic protocol, not broad harm or factual calibration",
+    "Grounded versus ungrounded arms differ from adversarial versus matched benign MCHL",
+    "Abstention is explicit, not proof of factual competence",
+    "LLM judge and LLM/human annotators were not used",
+    "Oracle emission target includes existing fragment/encoding rules",
+    "Model holdouts share prompt instances; template holdouts are the unseen-template check",
+    "Thresholds use training scores; bootstrap of fixed predictions omits training uncertainty",
+    "Independent replication and explicit external claim review are still required"
+  ],
+  "analysis_sha256": "32262576cb6678f7b0961bddd8ae8abd7cc0565a88358f87b96aedefad952e8e",
+  "pr_auc_method": "Non-interpolated Average Precision evaluated at whole tied-score thresholds",
+  "resume_note": "310 saved cases preserved after one Windows checkpoint rename failure; prompt/QA/oracle scoring unchanged; AP tie handling corrected before analysis",
+  "feature_names": [
+    "template_id",
+    "sanitized_prompt_length",
+    "prompt_type",
+    "fixed_style_token_flags"
+  ],
+  "source_summary_sha256": "9afefb3b6371c34116f0db8032605830244a67ffd11eb445c885473d176e8cba"
+}
