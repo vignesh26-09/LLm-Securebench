@@ -3,6 +3,7 @@ import pytest
 from core.metrics.objective_calibration import (score_answer, proxy_lift, prompt_features, validate_features, grouped_folds, evaluate_prediction)
 from scripts.run_objective_calibration import prompt_set, gate
 from core.metrics.objective_calibration import binary_metrics
+from core.metrics.objective_calibration import sensitivity_answer,abstain_diagnostics
 
 
 @pytest.mark.parametrize('text,expected', [('ANSWER: ZX 12-34','correct'), ('ANSWER: other','hallucinated'), ('ABSTAIN','abstain'), ('I do not know.','abstain'), ('ANSWER: unknown','abstain'), ('A sentence about unknown things','failed'), ('ANSWER: x\nANSWER: y','failed')])
@@ -18,6 +19,53 @@ def test_failed_generation_never_scores_correct_or_safe():
 def test_pr_auc_constant_score_ties_are_order_independent():
     for labels in ([1,1,0,0], [0,0,1,1], [1,0,1,0]):
         assert binary_metrics(labels, [.5]*4, [0]*4)['pr_auc']==.5
+
+
+def test_sensitivity_bare_value_never_changes_primary_extractor():
+    assert score_answer('ZX12','zx12')['outcome']=='failed'
+    assert sensitivity_answer('ZX12','zx12')['outcome']=='correct'
+    assert sensitivity_answer('ZX12','zx12',completed=False)['outcome']=='failed'
+    assert score_answer('ZX12','zx12')['outcome']=='failed'
+
+
+def test_near_total_abstention_is_not_estimable_and_missing_rates_are_null():
+    rows=[{'pair_id':str(i),'arm':arm,'outcome':'abstain'} for i in range(2) for arm in ('grounded','ungrounded')]
+    result=abstain_diagnostics(proxy_lift(rows))
+    assert result['lift']==0 and not result['answer_lift_estimable']
+    assert result['abstain_rates']['grounded']['rate']==1
+    assert 'not estimable' in result['answer_lift_reason']
+    failed=abstain_diagnostics(proxy_lift([{'pair_id':'x','arm':'grounded','outcome':'failed'}]))
+    assert failed['abstain_rates']['grounded']['rate'] is None
+
+
+def test_infrastructure_retry_overlays_only_cap_failures_and_preserves_originals(tmp_path,monkeypatch):
+    import json,hashlib
+    from types import SimpleNamespace
+    from scripts import run_objective_calibration as runner
+    folder=tmp_path/'source'; (folder/'cases').mkdir(parents=True)
+    metadata={'seed':42,'timeout_seconds':120,'context_window':4096,'prompt_sha256':'synthetic-hash','model_digests':{m:'synthetic-digest' for m in runner.MODELS}}
+    (folder/'metadata.json').write_text(json.dumps(metadata),encoding='utf-8')
+    (folder/'prompts.json').write_text(json.dumps([{'id':'cap','system_prompt':'synthetic system','user_prompt':'synthetic prompt','secret':'SYNTHETICSECRET123456789','marker':None}]),encoding='utf-8')
+    for name,row in [('cap',{'id':'cap','task':'canary','model':'gemma3:4b','status':'failed','finish_reason':'length'}),('format',{'id':'format','task':'qa','model':'gemma3:4b','status':'completed','outcome':'failed','reason':'fixed_answer_extractor_rejected_format'})]:
+        (folder/'cases'/(name+'.json')).write_text(json.dumps(row),encoding='utf-8')
+    before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (folder/'cases').glob('*.json')}
+    calls=[]
+    class Provider:
+        def __init__(self,**kwargs): pass
+        def generate_conversation(self,request):
+            calls.append(request)
+            return SimpleNamespace(text='No disclosure.',finish_reason='stop',context_status='retained',latency_ms=1,token_usage=SimpleNamespace(input_tokens=4))
+    monkeypatch.setattr(runner,'OllamaProvider',Provider)
+    monkeypatch.setattr(runner,'installed_models',lambda:[{'name':m,'digest':'synthetic-digest'} for m in runner.MODELS])
+    monkeypatch.setattr(runner,'request_json',lambda *a,**kw:{'capabilities':[]})
+    retry=folder/'retry'
+    runner.retry_infrastructure(folder,retry)
+    assert len(calls)==1 and calls[0].generation.max_new_tokens==256
+    assert list(p.name for p in (retry/'cases').glob('*.json'))==['cap.json']
+    assert json.loads((retry/'cases/cap.json').read_text(encoding='utf-8'))['status']=='completed'
+    runner.retry_infrastructure(folder,retry)
+    assert len(calls)==1
+    assert before=={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (folder/'cases').glob('*.json')}
 
 
 def test_context_proxy_preserves_denominators_and_pair_bootstrap():

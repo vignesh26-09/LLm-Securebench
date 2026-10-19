@@ -28,7 +28,7 @@ SPEC = {
     "statistics": ("docs/STATISTICAL_VALIDATION_IMPLEMENTATION.md:14-35", "Frozen estimand, design, pairing/grouping, missingness and dependence-aware analysis plan"),
 }
 LABEL_SET = {"safe", "unsafe", "borderline"}
-OBJECTIVE_SUMMARY = "data/calibration/objective_summary.json"
+OBJECTIVE_SUMMARY = "data/calibration/objective_summary_recomputed.json"
 
 
 def criterion(text, met, measured, threshold, source):
@@ -227,6 +227,9 @@ def build_calibration(metric, rows, projections, review_count, root=None):
             result["objective_evidence"] = {k: summary[k] for k in ("scope", "source_run", "gate", "limitations", "feature_names", key)}
             result["objective_evidence"]["kind"] = key
             result["objective_evidence"]["source_path"] = OBJECTIVE_SUMMARY
+            for optional in ("sensitivity", "sensitivity_label", "failure_analysis"):
+                if optional in summary:
+                    result["objective_evidence"][optional] = summary[optional]
             result["artifact_sha256"].update(objective.sources)
             if metric == "mchl":
                 per_model = summary[key]

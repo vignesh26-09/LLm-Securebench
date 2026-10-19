@@ -2,10 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 
 type Criterion = { text: string; met: boolean | null; measured_value: unknown; threshold: string | number | null; source_path: string };
 type ObjectiveMetrics = { pr_auc: number | null; recall: number | null; precision: number | null; accuracy: number | null };
+type ProxyResult = { assigned_pairs: number; complete_pairs: number; lift: number | null; ci95: number[] | null; counts: Record<string, Record<string, number>>; abstain_rates?: Record<string, { rate: number | null; scorable: number; abstain: number; failed: number }>; answer_lift_estimable?: boolean; answer_lift_reason?: string | null };
 type Objective = {
   kind: "hallucination_proxy" | "prediction"; scope: string; source_run: string; source_path: string; limitations: string[];
   gate?: { completed: number; failed: number; positives: number; mixed_template_groups: number };
-  hallucination_proxy?: Record<string, { assigned_pairs: number; complete_pairs: number; lift: number | null; ci95: number[] | null; counts: Record<string, Record<string, number>> }>;
+  hallucination_proxy?: Record<string, ProxyResult>;
+  sensitivity?: Record<string, ProxyResult>; sensitivity_label?: string;
+  failure_analysis?: { before_generation_failed: number; after_generation_failed: number; primary_format_failed: number; sensitivity_format_failed: number; regenerated: number };
   prediction?: Record<string, { logistic: ObjectiveMetrics; majority: ObjectiveMetrics; comparison: string; folds: { threshold_train_only?: number }[]; bootstrap: Record<string, Record<string, { ci95: number[] | null; undefined_resamples: number }>> }>;
 };
 export type Calibration = {
@@ -58,12 +61,16 @@ function ObjectiveEvidence({ evidence }: { evidence: Objective }) {
     <h3>Objective synthetic experiment</h3><p>{evidence.scope}</p>
     <p>Source: <code>{evidence.source_path}</code>; raw local run: <code>{evidence.source_run}</code>. Scientific calibration remains Not established.</p>
     {evidence.gate && <p>Separate oracle-emission dataset: {evidence.gate.completed} completed, {evidence.gate.failed} failed/incomplete excluded, {evidence.gate.positives} objective positives, {evidence.gate.mixed_template_groups} mixed-class template groups. Prediction metrics apply only to completed outputs.</p>}
+    {evidence.failure_analysis && <p>Generation failures before/after infrastructure-only regeneration: {evidence.failure_analysis.before_generation_failed} / {evidence.failure_analysis.after_generation_failed}; {evidence.failure_analysis.regenerated} cases truly regenerated. Primary QA format failures remain {evidence.failure_analysis.primary_format_failed}; sensitivity-only format failures: {evidence.failure_analysis.sensitivity_format_failed}.</p>}
     {evidence.kind === "hallucination_proxy" && evidence.hallucination_proxy && <>
       <p>Ungrounded minus grounded hallucinated-answer rate over complete pairs. This is a context-availability proxy, not canonical adversarial MCHL. Abstention is not proof of factual competence; malformed and failed responses are excluded.</p>
       <div className="table-wrap"><table><caption>Objective context proxy by model</caption>
         <thead><tr><th>Model</th><th>Complete / assigned pairs</th><th>Lift</th><th>Bootstrap 95% CI</th></tr></thead>
         <tbody>{Object.entries(evidence.hallucination_proxy).map(([model, item]) => <tr key={model}><td>{model}</td><td>{item.complete_pairs} / {item.assigned_pairs}</td><td>{measured(item.lift, "ratio")}</td><td>{interval(item.ci95)}</td></tr>)}</tbody>
       </table></div>
+      <div className="table-wrap"><table><caption>Primary abstention rates among scorable responses</caption><thead><tr><th>Model</th><th>Condition</th><th>Abstain / scorable</th><th>Abstain rate</th></tr></thead><tbody>{Object.entries(evidence.hallucination_proxy).flatMap(([model, item]) => Object.entries(item.abstain_rates ?? {}).map(([arm, value]) => <tr key={`${model}:${arm}`}><td>{model}</td><td>{arm}</td><td>{value.abstain} / {value.scorable}</td><td>{measured(value.rate, "ratio")}</td></tr>))}</tbody></table></div>
+      {Object.entries(evidence.hallucination_proxy).filter(([, item]) => item.answer_lift_estimable === false).map(([model, item]) => <p key={model}>{model}: {item.answer_lift_reason}. The raw complete-pair contrast above is descriptive, not evidence of factual-answer competence.</p>)}
+      {evidence.sensitivity && <details><summary>Sensitivity, not primary</summary><p>{evidence.sensitivity_label}</p><div className="table-wrap"><table><caption>Separate lenient-extractor sensitivity; primary scores unchanged</caption><thead><tr><th>Model</th><th>Complete pairs</th><th>Descriptive contrast</th><th>95% CI</th><th>Format failures</th></tr></thead><tbody>{Object.entries(evidence.sensitivity).map(([model, item]) => <tr key={model}><td>{model}</td><td>{item.complete_pairs}</td><td>{measured(item.lift, "ratio")}</td><td>{interval(item.ci95)}</td><td>{Object.values(item.counts).reduce((n, v) => n + v.failed, 0)}</td></tr>)}</tbody></table></div><p>Near-total abstention also limits interpretation of the sensitivity contrast.</p></details>}
       <div className="table-wrap"><table><caption>Answer outcomes, including abstentions and failures</caption>
         <thead><tr><th>Model</th><th>Condition</th><th>Correct</th><th>Abstain</th><th>Hallucinated</th><th>Failed/unscored</th></tr></thead>
         <tbody>{Object.entries(evidence.hallucination_proxy).flatMap(([model, item]) => Object.entries(item.counts).map(([arm, counts]) => <tr key={`${model}:${arm}`}><td>{model}</td><td>{arm}</td>{["correct", "abstain", "hallucinated", "failed"].map(name => <td key={name}>{measured(counts[name])}</td>)}</tr>))}</tbody>

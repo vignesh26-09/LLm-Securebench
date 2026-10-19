@@ -216,16 +216,98 @@ def subprocess_hash():
     return subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True, encoding='utf-8').strip()
 
 
+def retry_infrastructure(folder, retry_dir):
+    """Overlay only genuine output-cap failures; never rewrite original cases."""
+    from scripts.run_verification_pilot import atomic_json
+    folder = folder.resolve()
+    if retry_dir is None:
+        raise ValueError('An explicit new retry directory is required')
+    retry_dir = retry_dir.resolve()
+    retry_dir.relative_to(folder)
+    if retry_dir == folder:
+        raise ValueError('Retry checkpoint must be a new child folder')
+    retry_dir.mkdir(exist_ok=True)
+    (retry_dir / 'cases').mkdir(exist_ok=True)
+    import msvcrt
+    with (retry_dir / 'worker.lock').open('a+b') as lock:
+        lock.seek(0); lock.write(b'0'); lock.flush(); lock.seek(0)
+        msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
+        original = json.loads((folder / 'metadata.json').read_text(encoding='utf-8'))
+        prompts = {c['id']: c for c in json.loads((folder / 'prompts.json').read_text(encoding='utf-8'))}
+        originals = {p.name: json.loads(p.read_text(encoding='utf-8')) for p in (folder / 'cases').glob('*.json')}
+        eligible = {name: row for name, row in originals.items() if row['status'] == 'failed' and row.get('finish_reason') == 'length'}
+        installed = {m['name']: m for m in installed_models()}
+        if not all(m in installed and installed[m]['digest'] == original['model_digests'][m] for m in MODELS):
+            raise RuntimeError('Installed model identities changed; retry is not eligible')
+        metadata = {'phase': 'infrastructure_output_cap_retry', 'seed': original['seed'], 'temperature': 0,
+                    'timeout_seconds': original['timeout_seconds'], 'max_new_tokens': 256, 'context_window': original['context_window'],
+                    'model_digests': original['model_digests'], 'original_prompt_sha256': original['prompt_sha256'],
+                    'original_metadata_sha256': sha(folder / 'metadata.json'), 'eligible_cases': sorted(eligible),
+                    'cause': 'done_reason=length at 64-token cap; no timeout or context evidence',
+                    'transport_policy': 'Existing OllamaProvider; max 2 retries with exponential backoff',
+                    'scoring': 'Original QA extractor and oracle unchanged; format-only failures excluded from retries'}
+        meta_path = retry_dir / 'metadata.json'
+        if meta_path.exists():
+            if json.loads(meta_path.read_text(encoding='utf-8')) != metadata:
+                raise RuntimeError('Retry frozen metadata mismatch')
+        else:
+            with meta_path.open('x', encoding='utf-8') as f: json.dump(metadata, f, indent=2)
+        provider = OllamaProvider(seed=original['seed'])
+        for model in MODELS:
+            names = [name for name, row in eligible.items() if row['model'] == model]
+            if not names: continue
+            info = request_json(Request(ENDPOINT + '/api/show', data=json.dumps({'model': model}).encode(), headers={'Content-Type': 'application/json'}), original['timeout_seconds'], opener=urlopen)
+            descriptor = ModelMetadata(model, 'ollama-local', original['model_digests'][model], original['context_window'], tuple(info.get('capabilities', [])))
+            for name in names:
+                target = retry_dir / 'cases' / name
+                if target.exists(): continue
+                old = eligible[name]; case = prompts[old['id']]
+                row = {key: old[key] for key in ('id', 'task', 'model', 'template_id', 'prompt_type', 'features') if key in old}
+                row['regenerated_from'] = name
+                try:
+                    request = ConversationRequest(descriptor, case['id'], (ConversationMessage('user', case['user_prompt'], 0, case['id']+'-user'),),
+                        GenerationConfig(temperature=0, max_new_tokens=256, timeout_seconds=original['timeout_seconds']), original['seed'], case['system_prompt'])
+                    response = provider.generate_conversation(request)
+                    complete = response.finish_reason != 'length' and str(response.context_status) == 'retained'
+                    row.update(status='completed' if complete else 'failed', output=response.text, latency_ms=response.latency_ms,
+                               finish_reason=response.finish_reason, context_status=str(response.context_status),
+                               prompt_tokens=response.token_usage.input_tokens if response.token_usage else None)
+                    if complete:
+                        result = check(response.text, secrets=[case['secret']] if case['secret'] else [], markers=[case['marker']] if case['marker'] else [])
+                        row.update(label=int(result['fired']), oracle_matched_types=result['matched'])
+                    else: row.update(label=None, error='output_cap_or_context_unavailable_after_regeneration')
+                except Exception as error:
+                    row.update(status='failed', label=None, error=type(error).__name__+': '+str(error))
+                atomic(target, row)
+                saved = [json.loads(p.read_text(encoding='utf-8')) for p in (retry_dir/'cases').glob('*.json')]
+                state = {'status': 'regenerating', 'saved': len(saved), 'target': len(eligible), 'failed': sum(r['status']=='failed' for r in saved)}
+                atomic_json(retry_dir/'state.json', state)
+                with (retry_dir/'progress.log').open('a', encoding='utf-8') as f: f.write(json.dumps(state)+'\n')
+        effective = dict(originals)
+        effective.update({p.name: json.loads(p.read_text(encoding='utf-8')) for p in (retry_dir/'cases').glob('*.json')})
+        gemma = [r for r in effective.values() if r['model']=='gemma3:4b']
+        failed = sum(r['status']=='failed' or r.get('outcome')=='failed' for r in gemma)
+        atomic_json(retry_dir/'state.json', {'status': 'stopped_failure_gate' if failed / len(gemma) > .4 else 'complete',
+                    'saved': len(eligible), 'target': len(eligible), 'gemma_failed_items': failed, 'gemma_total_items': len(gemma)})
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--run-dir', required=True, type=Path)
     parser.add_argument('--prepare', action='store_true')
     parser.add_argument('--analyze-only', action='store_true')
+    parser.add_argument('--retry-infrastructure', action='store_true')
+    parser.add_argument('--retry-dir', type=Path)
     args = parser.parse_args()
-    try: execute(args.run_dir, args.prepare, args.analyze_only)
+    try:
+        if args.retry_infrastructure:
+            retry_infrastructure(args.run_dir, args.retry_dir)
+        else:
+            execute(args.run_dir, args.prepare, args.analyze_only)
     except Exception as error:
-        if args.run_dir.exists():
-            state_path = args.run_dir / 'state.json'
+        failure_dir = args.retry_dir if args.retry_infrastructure and args.retry_dir else args.run_dir
+        if failure_dir.exists():
+            state_path = failure_dir / 'state.json'
             previous = json.loads(state_path.read_text(encoding='utf-8')) if state_path.exists() else {}
             atomic(state_path, {**previous, 'status': 'failed', 'error': type(error).__name__ + ': ' + str(error), 'phase_failures': previous.get('phase_failures', 0) + 1})
         raise

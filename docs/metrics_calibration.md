@@ -153,3 +153,53 @@ exclusion-count rendering was checked with affected frontend tests afterward.
 All ten authenticated metric endpoints, health, ready, frontend and four old-page
 API checks returned HTTP 200 after restarting only verified repo-owned listeners.
 Diff scope: nine allowlisted files; raw run excluded from the staged index.
+
+## Failure diagnosis and infrastructure-only regeneration
+
+Original case files, prompts and metadata remain byte-identical (720 case hashes
+checked). Gemma's 0/60 primary QA pairs were caused by 60 fixed-extractor format
+failures, not timeouts or context loss; 53 grounded outputs were bare expected
+values. Qwen had 16 QA format failures and Llama 21. These primary labels remain
+unchanged. No QA was regenerated. Original prompt-token counts were not recorded;
+grounded prompts had 324-333 characters, num_ctx=4096, and Gemma retained context
+in all 60 grounded responses. Characters are not reported as token counts.
+
+All 37 generation failures were explicit done_reason=length at the 64-token
+output cap (Gemma 21, Qwen 16). Observed maximum latency was 8.31 seconds versus
+the 120-second timeout; no evidence justified raising timeout or num_ctx.
+Only these 37 cases were truly regenerated at 256 output tokens, temperature 0,
+same seed/digests/prompts, using the existing provider's two transport retries.
+New immutable overlay records live under the original run's infrastructure_retry
+child directory; originals and format failures are never replaced or relabeled.
+30 recovered; 7 remain failed (Gemma 5, Qwen 2). Gemma total failed/unscored
+items are 65/240 (27.1%), below the 40% stop gate; QA alone remains 60/120.
+
+The current aggregate is data/calibration/objective_summary_recomputed.json.
+The earlier tracked aggregate is retained for comparison. All primary estimands,
+normalization, answer extraction, oracle rules and question-pair bootstrap are
+unchanged. A separate bare-single-value extractor is explicitly labeled
+"sensitivity, not primary": it leaves 9 format failures versus primary 97;
+complete pairs are Gemma 53, Qwen 60 and Llama 58 in sensitivity only.
+
+Primary complete pairs remain 0/44/39. Raw Qwen/Llama descriptive contrasts
+remain 0 [0,0]; Gemma is unavailable. Grounded abstention among scorable responses:
+Gemma unavailable (0 scorable), Qwen 10/44 (22.73%), Llama 1/39 (2.56%).
+Ungrounded abstention is 60/60 (100%) for each model. Factual-answer lift is not
+estimable under near-total abstention; the panel retains the raw contrast only
+as a descriptive quantity. The 95% abstention flag is an explicit display/
+estimability diagnostic, not a scientific-calibration or hypothesis-test threshold.
+
+ML now uses 353 completed oracle-labeled outputs (147 positives, 7 failures
+excluded). Template holdout logistic AP=0.4894 [0.3754,0.6407] versus majority
+0.3013 [0.1853,0.4770]; model holdout AP=0.3978 [0.2977,0.5285] versus majority
+0.3448 [0.2218,0.4799]. All fold thresholds and paired intervals are retained in
+the recomputed aggregate. Primary and sensitivity numbers are never pooled.
+Both metric statuses remain Not established, with their original scientific
+criteria and independent-study/replication/claim-review requirements intact.
+
+Failure-fix verification: backend full suite 413 passed / 0 failed / 0 skipped;
+frontend full suite 71 passed / 0 failed, plus typecheck/lint PASS. Authenticated
+smoke checks for all ten metric endpoints and health/ready/frontend returned 200.
+Eight files changed, all within the previous commit's file list plus the new
+aggregate path. Original 720 case hashes, metadata and prompts were unchanged;
+the raw run and retry overlay are gitignored and excluded from the index.

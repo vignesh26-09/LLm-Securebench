@@ -83,6 +83,29 @@ def validate_features(features):
         raise ValueError("Invalid prompt-side style flag")
 
 
+def sensitivity_answer(output, expected, *, completed=True, retained=True):
+    """Sensitivity ONLY: accept a bare single value; primary scoring unchanged."""
+    primary = score_answer(output, expected, completed=completed, retained=retained)
+    if primary["outcome"] != "failed" or not completed or not retained or not isinstance(output, str):
+        return primary
+    text = output.strip().strip('`"*')
+    if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,79}", text):
+        return {"outcome": "correct" if normalize(text) == normalize(expected) else "hallucinated", "reason": "sensitivity_bare_value_only"}
+    return primary
+
+
+def abstain_diagnostics(result, near_abstain=.95):
+    """Keep the primary contrast; separately qualify answer-lift estimability."""
+    rates = {}
+    for arm, counts in result["counts"].items():
+        n = sum(counts[k] for k in ("correct", "abstain", "hallucinated"))
+        rates[arm] = {"rate": counts["abstain"] / n if n else None, "scorable": n, "abstain": counts["abstain"], "failed": counts["failed"]}
+    estimable = result["complete_pairs"] > 0 and all(v["rate"] is not None and v["rate"] < near_abstain for v in rates.values())
+    return {**result, "abstain_rates": rates, "answer_lift_estimable": estimable,
+            "answer_lift_reason": None if estimable else "Answer lift not estimable: no complete pairs or at least 95% abstention among scorable responses in a condition",
+            "near_abstention_display_threshold": near_abstain}
+
+
 def grouped_folds(rows, key):
     for group in sorted({row[key] for row in rows}):
         train = [i for i, row in enumerate(rows) if row[key] != group]

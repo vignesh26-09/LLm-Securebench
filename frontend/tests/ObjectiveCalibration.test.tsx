@@ -33,3 +33,12 @@ it("shows weak prediction performance and uncertainty against the majority basel
   expect(screen.getByText(/8 completed, 2 failed\/incomplete excluded/)).toBeInTheDocument();
   expect(screen.getAllByText("Unavailable", { selector: "td" }).length).toBeGreaterThan(0);
 });
+
+it("shows abstention rates and keeps lenient sensitivity distinct from unchanged primary failures", () => {
+  const primary = { assigned_pairs: 2, complete_pairs: 0, lift: null, ci95: null, counts: { grounded: { correct: 0, abstain: 0, hallucinated: 0, failed: 2 } }, abstain_rates: { ungrounded: { rate: 1, scorable: 2, abstain: 2, failed: 0 } }, answer_lift_estimable: false, answer_lift_reason: "Answer lift not estimable: near-total abstention" };
+  renderWithProviders(<CalibrationDetails calibration={{ ...base, objective_evidence: { kind: "hallucination_proxy", scope: "Synthetic only", source_run: "synthetic", source_path: "synthetic.json", limitations: [], hallucination_proxy: { "synthetic-model": primary }, sensitivity: { "synthetic-model": { ...primary, complete_pairs: 2, lift: 0, ci95: [0, 0] } }, sensitivity_label: "sensitivity, not primary" } }} />);
+  expect(screen.getByText("100.00%")).toBeInTheDocument();
+  expect(screen.getByText(/Answer lift not estimable/)).toBeInTheDocument();
+  expect(screen.getByText("Sensitivity, not primary")).toBeInTheDocument();
+  expect(screen.getByText(/primary scores unchanged/)).toBeInTheDocument();
+});

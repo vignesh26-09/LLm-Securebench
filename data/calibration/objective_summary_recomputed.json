@@ -1,0 +1,680 @@
+{
+  "schema_version": "objective-calibration-v1",
+  "source_run": "experiments/local-runs/calibration/20261019-150350",
+  "scope": "Synthetic fictional context-availability proxy and prompt-only oracle-emission prediction; not canonical MCHL or general harmfulness",
+  "scientific_calibration": "not_established",
+  "model_digests": {
+    "gemma3:4b": "a2af6cc3eb7fa8be8504abaf9b04e88f17a119ec3f04a3addf55f92841195f5a",
+    "qwen3.5:2b": "324d162be6ca5629ae4517c8710434d0bd2d665bc94dbad46e9af8fbf8a2f0df",
+    "llama3.2:3b": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72"
+  },
+  "seed": 42,
+  "prompt_sha256": "7c0b2b2b1e7cdb060d4899e4a245e3a693aaeef3768a30424e81fd8359a14ef5",
+  "protocol_sha256": "92f2be0622445f1af907fc0aecb88d165f0d4d042953afb7f6173bfb0c69e0ab",
+  "limitations": [
+    "Objective synthetic protocol, not broad harm or factual calibration",
+    "Grounded versus ungrounded arms differ from adversarial versus matched benign MCHL",
+    "Abstention is explicit, not proof of factual competence",
+    "LLM judge and LLM/human annotators were not used",
+    "Oracle emission target includes existing fragment/encoding rules",
+    "Model holdouts share prompt instances; template holdouts are the unseen-template check",
+    "Thresholds use training scores; bootstrap of fixed predictions omits training uncertainty",
+    "Independent replication and explicit external claim review are still required",
+    "At least 95% abstention in a condition makes factual-answer lift not estimable; raw primary contrast remains descriptive",
+    "Sensitivity is separate; primary format failures remain failed; no QA generation was retried",
+    "Output-cap-only regeneration changes generation length for originally failed canary cases; original checkpoints retained"
+  ],
+  "pr_auc_method": "Non-interpolated Average Precision evaluated at whole tied-score thresholds",
+  "feature_names": [
+    "template_id",
+    "sanitized_prompt_length",
+    "prompt_type",
+    "fixed_style_token_flags"
+  ],
+  "source_retry": "experiments/local-runs/calibration/20261019-150350/infrastructure_retry_20261019-152458",
+  "source_path": "data/calibration/objective_summary_recomputed.json",
+  "analysis_sha256": "221ab9b32497d28c93a7073542f24f70492e3ef67f6b03dbe82914fc56bfe22c",
+  "hallucination_proxy": {
+    "gemma3:4b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 0,
+      "incomplete_pairs": 60,
+      "lift": null,
+      "ci95": null,
+      "counts": {
+        "grounded": {
+          "correct": 0,
+          "abstain": 0,
+          "hallucinated": 0,
+          "failed": 60
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42,
+      "abstain_rates": {
+        "grounded": {
+          "rate": null,
+          "scorable": 0,
+          "abstain": 0,
+          "failed": 60
+        },
+        "ungrounded": {
+          "rate": 1.0,
+          "scorable": 60,
+          "abstain": 60,
+          "failed": 0
+        }
+      },
+      "answer_lift_estimable": false,
+      "answer_lift_reason": "Answer lift not estimable: no complete pairs or at least 95% abstention among scorable responses in a condition",
+      "near_abstention_display_threshold": 0.95
+    },
+    "qwen3.5:2b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 44,
+      "incomplete_pairs": 16,
+      "lift": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "counts": {
+        "grounded": {
+          "correct": 34,
+          "abstain": 10,
+          "hallucinated": 0,
+          "failed": 16
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42,
+      "abstain_rates": {
+        "grounded": {
+          "rate": 0.22727272727272727,
+          "scorable": 44,
+          "abstain": 10,
+          "failed": 16
+        },
+        "ungrounded": {
+          "rate": 1.0,
+          "scorable": 60,
+          "abstain": 60,
+          "failed": 0
+        }
+      },
+      "answer_lift_estimable": false,
+      "answer_lift_reason": "Answer lift not estimable: no complete pairs or at least 95% abstention among scorable responses in a condition",
+      "near_abstention_display_threshold": 0.95
+    },
+    "llama3.2:3b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 39,
+      "incomplete_pairs": 21,
+      "lift": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "counts": {
+        "grounded": {
+          "correct": 38,
+          "abstain": 1,
+          "hallucinated": 0,
+          "failed": 21
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42,
+      "abstain_rates": {
+        "grounded": {
+          "rate": 0.02564102564102564,
+          "scorable": 39,
+          "abstain": 1,
+          "failed": 21
+        },
+        "ungrounded": {
+          "rate": 1.0,
+          "scorable": 60,
+          "abstain": 60,
+          "failed": 0
+        }
+      },
+      "answer_lift_estimable": false,
+      "answer_lift_reason": "Answer lift not estimable: no complete pairs or at least 95% abstention among scorable responses in a condition",
+      "near_abstention_display_threshold": 0.95
+    }
+  },
+  "sensitivity": {
+    "gemma3:4b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 53,
+      "incomplete_pairs": 7,
+      "lift": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "counts": {
+        "grounded": {
+          "correct": 53,
+          "abstain": 0,
+          "hallucinated": 0,
+          "failed": 7
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42,
+      "abstain_rates": {
+        "grounded": {
+          "rate": 0.0,
+          "scorable": 53,
+          "abstain": 0,
+          "failed": 7
+        },
+        "ungrounded": {
+          "rate": 1.0,
+          "scorable": 60,
+          "abstain": 60,
+          "failed": 0
+        }
+      },
+      "answer_lift_estimable": false,
+      "answer_lift_reason": "Answer lift not estimable: no complete pairs or at least 95% abstention among scorable responses in a condition",
+      "near_abstention_display_threshold": 0.95
+    },
+    "qwen3.5:2b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 60,
+      "incomplete_pairs": 0,
+      "lift": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "counts": {
+        "grounded": {
+          "correct": 50,
+          "abstain": 10,
+          "hallucinated": 0,
+          "failed": 0
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42,
+      "abstain_rates": {
+        "grounded": {
+          "rate": 0.16666666666666666,
+          "scorable": 60,
+          "abstain": 10,
+          "failed": 0
+        },
+        "ungrounded": {
+          "rate": 1.0,
+          "scorable": 60,
+          "abstain": 60,
+          "failed": 0
+        }
+      },
+      "answer_lift_estimable": false,
+      "answer_lift_reason": "Answer lift not estimable: no complete pairs or at least 95% abstention among scorable responses in a condition",
+      "near_abstention_display_threshold": 0.95
+    },
+    "llama3.2:3b": {
+      "assigned_pairs": 60,
+      "complete_pairs": 58,
+      "incomplete_pairs": 2,
+      "lift": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "counts": {
+        "grounded": {
+          "correct": 57,
+          "abstain": 1,
+          "hallucinated": 0,
+          "failed": 2
+        },
+        "ungrounded": {
+          "correct": 0,
+          "abstain": 60,
+          "hallucinated": 0,
+          "failed": 0
+        }
+      },
+      "scope": "Synthetic objective context-availability proxy; NOT canonical adversarial MCHL",
+      "bootstrap_unit": "whole question pair within model",
+      "resamples": 1000,
+      "seed": 42,
+      "abstain_rates": {
+        "grounded": {
+          "rate": 0.017241379310344827,
+          "scorable": 58,
+          "abstain": 1,
+          "failed": 2
+        },
+        "ungrounded": {
+          "rate": 1.0,
+          "scorable": 60,
+          "abstain": 60,
+          "failed": 0
+        }
+      },
+      "answer_lift_estimable": false,
+      "answer_lift_reason": "Answer lift not estimable: no complete pairs or at least 95% abstention among scorable responses in a condition",
+      "near_abstention_display_threshold": 0.95
+    }
+  },
+  "generation_counts": {
+    "qa": {
+      "completed": 360
+    },
+    "canary": {
+      "completed": 353,
+      "failed": 7
+    }
+  },
+  "gate": {
+    "completed": 353,
+    "failed": 7,
+    "positives": 147,
+    "mixed_template_groups": 10,
+    "met": true
+  },
+  "sensitivity_label": "sensitivity, not primary: bare single-value extractor; no primary label or checkpoint changed",
+  "prediction": {
+    "template_id": {
+      "group_key": "template_id",
+      "logistic": {
+        "n": 353,
+        "positives": 147,
+        "pr_auc": 0.48941316789681016,
+        "recall": 0.7210884353741497,
+        "precision": 0.5170731707317073,
+        "accuracy": 0.603399433427762,
+        "reason": "One-class PR-AUC or zero-denominator rates are unavailable"
+      },
+      "majority": {
+        "n": 353,
+        "positives": 147,
+        "pr_auc": 0.3012796494429286,
+        "recall": 0.0,
+        "precision": null,
+        "accuracy": 0.5835694050991501,
+        "reason": "One-class PR-AUC or zero-denominator rates are unavailable"
+      },
+      "bootstrap": {
+        "logistic": {
+          "pr_auc": {
+            "ci95": [
+              0.3753737796172154,
+              0.64066267281331
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.42220385674931127,
+              1.0
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": [
+              0.3457297551789077,
+              0.6724605911330049
+            ],
+            "undefined_resamples": 0
+          },
+          "accuracy": {
+            "ci95": [
+              0.45608439666513323,
+              0.742178446354664
+            ],
+            "undefined_resamples": 0
+          }
+        },
+        "majority": {
+          "pr_auc": {
+            "ci95": [
+              0.18526475532426798,
+              0.4769693089492166
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": null,
+            "undefined_resamples": 1000
+          },
+          "accuracy": {
+            "ci95": [
+              0.4329339729576553,
+              0.7400185185185185
+            ],
+            "undefined_resamples": 0
+          }
+        },
+        "difference": {
+          "pr_auc": {
+            "ci95": [
+              0.06670545692345178,
+              0.3118466729557241
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.42220385674931127,
+              1.0
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": null,
+            "undefined_resamples": 1000
+          },
+          "accuracy": {
+            "ci95": [
+              -0.1638761974944731,
+              0.2023745993316511
+            ],
+            "undefined_resamples": 0
+          }
+        }
+      },
+      "folds": [
+        {
+          "group": "t00",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t01",
+          "status": "computed",
+          "train_n": 328,
+          "test_n": 25,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t02",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.5
+        },
+        {
+          "group": "t03",
+          "status": "computed",
+          "train_n": 325,
+          "test_n": 28,
+          "threshold_train_only": 0.4
+        },
+        {
+          "group": "t04",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.4
+        },
+        {
+          "group": "t05",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t06",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.4
+        },
+        {
+          "group": "t07",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t08",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t09",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t10",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        },
+        {
+          "group": "t11",
+          "status": "computed",
+          "train_n": 323,
+          "test_n": 30,
+          "threshold_train_only": 0.3
+        }
+      ],
+      "beats_majority_pr_auc": true,
+      "comparison": "Logistic exceeds majority baseline on observed PR-AUC; check paired CI",
+      "threshold_policy": "Training scores only; grid .1-.9, max F1; ties nearest .5 then lower",
+      "bootstrap_unit": "template cluster of fixed out-of-fold predictions",
+      "resamples": 1000,
+      "seed": 42
+    },
+    "model": {
+      "group_key": "model",
+      "logistic": {
+        "n": 353,
+        "positives": 147,
+        "pr_auc": 0.3977945331671186,
+        "recall": 0.7891156462585034,
+        "precision": 0.4773662551440329,
+        "accuracy": 0.5524079320113314,
+        "reason": "One-class PR-AUC or zero-denominator rates are unavailable"
+      },
+      "majority": {
+        "n": 353,
+        "positives": 147,
+        "pr_auc": 0.34481788398618585,
+        "recall": 0.09523809523809523,
+        "precision": 0.11666666666666667,
+        "accuracy": 0.32294617563739375,
+        "reason": "One-class PR-AUC or zero-denominator rates are unavailable"
+      },
+      "bootstrap": {
+        "logistic": {
+          "pr_auc": {
+            "ci95": [
+              0.2976806179098624,
+              0.5284586269866584
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.5396202282565918,
+              0.9565276145710928
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": [
+              0.2959863636363636,
+              0.6157184472374966
+            ],
+            "undefined_resamples": 0
+          },
+          "accuracy": {
+            "ci95": [
+              0.3446152150484961,
+              0.7324178403755869
+            ],
+            "undefined_resamples": 0
+          }
+        },
+        "majority": {
+          "pr_auc": {
+            "ci95": [
+              0.22177064222761816,
+              0.47991978173756344
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.0,
+              0.219426523297491
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": [
+              0.0,
+              0.31666666666666665
+            ],
+            "undefined_resamples": 0
+          },
+          "accuracy": {
+            "ci95": [
+              0.19363393138180673,
+              0.45001760563380283
+            ],
+            "undefined_resamples": 0
+          }
+        },
+        "difference": {
+          "pr_auc": {
+            "ci95": [
+              -0.0442347146841975,
+              0.1979623415682868
+            ],
+            "undefined_resamples": 0
+          },
+          "recall": {
+            "ci95": [
+              0.4596233923676997,
+              0.8802605599611588
+            ],
+            "undefined_resamples": 0
+          },
+          "precision": {
+            "ci95": [
+              0.1952413761070168,
+              0.5073424796747967
+            ],
+            "undefined_resamples": 0
+          },
+          "accuracy": {
+            "ci95": [
+              0.04044518523384134,
+              0.40845070422535207
+            ],
+            "undefined_resamples": 0
+          }
+        }
+      },
+      "folds": [
+        {
+          "group": "gemma3:4b",
+          "status": "computed",
+          "train_n": 238,
+          "test_n": 115,
+          "threshold_train_only": 0.2
+        },
+        {
+          "group": "llama3.2:3b",
+          "status": "computed",
+          "train_n": 233,
+          "test_n": 120,
+          "threshold_train_only": 0.5
+        },
+        {
+          "group": "qwen3.5:2b",
+          "status": "computed",
+          "train_n": 235,
+          "test_n": 118,
+          "threshold_train_only": 0.3
+        }
+      ],
+      "beats_majority_pr_auc": true,
+      "comparison": "Logistic exceeds majority baseline on observed PR-AUC; check paired CI",
+      "threshold_policy": "Training scores only; grid .1-.9, max F1; ties nearest .5 then lower",
+      "bootstrap_unit": "template cluster of fixed out-of-fold predictions",
+      "resamples": 1000,
+      "seed": 42
+    }
+  },
+  "failure_analysis": {
+    "before_generation_failed": 37,
+    "after_generation_failed": 7,
+    "primary_format_failed": 97,
+    "sensitivity_format_failed": 9,
+    "regenerated": 37,
+    "timeout_seconds": 120,
+    "num_ctx": 4096,
+    "retry_output_tokens": 256,
+    "grounded_prompt_tokens": "unavailable: original run did not record prompt token usage",
+    "original_cases_unchanged": 720
+  }
+}
