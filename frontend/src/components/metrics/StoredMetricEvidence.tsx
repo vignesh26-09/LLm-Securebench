@@ -5,10 +5,11 @@ import { ChartContainer } from "../charts/ChartContainer";
 import { ErrorState, LoadingState } from "../common/AsyncState";
 import { ProvenanceBadge } from "../common/ProvenanceBadge";
 import { StatusBadge } from "../common/StatusBadge";
+import { CalibrationDetails, type Calibration } from "./CalibrationDetails";
 
 type Series = { name: string; unit: string; kind: "bar" | "line"; points: { label: string; value: number | null; reason: string | null }[] };
 type Evidence = { id: string; family: string; status: string; schema_version: string; scope: string; series: Series[]; unavailable: string[]; provenance: Record<string, unknown> };
-type EvidencePage = { metric: string; records: Evidence[]; total: number; limit: number; offset: number; evidence_needed: string };
+type EvidencePage = { metric: string; records: Evidence[]; total: number; limit: number; offset: number; evidence_needed: string; calibration?: Calibration };
 
 function MeasurementChart({ series }: { series: Series }) {
   const host = useRef<HTMLDivElement>(null);
@@ -48,7 +49,7 @@ export function StoredMetricEvidence({ metric }: { metric: string }) {
   });
   const record = query.data?.records.find(item => item.id === identity) ?? query.data?.records[0];
   function move(next: number) { setIdentity(""); setOffset(next); }
-  return <section className="research-note" aria-label="Stored metric measurements">
+  return <><CalibrationDetails calibration={query.data?.calibration} loading={query.isLoading} error={query.isError} /><section className="research-note" aria-label="Stored metric measurements">
     <h2>Stored metric measurements</h2>
     <p>Source-native values from one saved record at a time; no cross-run averaging, new estimator, or scientific calibration is inferred.</p>
     {query.isLoading && <LoadingState />}
@@ -68,5 +69,5 @@ export function StoredMetricEvidence({ metric }: { metric: string }) {
       </>}
       <nav className="pagination" aria-label="Stored metric evidence pagination"><button type="button" disabled={!offset} onClick={() => move(Math.max(0, offset - query.data!.limit))}>Previous evidence</button><span>{query.data.total ? offset + 1 : 0}–{Math.min(offset + query.data.limit, query.data.total)} of {query.data.total} records</span><button type="button" disabled={offset + query.data.limit >= query.data.total} onClick={() => move(offset + query.data!.limit)}>Next evidence</button></nav>
     </>}
-  </section>;
+  </section></>;
 }

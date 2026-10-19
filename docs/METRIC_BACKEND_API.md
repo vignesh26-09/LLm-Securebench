@@ -89,3 +89,20 @@ caller-supplied calibration objects and engineering tests do not meet the
 independent scientific criteria in the metric-specific specs. No scalar DRAA
 risk, scalar PRI, ranking, synthetic UI observations or new decision thresholds
 are introduced. The source-value table remains available alongside each chart.
+
+### Calibration criteria and local artifacts
+
+The stored evidence GET response additionally contains `calibration`: `status`,
+`scope`, `criteria` (text, nullable `met`, `measured_value`, `threshold`,
+`source_path`), `missing_evidence`, `measurements`, and local artifact SHA-256s.
+The same read-only route with `metric=reviews` returns the reviews checklist;
+the actual review records remain at `/scientific-reviews`. No reviews calculator
+or scientific approval is created. Existing response fields remain unchanged.
+Calibration summaries cover all stored source records, independently of page
+offset; numerical ranges are descriptive, not pooled model estimates.
+
+Local canary judge recall/FPR/precision are recomputed from cached verdict rows.
+Absent private artifacts produce unavailable reasons, never demo values.
+Every current page remains `not_established`: artifact/record counts do not
+authenticate independent study design, replication or claim-review decisions.
+See `docs/metrics_calibration.md` for criteria, exact scope and missing inputs.

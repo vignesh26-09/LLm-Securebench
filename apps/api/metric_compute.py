@@ -39,6 +39,8 @@ from core.recovery.models import RCCalibrationArtifact, RecoveryRunInput
 from core.saea.engine import SAEAEngine
 from core.saea.models import SAEAInput
 from core.statistics.descriptive import summarize as summarize_statistics
+from apps.api.metric_calibration import build_calibration
+from core.persistence.models import ScientificReviewEntity
 
 
 METRIC_FAMILIES = {
@@ -212,20 +214,27 @@ def compute_metric(metric: str, payload: dict[str, Any]) -> dict[str, Any]:
 def register_metric_compute(app, factory) -> None:
     @app.get("/metrics/compute/{metric}/evidence")
     def stored_evidence(metric: str, limit: int = 25, offset: int = 0):
-        if metric not in METRIC_FAMILIES:
+        if metric not in METRIC_FAMILIES and metric != "reviews":
             raise HTTPException(404, "Metric not found")
         if not 1 <= limit <= 100 or offset < 0:
             raise HTTPException(422, "invalid_pagination")
-        families = METRIC_FAMILIES[metric]
         with factory() as session:
+            review_count = session.scalar(select(func.count()).select_from(ScientificReviewEntity))
+            if metric == "reviews":
+                return {"metric": metric, "records": [], "total": review_count, "limit": limit, "offset": offset,
+                        "scientific_calibration": "not_established", "evidence_needed": "scoped independent scientific review decisions",
+                        "calibration": build_calibration(metric, [], [], review_count)}
+            families = METRIC_FAMILIES[metric]
             total = session.scalar(select(func.count()).select_from(ScientificRecordEntity).where(
                 ScientificRecordEntity.family.in_(families)))
             rows = session.scalars(select(ScientificRecordEntity).where(
                 ScientificRecordEntity.family.in_(families)).order_by(
                 ScientificRecordEntity.created_at.desc(), ScientificRecordEntity.id).limit(limit).offset(offset)).all()
             records = [stored_metric_evidence(metric, row) for row in rows]
+            all_rows = session.scalars(select(ScientificRecordEntity).where(ScientificRecordEntity.family.in_(families))).all()
+            calibration = build_calibration(metric, all_rows, [stored_metric_evidence(metric, row) for row in all_rows], review_count)
         return {"metric": metric, "records": records, "total": total, "limit": limit, "offset": offset,
-                "scientific_calibration": "not_established", "evidence_needed": EVIDENCE_NEEDED[metric]}
+                "scientific_calibration": "not_established", "evidence_needed": EVIDENCE_NEEDED[metric], "calibration": calibration}
 
     @app.get("/metrics/catalog")
     def metric_catalog():
