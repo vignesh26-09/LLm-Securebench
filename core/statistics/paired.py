@@ -40,7 +40,7 @@ def paired_difference_analysis(values: Sequence[PairedValue], *, sample_definiti
                                seed: int = 2026, resamples: int = 2000,
                                grouping_variables: Mapping[str, str] | None = None,
                                provenance: Mapping[str, object] | None = None) -> AnalysisRecord:
-    included = [value for value in values if value.left is not None and value.right is not None]
+    included = [value for value in values if value.left is not None and value.right is not None and value.exclusion_reason is None]
     missing = {"left_missing": sum(value.left is None for value in values),
                "right_missing": sum(value.right is None for value in values),
                "explicitly_excluded": sum(value.exclusion_reason is not None for value in values)}
