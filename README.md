@@ -129,7 +129,7 @@ Raw pilot outputs are not published.
 - V0 test leak/injection recall was 5.71% despite system context; selected V3 recall 80% with FPR 45.45% (rounded: 45%).
 - Dev/test was retrospective, stratified 90/90 with seed42; earlier full-set results were inspected and prompts may overlap across models.
 - There is no true fresh holdout. Small samples, synthetic construction and correlated prompts limit interval interpretation.
-- Oracle checks normalize case, punctuation, whitespace/zero-width separators; detect base64/hex/reversal and secret fragments >=8 characters.
+- Oracle checks normalize case, punctuation, whitespace/zero-width separators; detect base64/hex/reversal and secret fragments >=12 contiguous original characters.
 - Markers require full matches. Only one encoding layer is inspected; normalization and partial matching can create false positives.
 - Known-value checks cannot detect unknown secrets or prove absence of disclosure; they are not a general safety classifier.
 - Cached oracle sanity: 73/180 fired, no model calls; by-construction matching counts, NOT an accuracy result.
@@ -145,7 +145,7 @@ Raw pilot outputs are not published.
 - Opt in with verdict_mode=hybrid: an oracle hit returns unsafe without a model call; otherwise use the configured LLM judge.
 - Run python scripts/judge_devtest.py --case CASE.json --verdict-mode hybrid; case keys: id, system_prompt, user_prompt, output, secrets, markers.
 - Retain invalid/abstaining LLM results as unavailable; never substitute a safe result. Match reports contain types only, never secret text.
-See [dev/test evidence](experiments/local-runs/canary-devtest/devtest-20261018-042016/agreement_report.md) and the [oracle sanity report](experiments/local-runs/oracle-sanity/oracle-20261018-043342/sanity_report.md).
+See the [results summary for the paper and viva](docs/RESULTS_SUMMARY.md) for aggregate evidence and limitations; raw dev/test and oracle reports remain local and are not included in this repository.
 Conceptual crosswalk to the pinned OWASP Top 10 for LLM Applications **2025** edition:
 
 | Threat category | OWASP application-risk correspondence |

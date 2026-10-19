@@ -676,5 +676,140 @@
     "retry_output_tokens": 256,
     "grounded_prompt_tokens": "unavailable: original run did not record prompt token usage",
     "original_cases_unchanged": 720
+  },
+  "paired_ml_differences": {
+    "method": "recomputed from stored features/labels, not stored predictions",
+    "script": "scripts/summarize_paired_ml.py",
+    "score_file_sha256": "b29179c4eba676581c12f876826046c6174c4ebbd2182d6d3de247b2c6a7c94f",
+    "reproduction_checks": {
+      "template_id": {
+        "logistic": {
+          "stored_ap": 0.48941316789681016,
+          "reproduced_ap": 0.48941316789681016,
+          "difference": 0.0,
+          "tolerance": 0.005
+        },
+        "majority": {
+          "stored_ap": 0.3012796494429286,
+          "reproduced_ap": 0.3012796494429286,
+          "difference": 0.0,
+          "tolerance": 0.005
+        }
+      },
+      "model": {
+        "logistic": {
+          "stored_ap": 0.3977945331671186,
+          "reproduced_ap": 0.3977945331671186,
+          "difference": 0.0,
+          "tolerance": 0.005
+        },
+        "majority": {
+          "stored_ap": 0.34481788398618585,
+          "reproduced_ap": 0.34481788398618585,
+          "difference": 0.0,
+          "tolerance": 0.005
+        }
+      }
+    },
+    "settings": {
+      "seed": 42,
+      "resamples": 1000,
+      "max_iterations": 300,
+      "learning_rate": 0.1,
+      "l2_regularization": 0.01
+    },
+    "estimator": "deterministic L2 logistic regression; this is the sole stored model, so model-vs-majority and logistic-vs-majority are the same comparison",
+    "comparisons": {
+      "template_id": {
+        "logistic_ap": 0.48941316789681016,
+        "majority_ap": 0.3012796494429286,
+        "ap_difference": 0.18813351845388154,
+        "ci95": [
+          0.06670545692345178,
+          0.3118466729557241
+        ],
+        "includes_zero": false,
+        "undefined_resamples": 0,
+        "group_count": 12,
+        "bootstrap_unit": "template_id",
+        "resamples": 1000,
+        "seed": 42,
+        "limitation": "Fixed OOF predictions; not retraining uncertainty. Three model groups give particularly fragile intervals.",
+        "method": "recomputed from stored features/labels, not stored predictions",
+        "script": "scripts/summarize_paired_ml.py",
+        "legacy_stored_ci_reference": "prediction.template_id.bootstrap.difference.pr_auc",
+        "legacy_stored_ci_unit": "template cluster of fixed out-of-fold predictions"
+      },
+      "model": {
+        "logistic_ap": 0.3977945331671186,
+        "majority_ap": 0.34481788398618585,
+        "ap_difference": 0.052976649180932756,
+        "ci95": [
+          0.024036146624584476,
+          0.16657235425140537
+        ],
+        "includes_zero": false,
+        "undefined_resamples": 0,
+        "group_count": 3,
+        "bootstrap_unit": "model",
+        "resamples": 1000,
+        "seed": 42,
+        "limitation": "Fixed OOF predictions; not retraining uncertainty. Three model groups give particularly fragile intervals.",
+        "method": "recomputed from stored features/labels, not stored predictions",
+        "script": "scripts/summarize_paired_ml.py",
+        "legacy_stored_ci_reference": "prediction.model.bootstrap.difference.pr_auc",
+        "legacy_stored_ci_unit": "template cluster of fixed out-of-fold predictions"
+      }
+    },
+    "judge_reference_intervals": {
+      "V0": {
+        "n": 90,
+        "non_safe": 35,
+        "tp": 2,
+        "fp": 0,
+        "recall": 0.05714285714285714,
+        "recall_ci95": [
+          0.015813161857108654,
+          0.1860705742016492
+        ],
+        "fpr": 0.0,
+        "fpr_wilson_ci95": [
+          0,
+          0.06528490111708637
+        ],
+        "source": "experiments/local-runs/canary-devtest/devtest-20261018-042016/test_metrics.json"
+      },
+      "V3": {
+        "n": 90,
+        "non_safe": 35,
+        "tp": 28,
+        "fp": 25,
+        "recall": 0.8,
+        "recall_ci95": [
+          0.6410838693433439,
+          0.8995755352620137
+        ],
+        "fpr": 0.45454545454545453,
+        "fpr_wilson_ci95": [
+          0.33025280252016564,
+          0.5847730975813876
+        ],
+        "source": "experiments/local-runs/canary-devtest/devtest-20261018-042016/test_metrics.json"
+      }
+    },
+    "human_llm_reference_agreement_interval": {
+      "matches": 23,
+      "n": 30,
+      "wilson_ci95": [
+        0.5907167384187784,
+        0.8820761185551049
+      ],
+      "excluded_rows": 0,
+      "sources": [
+        "experiments/local-runs/controlled/verification-20261017-232316/labeling/human_kit/human_sheet.csv",
+        "experiments/local-runs/controlled/verification-20261017-232316/labeling/human_kit/human_key.csv"
+      ],
+      "scope": "Conditional selected single-labeler check, not population accuracy"
+    }
   }
 }
