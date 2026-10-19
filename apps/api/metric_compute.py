@@ -210,6 +210,23 @@ def compute_metric(metric: str, payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def register_metric_compute(app, factory) -> None:
+    @app.get("/metrics/compute/{metric}/evidence")
+    def stored_evidence(metric: str, limit: int = 25, offset: int = 0):
+        if metric not in METRIC_FAMILIES:
+            raise HTTPException(404, "Metric not found")
+        if not 1 <= limit <= 100 or offset < 0:
+            raise HTTPException(422, "invalid_pagination")
+        families = METRIC_FAMILIES[metric]
+        with factory() as session:
+            total = session.scalar(select(func.count()).select_from(ScientificRecordEntity).where(
+                ScientificRecordEntity.family.in_(families)))
+            rows = session.scalars(select(ScientificRecordEntity).where(
+                ScientificRecordEntity.family.in_(families)).order_by(
+                ScientificRecordEntity.created_at.desc(), ScientificRecordEntity.id).limit(limit).offset(offset)).all()
+            records = [stored_metric_evidence(metric, row) for row in rows]
+        return {"metric": metric, "records": records, "total": total, "limit": limit, "offset": offset,
+                "scientific_calibration": "not_established", "evidence_needed": EVIDENCE_NEEDED[metric]}
+
     @app.get("/metrics/catalog")
     def metric_catalog():
         with factory() as session:
@@ -272,3 +289,134 @@ def register_metric_compute(app, factory) -> None:
             raise HTTPException(409, "Immutable metric calculation already exists") from None
         return {**calculated, "record_id": record_id, "persisted": True,
                 "evidence_class": "engineering_only"}
+
+
+EVIDENCE_NEEDED = {
+    "bsda": "matched baseline/perturbed component measurements; component-specific external calibration for normalized interpretations",
+    "recovery": "baseline, attack and recovery states with valid context; compatible external calibration for RC indices",
+    "saea": "matched sequential and isolated-control observations with verified context and per-step applicability",
+    "draa": "typed Mode A/B evidence features; scalar risk has no approved estimator",
+    "pri": "profile cells and explicit category coverage; scalar PRI and ranking have no approved estimator",
+    "dqi": "dataset component measurements and semantic embeddings for novelty and the weighted total",
+    "ml": "independent target labels, admissible features and an explicit leakage-reviewed grouped split",
+    "statistics": "finite recorded observations with their units and design/provenance; inferential claims need a qualified analysis plan",
+    "mchl": "context-valid matched factual pairs with frozen references and independent human factual-label references",
+}
+
+
+def stored_metric_evidence(metric: str, row) -> dict[str, Any]:
+    """Read-only display projection of source results; no estimator or calibration upgrade."""
+    payload, provenance = row.payload, row.provenance
+    series, unavailable = [], []
+    failed = {None, "", "failed", "failed_evaluation", "undefined", "blocked", "not_evaluated", "skipped"}
+
+    def group(name, unit, values, *, kind="bar"):
+        points = []
+        for label, value, reason in values:
+            numeric = isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+            points.append({"label": label, "value": value if numeric else None,
+                           "reason": None if numeric else reason or "needs a finite source measurement"})
+        if points:
+            series.append({"name": name, "unit": unit, "kind": kind, "points": points})
+
+    status = row.status
+    if status in failed:
+        unavailable.append(f"Source status {status}: needs eligible completed evidence; this record is not a safe/pass result.")
+    elif metric == "bsda":
+        components = payload.get("components")
+        components = components if isinstance(components, dict) else {}
+        values = []
+        for name in ("semantic", "safety", "instruction", "structural"):
+            component = components.get(name)
+            component = component if isinstance(component, dict) else {}
+            value = None if component.get("unmeasurable") else component.get("raw_distance")
+            values.append((name, value, component.get("unmeasurable_reason") or f"needs measurable {name} paired observations"))
+        group("BSDA raw component distances", "distance", values)
+        unavailable.append("Composite BSDA unavailable by specification; normalized interpretations need external component calibration.")
+    elif metric == "recovery":
+        values = [("Initial attack", payload.get("delta_a"), "needs measured initial attack deviation")]
+        for item in payload.get("recovery_deltas") or []:
+            if isinstance(item, (list, tuple)) and len(item) == 2:
+                values.append((f"Recovery step {item[0]}", item[1], "needs a completed recovery-state measurement"))
+        group("Observed recovery trajectory", "distance", values, kind="line")
+        indices = ("rc_auc_raw", "terminal_recovery_raw", "rc_auc_bounded", "terminal_recovery_bounded")
+        group("Recovery indices", "recovery ratio", [(k.replace("_", " "), payload.get(k),
+              "needs a compatible external applicability calibration and eligible trajectory") for k in indices])
+        if any(payload.get(k) is None for k in indices):
+            unavailable.append("RC indices unavailable: needs compatible external applicability calibration and an eligible trajectory.")
+    elif metric == "saea":
+        values = []
+        for step in payload.get("per_step") or []:
+            if isinstance(step, dict):
+                value = step.get("context_effect") if step.get("status") in {"applicable", "computed"} else None
+                values.append((f"Step {step.get('position', 'unknown')}", value,
+                               step.get("reason") or "needs valid matched sequential and isolated controls"))
+        group("Sequential minus isolated context effect", "distance difference", values, kind="line")
+        unavailable.append("Scientific synergy/calibration unavailable: needs qualified matched-control studies; CV_obs is not attack success.")
+    elif metric == "draa":
+        features = payload.get("features")
+        if isinstance(features, list):
+            counts = {}
+            for feature in features:
+                key = str(feature.get("status", "status unavailable")) if isinstance(feature, dict) else "status unavailable"
+                counts[key] = counts.get(key, 0) + 1
+            group("Recorded feature status counts", "count", [(k, v, None) for k, v in sorted(counts.items())]
+                  if features else [("Recorded features", len(features), None)])
+        elif isinstance(payload.get("feature_count"), int):
+            group("Recorded feature count", "count", [("Recorded features", payload["feature_count"], None)])
+        unavailable.append("Scalar risk unavailable: the approved Mode A/B specification supplies evidence, not a risk estimator.")
+    elif metric == "pri":
+        coverage = payload.get("coverage")
+        coverage = coverage if isinstance(coverage, dict) else payload.get("population") or payload
+        values = []
+        for name in ("requested_categories", "observed_categories"):
+            value = coverage.get(name)
+            values.append((name.replace("_", " "), len(value) if isinstance(value, list) else value,
+                           "needs explicit declared category coverage"))
+        cells = payload.get("cells")
+        values.append(("Recorded profile cells", len(cells) if isinstance(cells, list) else None,
+                       "needs typed profile cells"))
+        group("Descriptive profile coverage", "count", values)
+        unavailable.append("Scalar PRI and ranking unavailable: no approved estimator or decision rule exists.")
+    elif metric == "dqi":
+        components = payload.get("components")
+        components = components if isinstance(components, dict) else {}
+        missing_embeddings = provenance.get("embeddings_supplied") is False or payload.get("reason") == "semantic_embeddings_unavailable"
+        group("Measured dataset components", "ratio", [(name.replace("_", " "),
+              None if name == "novelty" and missing_embeddings else components.get(name),
+              "needs semantic embeddings" if name == "novelty" else "needs a measured dataset component")
+              for name in ("duplicate_quality", "coverage", "entropy", "novelty", "difficulty", "balance")])
+        if missing_embeddings or payload.get("score") is None:
+            unavailable.append("Aggregate DQI unavailable: needs all weighted components, including measured semantic novelty.")
+    elif metric == "statistics":
+        values = payload.get("values")
+        values = values if isinstance(values, dict) else {}
+        unit = str(provenance.get("units") or "source units unavailable")
+        group("Recorded descriptive measurements", unit, [(name.replace("_", " "), values.get(name),
+              "needs finite recorded observations") for name in ("minimum", "q1", "median", "mean", "q3", "maximum")])
+        if values.get("sample_variance") is None:
+            unavailable.append("Sample variance unavailable: needs at least two valid observations.")
+        unavailable.append("Inferential conclusions unavailable without a design-checked analysis plan; these are descriptive summaries.")
+    elif metric == "mchl":
+        eligible = payload.get("complete_context_valid_pairs")
+        if isinstance(eligible, int) and not isinstance(eligible, bool) and eligible > 0:
+            group("Matched factual-error measurements", "rate / rate difference", [(name.replace("_", " "), payload.get(name),
+                  "needs complete context-valid pairs and independently verified factual labels")
+                  for name in ("adversarial_rate_complete", "benign_rate_complete", "complete_pair_lift")])
+    elif metric == "ml":
+        for model, metrics in (payload.get("metrics") or {}).items():
+            if isinstance(metrics, dict):
+                group(f"Held-out metrics: {model}", "source metric units", [(name,
+                      item.get("value") if isinstance(item, dict) else item, "needs eligible held-out outcome labels")
+                      for name, item in metrics.items()])
+    if not any(p["value"] is not None for s in series for p in s["points"]):
+        unavailable.append("Numeric evidence unavailable: needs " + EVIDENCE_NEEDED[metric] + ".")
+    source = _public({k: provenance[k] for k in ("protocol", "reporting_class", "data_origin",
+        "source_sha256", "input_sha256", "benchmark_run_id", "dataset_version_id", "units",
+        "synthetic_fixture") if k in provenance})
+    if not source:
+        unavailable.append("Source provenance unavailable: needs a recorded source artifact hash, protocol or input provenance.")
+    return {**_public({"id": row.id, "family": row.family, "status": status,
+                    "schema_version": row.schema_version, "scope": row.scope,
+                    "series": series, "unavailable": unavailable,
+                    "scientific_calibration": "not_established"}), "provenance": source}

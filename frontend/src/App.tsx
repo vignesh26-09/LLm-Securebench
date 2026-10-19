@@ -2,6 +2,7 @@ import { Link, Route, Routes, useLocation } from "react-router-dom";
 import { AppShell } from "./components/shell/AppShell";
 import { BSDAPage, DQIPage, DRAAPage, MatchedHallucinationPage, MLPredictionPage, PRIPage, RecoveryPage, SAEAPage, StatisticalPage } from "./pages/MetricPages";
 import { EntityPage } from "./pages/EntityPage";
+import { ScientificReviewsPage } from "./pages/ScientificReviewsPage";
 import { StudioDashboard } from "./pages/StudioDashboard";
 import { LandingPage } from "./pages/LandingPage";
 import { ScientificRecordsPage } from "./pages/ScientificRecordsPage";
@@ -37,7 +38,7 @@ export default function App() {
     <Route path="/comparison" element={<ComparisonPage />} />
     <Route path="/dataset-versions" element={<EntityPage title="Dataset versions" resource="dataset-versions" description="Immutable source snapshots, content hashes and original payloads." />} />
     <Route path="/layer2" element={<EntityPage title="Layer 2 evidence" resource="layer2-results" description="Source-native dimensions and statuses. Scores are not probabilities; nulls remain null." />} />
-    <Route path="/reviews" element={<EntityPage title="Scientific reviews" resource="scientific-reviews" description="Explicit review records. Statistical outputs never automatically validate claims." />} />
+    <Route path="/reviews" element={<ScientificReviewsPage />} />
     <Route path="/records" element={<ScientificRecordsPage title="Experiment details" intro="Raw persisted scientific records with schema, status, payload, and provenance." />} />
     <Route path="*" element={<section><h1>Page not found</h1><p>This address does not match a dashboard page.</p><Link to="/">Return to overview</Link></section>} />
   </Routes></AppShell>;

@@ -65,3 +65,27 @@ Controlled BSDA, recovery, and SAEA results will appear
 there only after eligible real trajectories and measurements are executed and
 persisted under their appropriate evidence class; this computation API does not
 substitute for that process.
+
+## Read-only stored metric evidence
+
+`GET /metrics/compute/{metric}/evidence?limit=25&offset=0` projects saved
+`scientific_records` into per-record measurements for the metric pages. It uses
+the existing `/metrics/compute` proxy and existing API authentication; it does
+not invoke models, recalculate a new estimator, write records or change run reports.
+Recovery recognizes both `rc` and `recovery` families. Pagination is bounded
+to 1–100 records and never averages unrelated runs.
+
+Each response contains the actual record total, required evidence, source
+identity/schema/status, allowlisted provenance, measured series with units,
+and explicit per-point null/reason pairs. Failed/blocked/undefined records
+do not become numeric pass results. Recovery raw deviations can be shown
+without treating missing calibrated RC indices as zero. SAEA context effects
+retain failed/control-missing gaps. DQI novelty/aggregate remain unavailable
+without embeddings; DRAA/PRI charts show descriptive counts/coverage only.
+ML/MCHL remain unavailable without eligible held-out labels/matched factual pairs.
+
+`scientific_calibration` stays `not_established`: stored numbers, source counts,
+caller-supplied calibration objects and engineering tests do not meet the
+independent scientific criteria in the metric-specific specs. No scalar DRAA
+risk, scalar PRI, ranking, synthetic UI observations or new decision thresholds
+are introduced. The source-value table remains available alongside each chart.
