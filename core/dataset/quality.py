@@ -53,14 +53,14 @@ def analyze_category_balance(dataset: Dataset) -> CategoryBalance:
     return CategoryBalance(dict(Counter(value for value in values if value is not None)), normalized_entropy(values))
 
 
-def estimate_novelty(embeddings: Sequence[Embedding | None]) -> float:
+def estimate_novelty(embeddings: Sequence[Embedding | None]) -> float | None:
     """Mean 1 - maximum cosine similarity; absent vectors are excluded.
 
     This is an exploratory local-diversity proxy, not a validated novelty measure.
     """
     vectors = [vector for vector in embeddings if vector is not None]
     if len(vectors) < 2:
-        return 1.0 if vectors else 0.0
+        return None
     scores = [(1.0 - max(cosine_similarity(vector, other) for index, other in enumerate(vectors) if index != current)) / 2.0 for current, vector in enumerate(vectors)]
     return sum(scores) / len(scores)
 
