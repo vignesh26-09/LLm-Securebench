@@ -151,10 +151,26 @@ def test_fast_check_uses_ten_rotating_cases_and_one_call_each(tmp_path):
 
 
 def test_fast_check_api_records_ten_call_budget(tmp_path):
+    from pathlib import Path
+    from core.dataset.benchmark_catalog import BenchmarkSelection
+    from core.dataset.models import Dataset, DatasetRecord, DatasetMetadata, DatasetVersion
     app = create_app(f"sqlite:///{tmp_path / 'quick-api.db'}", enable_local_runs=True)
     client = TestClient(app, client=("127.0.0.1", 50013))
     headers = {"X-SecureLLM-Local": "1"}
-    with patch("apps.api.local_execution.installed_models", return_value=INVENTORY), patch("apps.api.local_execution.threading.Thread") as thread:
+    dummy_records = tuple(DatasetRecord(f"id-{i}", "prompt", "benign_control_source" if i % 2 == 0 else "red_team_source_seed") for i in range(10000))
+    mock_sel = BenchmarkSelection(
+        key="mixed-source-10000-v1",
+        dataset=Dataset(dummy_records, DatasetMetadata("1.0", DatasetVersion("1.0", "digest"))),
+        source_path=Path("dummy.jsonl"),
+        source_sha256="fake-hash",
+        dataset_id="dataset-id",
+        version_id="version-id",
+        source_count=10000,
+        offset=0,
+        count=10000,
+        evidence_class="engineering_class",
+    )
+    with patch("apps.api.local_execution.installed_models", return_value=INVENTORY), patch("apps.api.local_execution.threading.Thread") as thread, patch("apps.api.local_execution.load_selection", return_value=mock_sel):
         response = client.post("/internal/benchmark-jobs", json={"model": "test-model", "case_count": 10}, headers=headers)
     assert response.status_code == 202, response.text
     assert response.json()["planned_target_calls"] == 10
@@ -240,3 +256,36 @@ def test_unknown_context_does_not_become_an_available_saea_score(tmp_path):
     assert result["saea"].trajectory.cumulative_vulnerability is None
     assert result["rc"].rc_auc_raw is None
     assert len(result["bsda"]) == 2
+
+
+def test_mini_controlled_pilot_api_records_three_hundred_call_budget(tmp_path):
+    from core.dataset.benchmark_catalog import BenchmarkSelection
+    from core.dataset.models import Dataset, DatasetRecord, DatasetMetadata, DatasetVersion
+    app = create_app(f"sqlite:///{tmp_path / 'mini-api.db'}", enable_local_runs=True)
+    client = TestClient(app, client=("127.0.0.1", 50014))
+    headers = {"X-SecureLLM-Local": "1"}
+    from pathlib import Path
+    dummy_records = tuple(DatasetRecord(f"id-{i}", "prompt", "benign_control_source" if i % 2 == 0 else "red_team_source_seed") for i in range(10000))
+    mock_sel = BenchmarkSelection(
+        key="mixed-source-10000-v1",
+        dataset=Dataset(dummy_records, DatasetMetadata("1.0", DatasetVersion("1.0", "digest"))),
+        source_path=Path("dummy.jsonl"),
+        source_sha256="fake-hash",
+        dataset_id="dataset-id",
+        version_id="version-id",
+        source_count=10000,
+        offset=0,
+        count=10000,
+        evidence_class="engineering_class",
+    )
+    with patch("apps.api.local_execution.installed_models", return_value=INVENTORY), patch("apps.api.local_execution.threading.Thread") as thread, patch("apps.api.local_execution.load_selection", return_value=mock_sel):
+        response = client.post("/internal/benchmark-jobs", json={"model": "test-model", "case_count": 10, "run_mode": "controlled"}, headers=headers)
+    assert response.status_code == 202, response.text
+    assert response.json()["total_cases"] == 10
+    assert response.json()["planned_target_calls"] == 100
+    assert response.json()["planned_judge_calls"] == 200
+    assert response.json()["sample_mode"] == "controlled_mini_10"
+    assert thread.call_args.kwargs["args"][1]["full_corpus"] is True
+    assert len(thread.call_args.kwargs["args"][1]["sample_indices"]) == 10
+    app.state.session_factory.kw["bind"].dispose()
+

@@ -37,6 +37,7 @@ class RunInput(BaseModel):
     context_window: int = Field(default=4096, ge=1024, le=65536)
     confirm_full_corpus: bool = False
     resume_run_id: str | None = Field(default=None, pattern=r'^[a-zA-Z0-9]{1,64}$')
+    run_mode: Literal['fast_check', 'controlled'] | None = None
 
     @model_validator(mode='after')
     def validate_provider_configuration(self):
@@ -193,7 +194,7 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
             job = jobs.get(job_id)
             if job is None:
                 raise HTTPException(404, 'Active benchmark job not found on this server')
-            if job['case_count'] == QUICK_CASES:
+            if job.get('sample_mode') == 'rotating_quick_10':
                 raise HTTPException(409, 'Quick checks finish after ten bounded calls and cannot be resumed.')
             if getattr(request.state, 'guest_stop', False) and (job['provider'] != 'ollama-local' or job['model'] not in
                     {item['ollama_model'] for item in SHOWCASE_MODELS}):
@@ -228,7 +229,7 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
             raise HTTPException(422, 'Choose a ten-prompt quick check, rotating 50-prompt pilot, or all 10,000 prompts.')
         if body.case_count == 10000 and not body.confirm_full_corpus:
             raise HTTPException(422, 'Confirm the full run budget: 100,000 target calls plus up to 200,000 local judge calls.')
-        quick = body.case_count == QUICK_CASES
+        quick = (body.case_count == QUICK_CASES and body.run_mode != 'controlled')
         judge_model = None if quick else body.judge_model or body.model
         if not quick:
             try:
@@ -263,7 +264,7 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
                         raise HTTPException(422, 'Resume requires the original case count, judge, provider and context settings.')
                     sample_indices = saved.payload.get('sample_indices')
                     sample_cycle = saved.payload.get('sample_cycle')
-                    if body.case_count == PILOT_CASES and (not isinstance(sample_indices, list) or len(sample_indices) != PILOT_CASES):
+                    if (not quick) and body.case_count in {QUICK_CASES, PILOT_CASES} and (not isinstance(sample_indices, list) or len(sample_indices) != body.case_count):
                         raise HTTPException(422, 'Saved pilot allocation is unavailable for resume.')
             elif body.case_count in {QUICK_CASES, PILOT_CASES}:
                 from sqlalchemy import select
@@ -272,11 +273,12 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
                     prior = [row.payload for row in session.scalars(select(ScientificRecordEntity).where(
                         ScientificRecordEntity.family == 'benchmark_sample_allocation'))
                         if row.payload.get('source_sha256') == selection.source_sha256]
-                    allocated = allocate_rotating(selection, prior, 5) if quick else allocate_pilot(selection, prior)
+                    allocated = allocate_rotating(selection, prior, 5) if (quick or body.case_count == QUICK_CASES) else allocate_pilot(selection, prior)
                     sample_indices = list(allocated.indices)
                     sample_cycle = allocated.cycle
+                    schema_ver = 'rotating-quick-10-v1' if quick else 'balanced-rotating-10-v1' if body.case_count == QUICK_CASES else 'balanced-rotating-50-v1'
                     session.add(ScientificRecordEntity(id=f'{job_id}:sample-allocation',
-                        family='benchmark_sample_allocation', schema_version='rotating-quick-10-v1' if quick else 'balanced-rotating-50-v1',
+                        family='benchmark_sample_allocation', schema_version=schema_ver,
                         scope='BENCHMARK_RUN', owner_id=job_id, status='assigned',
                         payload={'sample_indices': sample_indices, 'sample_cycle': sample_cycle,
                                  'selection_sha256': allocated.selection_sha256,
@@ -287,7 +289,7 @@ def register_execution(app, database_url, enabled=False, remote_enabled=False):
                             'dataset_key': selection.key, 'case_offset': selection.offset,
                             'case_count': body.case_count, 'source_count': selection.source_count,
                             'judge_model': judge_model, 'context_window': body.context_window, 'total_cases': body.case_count, 'completed_cases': 0,
-                            'sample_mode': 'rotating_quick_10' if quick else 'balanced_rotating_50' if body.case_count == PILOT_CASES else 'full_corpus',
+                            'sample_mode': 'rotating_quick_10' if quick else 'controlled_mini_10' if body.case_count == QUICK_CASES else 'balanced_rotating_50' if body.case_count == PILOT_CASES else 'full_corpus',
                             'planned_target_calls': body.case_count if quick else body.case_count * 10,
                             'planned_judge_calls': 0 if quick else body.case_count * 20,
                             'status': 'running',

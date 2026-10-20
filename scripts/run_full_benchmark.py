@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 
 from core.dataset.benchmark_catalog import LARGE_KEY, load_selection
 from core.dataset.models import Dataset
-from core.dataset.sample_rotation import PILOT_CASES
+from core.dataset.sample_rotation import PILOT_CASES, QUICK_CASES
 from core.dataset.quality import calculate_dqi
 from core.detection.aggregation import LayerOneAggregator
 from core.draa.evidence import EvidenceExtractor
@@ -90,14 +90,15 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
     if selection.count != CORPUS_CASES or len(selection.dataset.records) != CORPUS_CASES:
         raise ValueError("Full corpus execution requires every verified source record")
     if sample_indices is not None:
-        if (len(sample_indices) != PILOT_CASES or len(set(sample_indices)) != PILOT_CASES
+        if (len(sample_indices) not in {QUICK_CASES, PILOT_CASES} or len(set(sample_indices)) != len(sample_indices)
                 or any(type(index) is not int or index < 0 or index >= CORPUS_CASES for index in sample_indices)
                 or tuple(sample_indices) != tuple(sorted(sample_indices))
                 or type(sample_cycle) is not int or sample_cycle < 0):
-            raise ValueError("Invalid frozen 50-case pilot allocation")
+            raise ValueError("Invalid frozen pilot allocation")
+        case_target_count = len(sample_indices)
         selection = replace(selection,
             dataset=Dataset(records=tuple(selection.dataset.records[index] for index in sample_indices),
-                            metadata=selection.dataset.metadata), count=PILOT_CASES)
+                            metadata=selection.dataset.metadata), count=case_target_count)
     total_cases = selection.count
     run_id = run_id or uuid.uuid4().hex
     if not run_id.isalnum():
@@ -116,7 +117,7 @@ def run_full_model(model_name, *, database_url=None, run_id=None,
         "source_sha256": selection.source_sha256, "dataset_id": selection.dataset_id,
         "dataset_version_id": selection.version_id, "source_count": CORPUS_CASES,
         "case_count": total_cases, "case_offset": 0, "benchmark_run_id": run_id,
-        "sample_mode": "balanced_rotating_50" if sample_indices is not None else "full_corpus",
+        "sample_mode": "controlled_mini_10" if (sample_indices is not None and len(sample_indices) == QUICK_CASES) else "balanced_rotating_50" if sample_indices is not None else "full_corpus",
         "sample_selection_sha256": hashlib.sha256(json.dumps(sample_indices, separators=(",", ":")).encode()).hexdigest() if sample_indices is not None else None,
         "judge_model": judge_model, "judge_is_target_model": judge_model == model_name,
         "judge_validation": "not_established", "helpfulness": "instruction_following_proxy",

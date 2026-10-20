@@ -103,6 +103,7 @@ export interface BenchmarkJob {
   planned_judge_calls?: number;
   judge_model?: string;
   context_window?: number;
+  sample_mode?: string;
   last_case_id?: string | null;
   last_latency_ms?: number | null;
 }
@@ -126,6 +127,7 @@ export interface BenchmarkRunInput {
   resume_run_id?: string;
   endpoint?: string;
   api_key?: string;
+  run_mode?: "fast_check" | "controlled";
 }
 
 export interface BenchmarkDataset {
