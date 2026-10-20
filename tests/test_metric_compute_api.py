@@ -96,6 +96,14 @@ class MetricComputeAPITests(unittest.TestCase):
                   "technique_family": "test", "position": 1, "evaluation_case_id": "case",
                   "state": state("sequential", .7), "isolated_state": state("isolated", .2),
                   "isolated_baseline": [state("isolated-baseline", 0)]}
+        identity = {"evaluation_case_id": "case", "attack_id": "a", "attack_instance_id": "a1",
+                    "target_model": "model", "target_model_version": "v1", "provider": "mock",
+                    "generation_digest": "generation", "dataset_version": "v1",
+                    "behavior_representation_version": "behavior-v1", "layer1_version": "layer1-v1",
+                    "layer2_judge_version": "judge-v1", "measurement_version": "measurement-v1",
+                    "threat_model": "injection"}
+        attack.update(sequential_identity=identity, isolated_identity=dict(identity),
+                      contamination_status="isolation_verified")
         value = {"run_id": "run", "sequence_id": "seq", "model_id": "model",
                  "dataset_id": "dataset", "dataset_version": "v1",
                  "baseline_states": [state("baseline", 0)], "attacks": [attack],

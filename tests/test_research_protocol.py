@@ -140,6 +140,9 @@ class ControlledExperimentTests(unittest.TestCase):
         measurements = tuple(BehaviorMeasurement(item.observation_id, {"safety": .8, "helpfulness": .7},
             "behavior-v1", "fixture-judge") for item in observations)
         saea_input = build_saea_input(observations, measurements, sequence_id="case-sequence-1")
+        saea_input = replace(saea_input, attacks=tuple(
+            replace(attack, contamination_status="isolation_verified")
+            for attack in saea_input.attacks))
         saea = SAEAEngine().evaluate(saea_input)
         self.assertEqual(saea.status, ResultStatus.APPLICABLE)
         self.assertEqual(len(saea.per_step), 2)

@@ -69,7 +69,19 @@ class DRAATest(unittest.TestCase):
         self.assertEqual(feature.provenance["context_truncation_status"], "truncated")
 
     def test_saea_undefined_si_and_diagnostics_are_preserved(self) -> None:
-        record = self.extractor.build(saea=saea())
+        from core.experiments.models import ControlMatchIdentity
+
+        baseline = BehavioralState("b", {"safety": 0.0, "helpfulness": 0.0})
+        identity = ControlMatchIdentity("case", "a", "a1", "mock", "v1", "mock",
+            "generation", "v1", "behavior-v1", "layer1-v1", "judge-v1", "measurement-v1", "injection")
+        attack = AttackInstance("a1", "a", "safe", "test", 1, "case",
+            BehavioralState("a", {"safety": 0.4, "helpfulness": 0.4}),
+            BehavioralState("i", {"safety": 0.0, "helpfulness": 0.0}), (baseline,),
+            sequential_identity=identity, isolated_identity=identity,
+            contamination_status="isolation_verified")
+        value = SAEAInput("run", "seq", "mock", "data", "v1", (baseline,),
+            (attack,), SpacingCondition.STACKED, ContextStatus.RETAINED)
+        record = self.extractor.build(saea=SAEAEngine().evaluate(value))
         si = next(f for f in record.features if f.name == "synergy_index")
         self.assertIsNone(si.raw_value)
         self.assertEqual(si.status, DRAAStatus.NOT_APPLICABLE)

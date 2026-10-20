@@ -34,8 +34,19 @@ class SAEATest(unittest.TestCase):
         self.engine = SAEAEngine()
 
     def test_two_attack_bliss_and_per_step(self) -> None:
+        from dataclasses import replace
+        from core.experiments.models import ControlMatchIdentity
+
         first = attack("a-1", 1, state("a", 0.6, 0.0), state("ia", 0.2, 0.0))
         second = attack("b-1", 2, state("b", 0.0, 0.8), state("ib", 0.0, 0.4))
+        controls = []
+        for item in (first, second):
+            identity = ControlMatchIdentity("case", item.attack_id, item.attack_instance_id,
+                "mock", "v1", "mock", "generation", "v1", "behavior-v1",
+                "layer1-v1", "judge-v1", "measurement-v1", "injection")
+            controls.append(replace(item, sequential_identity=identity, isolated_identity=identity,
+                                    contamination_status="isolation_verified"))
+        first, second = controls
         result = self.engine.evaluate(input_for((first, second)))
         self.assertEqual(result.status, ResultStatus.APPLICABLE)
         self.assertAlmostEqual(result.trajectory.cumulative_vulnerability, (0.6 / 2**0.5 + 0.8 / 2**0.5) / 2)
@@ -57,7 +68,15 @@ class SAEATest(unittest.TestCase):
         self.assertEqual(result.synergy.status, ResultStatus.UNDEFINED)
 
     def test_zero_denominator_is_not_applicable(self) -> None:
+        from dataclasses import replace
+        from core.experiments.models import ControlMatchIdentity
+
         item = attack("a-1", 1, state("a", 0.6, 0.6), state("ia", 0.0, 0.0))
+        identity = ControlMatchIdentity("case", item.attack_id, item.attack_instance_id,
+            "mock", "v1", "mock", "generation", "v1", "behavior-v1",
+            "layer1-v1", "judge-v1", "measurement-v1", "injection")
+        item = replace(item, sequential_identity=identity, isolated_identity=identity,
+                       contamination_status="isolation_verified")
         result = self.engine.evaluate(input_for((item,)))
         self.assertIsNone(result.synergy.synergy_index)
         self.assertEqual(result.synergy.status, ResultStatus.NOT_APPLICABLE)

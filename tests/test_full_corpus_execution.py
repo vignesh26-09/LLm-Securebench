@@ -34,10 +34,16 @@ def fixture_judge(n):
 
 
 def test_full_pipeline_persists_paired_and_sequential_metrics_and_resumes(tmp_path):
+    class VerifiedIsolationProvider(MockInferenceProvider):
+        def generate_conversation(self, request):
+            response = super().generate_conversation(request)
+            return replace(response, metadata={**response.metadata,
+                "cache_bypass": True, "provider_state_scope": "request"})
+
     url = f"sqlite:///{tmp_path / 'run.db'}"
     app = create_app(url)
     selection = load_selection(LARGE_KEY, count=2)
-    provider = MockInferenceProvider()
+    provider = VerifiedIsolationProvider()
     progress = []
     arguments = dict(database_url=url, run_id="fullfixture", provider=provider,
         judge=fixture_judge(2), inventory=INVENTORY, output_directory=tmp_path / "observations",
