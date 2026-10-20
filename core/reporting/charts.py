@@ -98,8 +98,11 @@ def _bsda_distribution(session, output_dir, filters):
     for record in records:
         payload = record.payload
         components = payload.get("components", payload)
-        for name in ("D_sem", "D_safety", "D_instr", "D_struct"):
-            value = components.get(name, components.get(name.lower())) if isinstance(components, Mapping) else None
+        for name, native_name in (("D_sem", "semantic"), ("D_safety", "safety"),
+                                  ("D_instr", "instruction"), ("D_struct", "structural")):
+            value = components.get(name, components.get(name.lower(), components.get(native_name))) if isinstance(components, Mapping) else None
+            if isinstance(value, Mapping):
+                value = value.get("raw_distance")
             if isinstance(value, (int, float)):
                 rows.append({"record_id": record.id, "model": _identity(record, "model"), "component": name, "value": value})
             else:
@@ -115,7 +118,7 @@ def _bsda_distribution(session, output_dir, filters):
 
 
 def _recovery_distribution(session, output_dir, filters):
-    records = _real_records(session, "recovery", filters)
+    records = _real_records(session, "rc", filters) + _real_records(session, "recovery", filters)
     rows, excluded = [], {"not_applicable": 0, "uncalibrated": 0, "blocked": 0, "missing_rc_auc": 0}
     for record in records:
         status = str(record.status or record.payload.get("status", "unknown"))
