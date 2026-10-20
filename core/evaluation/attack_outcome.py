@@ -74,6 +74,8 @@ def import_human_outcomes(path: Path, *, evaluator_id: str, evaluator_version: s
     if path.suffix.lower() == ".csv":
         with path.open(encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))
+    elif path.suffix.lower() == ".jsonl":
+        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
     else:
         raw = json.loads(path.read_text(encoding="utf-8"))
         rows = raw if isinstance(raw, list) else raw.get("records", [])

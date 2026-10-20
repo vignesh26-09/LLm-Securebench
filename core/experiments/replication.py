@@ -95,6 +95,8 @@ def compare_replay(bundle: ReplicationBundle, replay_observations: Sequence[obje
             {"original_canary": original.get("canary_evidence"),
              "replay_canary": current.get("canary_evidence") if current else None}))
     status = "identical" if rows and all(row.response_status == "identical" and row.context_status == "identical"
+                                         and row.layer1_status in {"identical", "not_exported"}
+                                         and row.layer2_status in {"identical", "not_exported"}
                                          for row in rows) else "differences_observed"
     return ReplayReport(bundle.bundle_id, replay_id, utc_now(), tuple(rows), status)
 
