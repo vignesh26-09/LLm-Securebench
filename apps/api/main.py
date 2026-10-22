@@ -69,5 +69,16 @@ def create_app(database_url:str="sqlite:///./securellmbench.db", *, enable_local
    review=PersistenceService(session).create_review(ScientificReviewEntity(id=input.review_id,claim_id=input.claim_id,evidence_bundle_id=input.evidence_bundle_id,reviewer_protocol=input.reviewer_protocol,decision=input.decision,rationale=input.rationale,provenance=input.provenance))
    return {"review_id":review.id,"decision":review.decision,"claim_validated":False}
  return app
-app=create_app(enable_local_runs=os.environ.get('SECURELLM_ENABLE_LOCAL_RUNS')=='1',
-               enable_remote_runs=os.environ.get('SECURELLM_ENABLE_REMOTE_RUNS')=='1',require_auth=True)
+def _load_env_defaults():
+    env_file = Path(__file__).resolve().parents[2] / '.env'
+    if env_file.exists():
+        for line in env_file.read_text(encoding='utf-8').splitlines():
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+_load_env_defaults()
+app = create_app(enable_local_runs=os.environ.get('SECURELLM_ENABLE_LOCAL_RUNS', '1') == '1',
+                 enable_remote_runs=os.environ.get('SECURELLM_ENABLE_REMOTE_RUNS') == '1', require_auth=True)
+
