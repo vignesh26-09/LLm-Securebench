@@ -8,4 +8,4 @@ import "./studio.css";
 import { MotionConfig } from "framer-motion";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } });
-createRoot(document.getElementById("root")!).render(<StrictMode><MotionConfig reducedMotion="user"><QueryClientProvider client={queryClient}><BrowserRouter><App /></BrowserRouter></QueryClientProvider></MotionConfig></StrictMode>);
+createRoot(document.getElementById("root")!).render(<StrictMode><MotionConfig reducedMotion="user"><QueryClientProvider client={queryClient}><BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}><App /></BrowserRouter></QueryClientProvider></MotionConfig></StrictMode>);
