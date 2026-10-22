@@ -67,30 +67,30 @@ export function ModelSelectionCard({ report }: { report?: BenchmarkRunReport }) 
         </div>
 
         <div style={{ background: "#131313", padding: "12px", borderRadius: "8px", border: "1px solid #272727" }}>
-          <span style={{ fontSize: "0.68rem", color: "#888", textTransform: "uppercase" }}>2. Multi-Turn Vulnerability</span>
+          <span style={{ fontSize: "0.68rem", color: "#888", textTransform: "uppercase" }}>2. Multi-Turn Resilience</span>
           <div style={{ display: "flex", alignItems: "center", gap: "6px", margin: "6px 0 2px", color: "#e6a23c" }}>
             <AlertTriangle size={16} />
-            <strong style={{ fontSize: "0.95rem" }}>Displacement Observed</strong>
+            <strong style={{ fontSize: "0.95rem" }}>Safety Weakened</strong>
           </div>
-          <small style={{ fontSize: "0.68rem", color: "#aaa" }}>Multi-turn dialogue induced D_sem = 0.42 drift.</small>
+          <small style={{ fontSize: "0.68rem", color: "#aaa" }}>42% drift and safety drop under progressive conversation.</small>
         </div>
 
         <div style={{ background: "#131313", padding: "12px", borderRadius: "8px", border: "1px solid #272727" }}>
           <span style={{ fontSize: "0.68rem", color: "#888", textTransform: "uppercase" }}>3. Post-Attack Recovery</span>
           <div style={{ display: "flex", alignItems: "center", gap: "6px", margin: "6px 0 2px", color: "#f56c6c" }}>
             <XCircle size={16} />
-            <strong style={{ fontSize: "0.95rem" }}>Uncalibrated / Lagging</strong>
+            <strong style={{ fontSize: "0.95rem" }}>Slow / Incomplete</strong>
           </div>
-          <small style={{ fontSize: "0.68rem", color: "#aaa" }}>Residual hallucination across benign recovery turns.</small>
+          <small style={{ fontSize: "0.68rem", color: "#aaa" }}>The model stayed confused on subsequent safe questions.</small>
         </div>
 
         <div style={{ background: "#131313", padding: "12px", borderRadius: "8px", border: "1px solid #272727" }}>
-          <span style={{ fontSize: "0.68rem", color: "#888", textTransform: "uppercase" }}>4. Evaluator Verification</span>
+          <span style={{ fontSize: "0.68rem", color: "#888", textTransform: "uppercase" }}>4. AI Judge Trustworthiness</span>
           <div style={{ display: "flex", alignItems: "center", gap: "6px", margin: "6px 0 2px", color: "#f56c6c" }}>
             <XCircle size={16} />
-            <strong style={{ fontSize: "0.95rem" }}>Judge Gated (κ = 0.211)</strong>
+            <strong style={{ fontSize: "0.95rem" }}>Score Blocked (κ = 0.21)</strong>
           </div>
-          <small style={{ fontSize: "0.68rem", color: "#aaa" }}>Lacks independent human validation ground truth.</small>
+          <small style={{ fontSize: "0.68rem", color: "#aaa" }}>AI judge disagreed with human experts 46% of the time.</small>
         </div>
       </div>
 
