@@ -146,7 +146,7 @@ export interface BenchmarkRunReport {
   run: { id: string; status: string; model_name: string | null; model_config_id: string; created_at: string };
   execution: { total_cases: number; completed_cases: number; failed_cases: number; coverage: number; mean_latency_ms: number | null };
   detector_summary: { detector: string; max_score: number; observed_signal_count: number }[];
-  cases: { id: string; case_id: string | null; execution_status: string; latency_ms: number | null; finish_reason: string | null; response_available: boolean; observed_detector_signals: { detector: string; score: number; confidence: number | null }[] }[];
+  cases: { id: string; case_id: string | null; prompt?: string | null; response?: string | null; execution_status: string; latency_ms: number | null; finish_reason: string | null; response_available: boolean; observed_detector_signals: { detector: string; score: number; confidence: number | null }[] }[];
   model_score: { status: string; value: number | null; mean_threat_score: number | null; worst_case_threat_score: number | null; formula_version: string | null; formula: Record<string, string> | null; warnings: string[] };
   selection: { status: "evidence_review_required"; label: string; reason: string };
   interpretation: { observed_detector_signals: string; model_score: string };

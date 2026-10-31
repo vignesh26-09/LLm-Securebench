@@ -161,6 +161,8 @@ def register_resources(app, factory):
                 cases.append({
                     "id": evaluation.id,
                     "case_id": evaluation.case_id,
+                    "prompt": evaluation.prompt,
+                    "response": evaluation.response,
                     "execution_status": evaluation.execution_status,
                     "latency_ms": evaluation.latency_ms,
                     "finish_reason": evaluation.provider_metadata.get("finish_reason"),

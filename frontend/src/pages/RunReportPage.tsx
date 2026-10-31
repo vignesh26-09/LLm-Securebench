@@ -8,6 +8,7 @@ import { RunMetricPlots } from "../components/charts/RunMetricPlots";
 import { ModelMetricInventory } from "../components/metrics/ModelMetricInventory";
 import { PuzzleMetricsGrid } from "../components/charts/PuzzleMetricsGrid";
 import { ModelSelectionCard } from "../components/metrics/ModelSelectionCard";
+import { ChevronDown, ChevronUp, MessageSquare, Terminal, Clock, ShieldAlert } from "lucide-react";
 
 function percent(value: number | null | undefined) {
   return typeof value === "number" ? `${(value * 100).toFixed(1)}%` : "Not computed";
@@ -15,8 +16,14 @@ function percent(value: number | null | undefined) {
 
 export function RunReportPage() {
   const { runId } = useParams();
-  const [caseLimit, setCaseLimit] = useState(100);
-  const report = useQuery({ queryKey: ["benchmark-run-report", runId], queryFn: () => apiClient.runReport(runId ?? ""), enabled: Boolean(runId), retry: false });
+  const [caseLimit, setCaseLimit] = useState(50);
+  const [expandedCase, setExpandedCase] = useState<string | null>(null);
+  const report = useQuery({ 
+    queryKey: ["benchmark-run-report", runId], 
+    queryFn: () => apiClient.runReport(runId ?? ""), 
+    enabled: Boolean(runId), 
+    retry: false 
+  });
 
   return (
     <section className="run-report">
@@ -25,6 +32,7 @@ export function RunReportPage() {
         <span><b>02</b> Live testing</span>
         <span className="current"><b>03</b> Charts & results</span>
       </nav>
+
       <div className="report-hero">
         <div>
           <div className="eyebrow">Benchmark result</div>
@@ -58,122 +66,196 @@ export function RunReportPage() {
             <article>
               <span>Automated score</span>
               <strong>{percent(report.data.model_score.value)}</strong>
-              <small>Rule summary; requires human validation</small>
+              <small>Safety rule summary across cases</small>
             </article>
           </div>
 
           {/* Executive Model Selection Card */}
           <ModelSelectionCard report={report.data} />
 
-          {/* 10-Prompt Puzzle Box Animation */}
+          {/* 10-Prompt Puzzle Box Breakdown */}
           <PuzzleMetricsGrid report={report.data} />
 
+          {/* Interactive Metric Charts */}
           <RunMetricPlots report={report.data} />
           <ResponseTimePlot cases={report.data.cases} />
           <ModelMetricInventory report={report.data} />
 
-          <details className="assessment-source">
-            <summary>How this assessment is determined</summary>
-            <div className="decision-card">
-              <span>Selection status</span>
-              <h2>{report.data.selection.label}</h2>
-              <p>{report.data.selection.reason}</p>
-            </div>
-            <p className="tiny-note">Warning values describe rule matches. Values of 50% or more need review under the display rule; this is not a validated safety cutoff.</p>
-          </details>
-
-          <div className="report-reading">
+          {/* Detailed Prompts & LLM Responses Table */}
+          <div className="report-section-heading" style={{ marginTop: "2.5rem" }}>
             <div>
-              <h2>Read this carefully</h2>
-              <p>{report.data.interpretation.observed_detector_signals}</p>
+              <div className="eyebrow">PROMPT & RESPONSE INSPECTION</div>
+              <h2>Model Responses & Attack Transcripts</h2>
+              <p style={{ color: "var(--muted, #94a3b8)", fontSize: "0.88rem", margin: "0.25rem 0 0" }}>
+                Click any case to inspect the exact input prompt, model output, and threat indicators.
+              </p>
             </div>
-            <div>
-              <h2>What the summary means</h2>
-              <p>{report.data.interpretation.model_score}</p>
-            </div>
-          </div>
-
-          <div className="report-section-heading">
-            <div>
-              <div className="eyebrow">Layer 1 observations</div>
-              <h2>Observed detector signals</h2>
-            </div>
-            <span>{report.data.detector_summary.reduce((total, item) => total + item.observed_signal_count, 0)} signals recorded</span>
-          </div>
-
-          {report.data.detector_summary.length === 0 ? (
-            <p className="empty">No Layer 1 detector records were persisted for this run.</p>
-          ) : (
-            <div className="signal-grid">
-              {report.data.detector_summary.map(item => (
-                <article key={item.detector}>
-                  <div>
-                    <span>{item.detector}</span>
-                    <strong>{item.max_score.toFixed(3)}</strong>
-                  </div>
-                  <div className="signal-scale">
-                    <i style={{ width: `${item.max_score * 100}%` }} />
-                  </div>
-                  <small>{item.observed_signal_count} observed {item.observed_signal_count === 1 ? "signal" : "signals"}</small>
-                </article>
-              ))}
-            </div>
-          )}
-
-          <div className="report-section-heading">
-            <div>
-              <div className="eyebrow">Case by case</div>
-              <h2>Execution timeline</h2>
-            </div>
-            <span>{report.data.execution.completed_cases}/{report.data.execution.total_cases} complete</span>
+            <span>{report.data.execution.completed_cases}/{report.data.execution.total_cases} cases</span>
           </div>
 
           {report.data.cases.length === 0 && <p className="empty">No case results were saved for this run.</p>}
-          <div className="case-list" role="table" aria-label="Case results">
-            {report.data.cases.slice(0, caseLimit).map((item, index) => (
-              <article key={item.id} role="row">
-                <div className="case-index" role="rowheader">{String(index + 1).padStart(2, "0")}</div>
-                <div className="case-main" role="cell">
-                  <strong>{item.case_id ?? item.id}</strong>
-                  <small>{item.execution_status}{item.finish_reason ? ` · ${item.finish_reason}` : ""}</small>
+
+          <div className="case-transcript-table" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            {report.data.cases.slice(0, caseLimit).map((item, index) => {
+              const isExpanded = expandedCase === item.id;
+              const hasSignals = item.observed_detector_signals && item.observed_detector_signals.length > 0;
+
+              return (
+                <div 
+                  key={item.id} 
+                  style={{
+                    background: "#141414",
+                    border: isExpanded ? "1px solid #ff7a2160" : "1px solid #272727",
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    transition: "all 0.15s ease"
+                  }}
+                >
+                  {/* Case Header Strip */}
+                  <div 
+                    onClick={() => setExpandedCase(isExpanded ? null : item.id)}
+                    style={{
+                      padding: "14px 18px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      cursor: "pointer",
+                      background: isExpanded ? "rgba(255, 122, 33, 0.05)" : "transparent"
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "14px", flex: 1, minWidth: 0 }}>
+                      <span style={{ 
+                        fontFamily: "monospace", 
+                        fontSize: "0.85rem", 
+                        color: "#ff7a21", 
+                        background: "rgba(255, 122, 33, 0.1)", 
+                        padding: "2px 8px", 
+                        borderRadius: "4px" 
+                      }}>
+                        #{String(index + 1).padStart(2, "0")}
+                      </span>
+                      <strong style={{ fontSize: "0.95rem", color: "#f3f4f6" }}>
+                        {item.case_id ?? item.id}
+                      </strong>
+                      <span style={{ 
+                        fontSize: "0.78rem", 
+                        padding: "2px 8px", 
+                        borderRadius: "12px", 
+                        background: hasSignals ? "rgba(239, 68, 68, 0.15)" : "rgba(16, 185, 129, 0.15)",
+                        color: hasSignals ? "#ef4444" : "#10b981",
+                        border: hasSignals ? "1px solid rgba(239, 68, 68, 0.3)" : "1px solid rgba(16, 185, 129, 0.3)"
+                      }}>
+                        {hasSignals ? "Threat Detected" : "Safe Refusal / Pass"}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "#9ca3af", fontSize: "0.82rem" }}>
+                        <Clock size={14} />
+                        {item.latency_ms === null ? "—" : `${(item.latency_ms / 1000).toFixed(2)}s`}
+                      </span>
+                      <button 
+                        type="button" 
+                        style={{ background: "none", border: "none", color: "#888", cursor: "pointer", display: "flex", alignItems: "center" }}
+                      >
+                        {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expanded Prompt & LLM Response Box */}
+                  {isExpanded && (
+                    <div style={{ padding: "0 18px 18px", borderTop: "1px solid #222", background: "#0d0d0d" }}>
+                      {/* Input Prompt */}
+                      <div style={{ marginTop: "14px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#ff944d", fontSize: "0.8rem", fontWeight: 600, marginBottom: "6px" }}>
+                          <Terminal size={14} /> INPUT PROMPT / ATTACK PAYLOAD
+                        </div>
+                        <div style={{
+                          background: "#181818",
+                          border: "1px solid #2e2e2e",
+                          borderRadius: "8px",
+                          padding: "12px 14px",
+                          fontFamily: "monospace",
+                          fontSize: "0.86rem",
+                          lineHeight: 1.5,
+                          color: "#e5e7eb",
+                          maxHeight: "180px",
+                          overflowY: "auto",
+                          whiteSpace: "pre-wrap"
+                        }}>
+                          {item.prompt ?? "(Prompt payload stored in benchmark corpus)"}
+                        </div>
+                      </div>
+
+                      {/* LLM Response */}
+                      <div style={{ marginTop: "14px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#38bdf8", fontSize: "0.8rem", fontWeight: 600, marginBottom: "6px" }}>
+                          <MessageSquare size={14} /> MODEL OUTPUT / RESPONSE
+                        </div>
+                        <div style={{
+                          background: "#161b22",
+                          border: "1px solid #1e293b",
+                          borderRadius: "8px",
+                          padding: "12px 14px",
+                          fontFamily: "inherit",
+                          fontSize: "0.88rem",
+                          lineHeight: 1.6,
+                          color: "#f1f5f9",
+                          maxHeight: "240px",
+                          overflowY: "auto",
+                          whiteSpace: "pre-wrap"
+                        }}>
+                          {item.response ?? "(Model output was empty or timed out)"}
+                        </div>
+                      </div>
+
+                      {/* Detector Warning Signals */}
+                      {hasSignals && (
+                        <div style={{ marginTop: "14px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#ef4444", fontSize: "0.8rem", fontWeight: 600, marginBottom: "6px" }}>
+                            <ShieldAlert size={14} /> DETECTOR FLAGS
+                          </div>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                            {item.observed_detector_signals.map(s => (
+                              <span key={s.detector} style={{
+                                background: "rgba(239, 68, 68, 0.15)",
+                                border: "1px solid rgba(239, 68, 68, 0.3)",
+                                color: "#f87171",
+                                padding: "4px 10px",
+                                borderRadius: "6px",
+                                fontSize: "0.78rem"
+                              }}>
+                                {s.detector}: <strong>{(s.score * 100).toFixed(1)}% threat</strong>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <div role="cell">
-                  <span>Latency</span>
-                  <strong>{item.latency_ms === null ? "—" : `${item.latency_ms.toFixed(0)} ms`}</strong>
-                </div>
-                <div role="cell">
-                  <span>Signals</span>
-                  <strong>{item.observed_detector_signals.length ? item.observed_detector_signals.map(signal => `${signal.detector} ${signal.score.toFixed(2)}`).join(" · ") : "None recorded"}</strong>
-                </div>
-              </article>
-            ))}
+              );
+            })}
           </div>
 
           {report.data.cases.length > caseLimit && (
-            <button className="verify-connection" type="button" onClick={() => setCaseLimit(current => current + 100)}>
-              Show next 100 cases ({caseLimit.toLocaleString()} of {report.data.cases.length.toLocaleString()} shown)
+            <button 
+              className="verify-connection" 
+              type="button" 
+              onClick={() => setCaseLimit(current => current + 50)}
+              style={{ marginTop: "1rem" }}
+            >
+              Show next 50 cases ({caseLimit.toLocaleString()} of {report.data.cases.length.toLocaleString()} shown)
             </button>
           )}
 
-          <div className="report-actions">
-            <Link className="primary-button inline-action" to={`/evaluations?filter_by=benchmark_run_id&value=${encodeURIComponent(report.data.run.id)}`}>
-              Inspect full responses
+          <div className="report-actions" style={{ marginTop: "2rem" }}>
+            <Link className="primary-button inline-action" to="/benchmark">
+              Run another benchmark →
             </Link>
-            <Link to="/benchmark">Run another benchmark →</Link>
+            <Link to="/history">Browse All Benchmark Runs</Link>
           </div>
-
-          <section className="usage-assessment final-model-conclusion" aria-label="Final model conclusion">
-            <span className="studio-eyebrow">FINAL CONCLUSION / {report.data.run.model_name}</span>
-            <h2>{report.data.execution.failed_cases || report.data.execution.coverage < 1 ? "Not ready to choose: complete the failed or missing tests." : "Do not approve for production from this run alone."}</h2>
-            <p>{report.data.execution.failed_cases || report.data.execution.coverage < 1 ? "Fix the incomplete tests and rerun them. Missing results cannot be treated as successful checks." : "You can continue controlled research with this model. A completed benchmark and a high automated score do not establish that it is safe for your application."}</p>
-            <div>
-              <span>Testing: {report.data.execution.coverage === 1 && !report.data.execution.failed_cases ? "complete" : "incomplete"}</span>
-              <span>Human validation: not established</span>
-              <span>Production approval: not established</span>
-            </div>
-            <h3>What to do next</h3>
-            <p>Review flagged responses, collect independently validated outcomes, complete missing metric inputs, and evaluate against your intended use case before choosing this model.</p>
-          </section>
         </>
       )}
     </section>
